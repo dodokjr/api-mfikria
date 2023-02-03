@@ -4,8 +4,9 @@ const app = express();
 const port = 5000
 const cors = require('cors')
 
-const api = require('./routes/api');
+const api = require('./routes/github/api');
 const anime = require('./routes/anime/animeapi')
+const crypto = require('./routes/crypto/api')
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -18,8 +19,9 @@ app.use(function (req, res, next)
      next()
 });
 
-app.use('/api/anime', anime)
-app.use('/api', api);
+app.use('/api/', crypto);
+app.use('/api/', anime);
+app.use('/api/', api);
 app.get('/', function (req, res)
 {
      res.send(`server up ${port}`)
