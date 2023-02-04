@@ -4,8 +4,8 @@ const app = express();
 const port = 5000
 const cors = require('cors')
 
-const api = require('./routes/github/api');
-const anime = require('./routes/anime/animeapi')
+const github = require('./routes/github/api');
+const anime = require('./routes/anime/api')
 const crypto = require('./routes/crypto/api')
 
 app.use(bodyParser.json());
@@ -19,13 +19,14 @@ app.use(function (req, res, next)
      next()
 });
 
-app.use('/api/', crypto);
-app.use('/api/', anime);
-app.use('/api/', api);
-app.get('/', function (req, res)
+app.use('/v3/', crypto);
+app.use('/v2/', anime);
+app.use('/v1/', github);
+app.post('/', function (req, res)
 {
-     res.send(`server up ${port}`)
-})
+     res.json({ message: "Selamat datang di api mfikria " });
+     console.log(res);
+});
 
 
 app.listen(port, () =>

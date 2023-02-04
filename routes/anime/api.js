@@ -2,16 +2,36 @@ const express = require('express');
 const router = express.Router();
 const https = require('https');
 
-router.get('/:user', async function (req, res)
+let url = 'api.jikan.moe'
+
+router.get('/anime/', async function (req, res)
 {
-     const user = req.params.user;
      const options = {
-          hostname: 'api.github.com',
-          path: '/users/' + user,
+          hostname: `${url}`,
+          path: '/v4/anime',
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
-          OAuth: "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"
+     }
+     https.get(options, function (apiResponse)
+     {
+          apiResponse.pipe(res);
+     }).on('error', (e) =>
+     {
+          console.log(e);
+          res.status(500).send('Api Salah');
+     })
+});
+
+router.get('/:quer', async function (req, res)
+{
+     const quer = req.params.quer;
+     const options = {
+          hostname: `${url}`,
+          path: '/v4/anime?q=' + quer,
+          headers: {
+               'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
+          },
      }
      https.get(options, function (apiResponse)
      {
@@ -23,48 +43,23 @@ router.get('/:user', async function (req, res)
      })
 })
 
-router.get('/me/:reponame', async function (req, res)
+router.get('/anime/videos/:ida', async function (req, res)
 {
-     const user = req.params.user;
-     const reponame = req.params.reponame;
+     const ida = req.params.ida;
      const options = {
-          hostname: 'api.github.com',
-          path: '/users/repos' + user,
+          hostname: `${url}`,
+          path: '/v4/anime/' + ida + '/videos',
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
-          OAuth: "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"
      }
      https.get(options, function (apiResponse)
      {
           apiResponse.pipe(res);
      }).on('error', (e) =>
      {
-          console.log(ee);
-          res.status(500).send('Api salah')
-     })
-})
-
-router.get('/:user/repos', async function (req, res)
-{
-     const user = req.params.user;
-     const username = req.params.username;
-     const repos = req.params.repos;
-     const options = {
-          hostname: 'api.github.com',
-          path: '/users/' + user + '/repos',
-          headers: {
-               'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
-          },
-          OAuth: "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"
-     }
-     https.get(options, function (apiResponse)
-     {
-          apiResponse.pipe(res);
-     }).on('error', (e) =>
-     {
-          console.log(ee);
-          res.status(500).send('Api salah')
+          console.log(e);
+          res.status(500).send('Api Salah');
      })
 })
 

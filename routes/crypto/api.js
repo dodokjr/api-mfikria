@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const https = require('https');
 
-router.get('/crypto', async function (req, res)
+router.get('/', async function (req, res)
 {
      const options = {
           hostname: 'api.coingecko.com',

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const https = require('https');
 
-router.get('/:user', async function (req, res)
+router.get('/github/:user', async function (req, res)
 {
      const user = req.params.user;
      const options = {
@@ -23,7 +23,7 @@ router.get('/:user', async function (req, res)
      })
 })
 
-router.get('/me/:reponame', async function (req, res)
+router.get('/github/:user/:reponame', async function (req, res)
 {
      const user = req.params.user;
      const reponame = req.params.reponame;
@@ -33,7 +33,7 @@ router.get('/me/:reponame', async function (req, res)
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
-          OAuth: "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"
+          OAuth: "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"
      }
      https.get(options, function (apiResponse)
      {
@@ -45,18 +45,18 @@ router.get('/me/:reponame', async function (req, res)
      })
 })
 
-router.get('/:user/repos', async function (req, res)
+router.get('/github/:user/:username/repos', async function (req, res)
 {
      const user = req.params.user;
      const username = req.params.username;
      const repos = req.params.repos;
      const options = {
           hostname: 'api.github.com',
-          path: '/users/' + user + '/repos',
+          path: '/users/' + username + '/repos',
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
-          OAuth: "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"
+          OAuth: "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"
      }
      https.get(options, function (apiResponse)
      {
