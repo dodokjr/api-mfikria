@@ -4,7 +4,7 @@ const https = require('https');
 
 let url = 'api.jikan.moe'
 
-router.get('/anime/', async function (req, res)
+router.get('/', async function (req, res)
 {
      const options = {
           hostname: `${url}`,
