@@ -21,7 +21,7 @@ router.get('/', async function (req, res)
      })
 });
 
-router.get('/crypto/:coins', async function (req, res)
+router.get('/:coins', async function (req, res)
 {
      const coins = req.params.coins;
      const options = {

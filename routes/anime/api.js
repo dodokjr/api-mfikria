@@ -43,7 +43,7 @@ router.get('/:quer', async function (req, res)
      })
 })
 
-router.get('/anime/videos/:ida', async function (req, res)
+router.get('/videos/:ida', async function (req, res)
 {
      const ida = req.params.ida;
      const options = {

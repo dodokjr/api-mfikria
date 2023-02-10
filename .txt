@@ -1,1 +1,4 @@
 api/v3/coins/bitcoin
+
+img/1-8
+vidio/1
