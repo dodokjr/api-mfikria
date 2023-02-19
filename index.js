@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(function (req, res, next)
 {
-     res.setHeader('Access-Control-Allow-Origin', '*');
+     res.setHeader('Access-Control-Allow-Origin', 'https://mfikria.netlify.app/', '*');
      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
      res.setHeader('Access-Control-Allow-Credentials', true);
@@ -28,7 +28,9 @@ app.get('/', function (req, res)
      res.json({ message: "Selamat datang di api mfikria " });
 
 });
-app.get('/media-url', function (req, res)
+
+
+app.get('/media-url/link', function (req, res)
 {
      res.json({
           github: "https://github.com/dodokjr",
@@ -36,6 +38,29 @@ app.get('/media-url', function (req, res)
           youtube: "https://www.youtube.com/channel/UCLP0I71nvbJ2D_Y5y-mwbEw",
           linkendi: "https://www.linkedin.com/in/muhammad-fikri-ardiyansah-952752194/",
           discord: "https://discord.gg/DnNTUuGP"
+     })
+})
+
+app.get('/media-url/img', function (req, res)
+{
+     res.json({
+          data: {
+               One: {
+                    "src": "https://i.pinimg.com/236x/46/63/c1/4663c1a34ec2c158551d6c85c5e7bb87.jpg",
+                    "des": "Hallo kawankawan",
+                    "title": "Hallo dek"
+               },
+               Two: {
+                    "src": "https://i.pinimg.com/236x/d3/7b/d0/d37bd0f69a5ff9ca11351691d42a416e.jpg",
+                    "des": "Hallo kawankawan",
+                    "title": "Hallo dek"
+               },
+               Three: {
+                    "src": "https://i.pinimg.com/736x/00/a7/19/00a7190504eea461bbce8c3b5c12dd41.jpg",
+                    "des": "Hallo kawankawan",
+                    "title": "Hallo dek"
+               },
+          }
      })
 })
 
