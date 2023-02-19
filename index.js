@@ -18,6 +18,7 @@ app.use(function (req, res, next)
      res.setHeader('Access-Control-Allow-Origin', '*');
      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+     res.setHeader('Cookies', 'userMax1000')
      res.setHeader('Vary', '*');
      res.setHeader('Access-Control-Allow-Credentials', true);
      next()
@@ -40,7 +41,7 @@ app.get('/', function (req, res)
 });
 
 
-app.get('/media-url/link', function (req, res)
+app.get('/media-url/', function (req, res)
 {
      res.json({
           github: "https://github.com/dodokjr",
