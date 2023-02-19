@@ -1,4 +1,5 @@
 const bodyParser = require('body-parser');
+var cookieSession = require('cookie-session')
 const express = require('express');
 const app = express();
 const port = 5000
@@ -9,11 +10,12 @@ const anime = require('./routes/anime/api');
 const crypto = require('./routes/crypto/api');
 const public = require('./routes/public/api');
 
+
 app.use(bodyParser.json());
 app.use(cors());
 app.use(function (req, res, next)
 {
-     res.setHeader('Access-Control-Allow-Origin', 'https://mfikria.netlify.app/', '*');
+     res.setHeader('Access-Control-Allow-Origin', '*');
      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
      res.setHeader('Vary', '*');
@@ -21,13 +23,20 @@ app.use(function (req, res, next)
      next()
 });
 
+
+app.set('trust proxy', 1)
+app.use(cookieSession({
+     name: 'session',
+     keys: ['2098xxpotn', '0924hfjahsjf'],
+}))
+
 app.use('/v3/', crypto);
 app.use('/v2/', anime);
 app.use('/v1/', github);
 app.get('/', function (req, res)
 {
      res.json({ message: "Selamat datang di api mfikria " });
-
+     req.session.views = (req.session.views || 0) + 1
 });
 
 
