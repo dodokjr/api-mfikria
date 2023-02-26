@@ -2,3 +2,12 @@ api/v3/coins/bitcoin
 
 img/1-8
 vidio/1
+
+
+github: "https://github.com/dodokjr",
+          instagram: "https://www.instagram.com/fkri__17/",
+          youtube: "https://www.youtube.com/channel/UCLP0I71nvbJ2D_Y5y-mwbEw",
+          linkendi: "https://www.linkedin.com/in/muhammad-fikri-ardiyansah-952752194/",
+          discord: "https://discord.gg/DnNTUuGP"
+
+          const link = require('./routes/media-url/link/api');app.use('/v4/', link);
