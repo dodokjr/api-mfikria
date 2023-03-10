@@ -18,11 +18,11 @@ app.use(cors());
 app.use(function (req, res, next)
 {
      res.setHeader('Access-Control-Allow-Origin', '*');
-     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+     res.setHeader('Access-Control-Allow-Methods', 'GET');
      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
+     res.setHeader('age', '5')
      res.setHeader('Vary', '*');
-     res.set('Cache-Control', 'public, max-age=31557600, s-maxage=31557600');
+     res.set('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
      res.setHeader('Access-Control-Allow-Credentials', true);
      res.cookie('mfikria', '913698yg3l1qjxuj14RF634NZHV', { maxAge: 900000, httpOnly: true });
      next()
