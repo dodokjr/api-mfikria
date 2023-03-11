@@ -45,7 +45,16 @@ app.get('/', function (req, res)
      req.session.views = (req.session.views || 0) + 1
 });
 
+app.get('/like', function (req, res)
+{
+     res.json({
+          one: 'https://i.pinimg.com/750x/07/a5/33/07a533c3c90cb142604d63a1de4626d2.jpg',
+          two: 'https://i.pinimg.com/736x/44/91/ae/4491ae96bdba7c06b09bf19656aafd01.jpg',
+          three: 'https://i.pinimg.com/736x/12/ec/96/12ec96842cae66a809ec019da9cadfce.jpg'
+     })
+})
+
 app.listen(port, () =>
 {
      console.log(`masuk ${port}`)
-})
+});
