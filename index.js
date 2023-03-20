@@ -39,6 +39,11 @@ app.use('/link', link)
 app.use('/v2/crypto', crypto);
 app.use('/v2/anime', anime);
 app.use('/v2/github', github);
+app.get('/v2', function (req, res)
+{
+     res.json({ url: "/v2 /github/{name}, /anime/{name}, /crypto " });
+     req.session.views = (req.session.views || 0) + 1
+});
 app.get('/', function (req, res)
 {
      res.json({ message: "Selamat datang di api mfikria " });
