@@ -8,6 +8,7 @@ const ig = `${port}//www.instagram.com/fkri__17/?hl=en&${dari}`;
 const gb = `${port}//github.com/dodokjr?${dari}`;
 const ld = `${port}//www.linkedin.com/in/muhammad-fikri-ardiyansah-952752194/?${dari}`;
 const dc = `${port}//discord.gg/xHQhrDm4dA?${dari}`;
+const st = `${port}//steamcommunity.com/id/hokage_17/?${dari}`
 router.get("/", function (res, req)
 {
      req.json({
@@ -15,7 +16,8 @@ router.get("/", function (res, req)
           instagram: ig,
           youtube: ytb,
           linkedin: ld,
-          discord: dc
+          discord: dc,
+          steam: st
      })
 })
 
