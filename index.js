@@ -5,6 +5,8 @@ const express = require('express');
 const app = express();
 const port = 5000
 const cors = require('cors')
+var favicon = require('serve-favicon')
+var path = require('path')
 
 const github = require('./routes/github/api');
 const anime = require('./routes/anime/api');
@@ -28,12 +30,7 @@ app.use(function (req, res, next)
      next()
 });
 
-
-app.set('trust proxy', 1)
-app.use(cookieSession({
-     name: 'session',
-     keys: ['2098xxpotn', '0924hfjahsjf'],
-}))
+app.use(favicon(path.join(__dirname, 'public', 'logo.ico')));
 
 app.use('/link', link)
 app.use('/v2/crypto', crypto);
