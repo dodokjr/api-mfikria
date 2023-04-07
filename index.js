@@ -31,7 +31,7 @@ app.use(function (req, res, next)
 });
 
 app.use(favicon(path.join(__dirname, 'public', 'logo.ico')));
-
+app.use('/public', express.static(__dirname + "/public"));
 app.use('/link', link)
 app.use('/v2/crypto', crypto);
 app.use('/v2/anime', anime);
