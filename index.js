@@ -12,6 +12,7 @@ const github = require('./routes/github/api');
 const anime = require('./routes/anime/api');
 const crypto = require('./routes/crypto/api');
 const link = require('./routes/media-url/link/api');
+const users = require('./routes/users/api');
 
 
 app.use(cookieParser());
@@ -32,19 +33,18 @@ app.use(function (req, res, next)
 
 app.use(favicon(path.join(__dirname, 'public', 'logo.ico')));
 app.use('/public', express.static(__dirname + "/public"));
-app.use('/link', link)
+app.use('/link', link);
+app.use('/users', users)
 app.use('/v2/crypto', crypto);
 app.use('/v2/anime', anime);
 app.use('/v2/github', github);
 app.get('/v2', function (req, res)
 {
      res.json({ url: "/v2 /github/{name}, /anime/{name}, /crypto " });
-     req.session.views = (req.session.views || 0) + 1
 });
 app.get('/', function (req, res)
 {
      res.json({ message: "Selamat datang di api mfikria " });
-     req.session.views = (req.session.views || 0) + 1
 });
 
 
