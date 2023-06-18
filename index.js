@@ -44,7 +44,7 @@ app.get('/v2', function (req, res)
 });
 app.get('/', function (req, res)
 {
-     res.json({ message: "Selamat datang di api mfikria " });
+     res.json({ message: 'Github: Dodokjr' });
 });
 
 
