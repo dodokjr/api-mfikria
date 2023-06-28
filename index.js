@@ -38,14 +38,6 @@ app.use('/v3/users', users)
 app.use('/v2/crypto', crypto);
 app.use('/v2/anime', anime);
 app.use('/v2/github', github);
-app.get('/v2', function (req, res)
-{
-     res.json({ url: "/v2 /github/{name}, /anime/{name}, /crypto " });
-});
-// app.get('/', function (req, res)
-// {
-//      res.json({ message: 'Github: Dodokjr url : /v2/' });
-// });
 
 app.get('/v3', async function (req, res)
 {
