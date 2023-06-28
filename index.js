@@ -8,11 +8,11 @@ const cors = require('cors')
 var favicon = require('serve-favicon')
 var path = require('path')
 
-const github = require('./routes/github/api');
-const anime = require('./routes/anime/api');
-const crypto = require('./routes/crypto/api');
-const link = require('./routes/media-url/link/api');
-const users = require('./routes/users/api');
+const github = require('./routes/v2/github/api');
+const anime = require('./routes/v2/anime/api');
+const crypto = require('./routes/v2/crypto/api');
+const link = require('./routes/v2/link-media/api');
+const users = require('./routes/v3/users/api');
 
 
 app.use(cookieParser());
@@ -32,9 +32,9 @@ app.use(function (req, res, next)
 });
 
 app.use(favicon(path.join(__dirname, 'public', 'logo.ico')));
-app.use('/public', express.static(__dirname + "/public"));
+app.use('/', express.static(__dirname + "/public"));
 app.use('/link', link);
-app.use('/users', users)
+app.use('/v3/users', users)
 app.use('/v2/crypto', crypto);
 app.use('/v2/anime', anime);
 app.use('/v2/github', github);
@@ -42,10 +42,16 @@ app.get('/v2', function (req, res)
 {
      res.json({ url: "/v2 /github/{name}, /anime/{name}, /crypto " });
 });
-app.get('/', function (req, res)
+// app.get('/', function (req, res)
+// {
+//      res.json({ message: 'Github: Dodokjr url : /v2/' });
+// });
+
+app.get('/v3', async function (req, res)
 {
-     res.json({ message: 'Github: Dodokjr' });
-});
+     res.json({ hello: 'api' })
+})
+
 
 
 app.listen(port, () =>
