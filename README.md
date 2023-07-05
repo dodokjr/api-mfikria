@@ -1,3 +1,9 @@
 # api-mfikria
 
-<img src="https://i.pinimg.com/originals/f6/d8/11/f6d811475b0e8c881170fe44e38dbb50.gif" alt="pp"/>
+<img src="https://i.pinimg.com/564x/37/e5/4f/37e54f92afe82f5fd1b55b205e7a745f.jpg" alt="pp" width="100"/>
+
+Geting Url
+|      url           |      descipson       |
+| ------------------------ | -------------------- |
+| /v2/github/{YourProfile}        |      profile Your Github        |
+| /v2/github/{YourProfile}/repos  |      Repos Your Github   |
