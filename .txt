@@ -11,3 +11,6 @@ github: "https://github.com/dodokjr",
           discord: "https://discord.gg/DnNTUuGP"
 
           const link = require('./routes/media-url/link/api');app.use('/v4/', link);
+
+
+          https://komi.katowproject.app/api/otakudesu/complete-anime/

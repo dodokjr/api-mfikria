@@ -13,6 +13,11 @@ const anime = require('./routes/v2/anime/api');
 const crypto = require('./routes/v2/crypto/api');
 const link = require('./routes/v2/link-media/api');
 const users = require('./routes/v3/users/api');
+const animeII = require('./routes/v3/anime/api');
+const movies = require('./routes/v3/movies/api');
+const series = require('./routes/v3/movies/seris-api');
+const searchM = require('./routes/v3/movies/search');
+const about = require('./routes/v3/movies/about')
 
 
 app.use(cookieParser());
@@ -43,6 +48,12 @@ app.get('/v3', async function (req, res)
 {
      res.json({ hello: 'api' })
 })
+
+app.use('/v3/anime', animeII);
+app.use('/v3/lk21/movies', movies);
+app.use('/v3/lk21/series', series);
+app.use('/v3/lk21/s', searchM)
+app.use('/v3/lk21/', about)
 
 
 
