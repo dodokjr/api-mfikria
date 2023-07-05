@@ -20,6 +20,9 @@ const searchM = require('./routes/v3/movies/search');
 const about = require('./routes/v3/movies/about')
 
 
+app.use(bodyParser.urlencoded({
+     extended: true
+}))
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(cors());
@@ -43,12 +46,7 @@ app.use('/v3/users', users)
 app.use('/v2/crypto', crypto);
 app.use('/v2/anime', anime);
 app.use('/v2/github', github);
-
-app.get('/v3', async function (req, res)
-{
-     res.json({ hello: 'api' })
-})
-
+// V3
 app.use('/v3/anime', animeII);
 app.use('/v3/lk21/movies', movies);
 app.use('/v3/lk21/series', series);
@@ -57,7 +55,23 @@ app.use('/v3/lk21/', about)
 
 
 
+app.get('*', function (req, res)
+{
+     res.sendFile(path.join(__dirname + '/public/404.html'))
+})
+
 app.listen(port, () =>
 {
      console.log(`masuk ${port}`)
 });
+
+function errorHandler(err, req, res, next)
+{
+     if (req.xhr)
+     {
+          res.ststus(500).sand({ error: 'Api Tidak Ditemukan' })
+     } else
+     {
+          next(err)
+     }
+}
