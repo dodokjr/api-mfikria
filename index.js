@@ -27,7 +27,6 @@ const limiter = rateLimit({
      standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
      legacyHeaders: false,
 })
-app.use(limiter)
 app.use(bodyParser.urlencoded({
      extended: true
 }))
