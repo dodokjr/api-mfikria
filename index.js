@@ -3,10 +3,10 @@ const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const app = express();
-const port = 5000
-const cors = require('cors')
-var favicon = require('serve-favicon')
-var path = require('path')
+const cors = require('cors');
+var favicon = require('serve-favicon');
+var path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const github = require('./routes/v2/github/api');
 const anime = require('./routes/v2/anime/api');
@@ -19,7 +19,15 @@ const series = require('./routes/v3/movies/seris-api');
 const searchM = require('./routes/v3/movies/search');
 const about = require('./routes/v3/movies/about')
 
+const port = 5000
 
+const limiter = rateLimit({
+     windowMs: 5 * 60 * 1000, // 5 minutes
+     max: 25, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+     legacyHeaders: false,
+})
+app.use(limiter)
 app.use(bodyParser.urlencoded({
      extended: true
 }))
@@ -35,7 +43,7 @@ app.use(function (req, res, next)
      res.setHeader('Vary', '*');
      res.set('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
      res.setHeader('Access-Control-Allow-Credentials', true);
-     res.cookie('mfikria', '913698yg3l1qjxuj14RF634NZHV', { maxAge: 900000, httpOnly: true });
+     res.cookie('mfikria', randomNumber, { maxAge: 900000, httpOnly: true });
      next()
 });
 
@@ -57,7 +65,7 @@ app.use('/v3/lk21/', about)
 
 app.get('*', function (req, res)
 {
-     res.sendFile(path.join(__dirname + '/public/404.html'))
+     res.status(404).sendFile(path.join(__dirname + '/public/404.html'))
 })
 
 app.listen(port, () =>
@@ -75,3 +83,7 @@ function errorHandler(err, req, res, next)
           next(err)
      }
 }
+
+
+var randomNumber = Math.random().toString();
+randomNumber = randomNumber.substring(2, randomNumber.length);
