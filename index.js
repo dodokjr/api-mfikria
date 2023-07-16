@@ -39,11 +39,11 @@ app.use(function (req, res, next)
      res.setHeader('Access-Control-Allow-Origin', '*');
      res.setHeader('Access-Control-Allow-Methods', 'GET');
      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-     res.setHeader('age', '5')
+     res.setHeader('age', '15')
      res.setHeader('Vary', '*');
      res.set('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
      res.setHeader('Access-Control-Allow-Credentials', true);
-     res.cookie(randomValue, randomNumber, { maxAge: 100000, httpOnly: true, sameSite: true, secure: true });
+     res.cookie(cookieName, randomValue, { maxAge: 100000, httpOnly: true, sameSite: 'lax', secure: true });
      next()
 });
 
@@ -107,4 +107,6 @@ function randomString(len, charSet)
      return randomString;
 }
 
-var randomValue = randomString(5);
+var randomValue = randomString(25);
+
+var cookieName = 'Root'
