@@ -43,7 +43,7 @@ app.use(function (req, res, next)
      res.setHeader('Vary', '*');
      res.set('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
      res.setHeader('Access-Control-Allow-Credentials', true);
-     res.cookie('mfikria', randomValue, { maxAge: 100000, httpOnly: true, sameSite: true, secure: true });
+     res.cookie(randomValue, randomNumber, { maxAge: 100000, httpOnly: true, sameSite: true, secure: true });
      next()
 });
 
