@@ -1,6 +1,6 @@
 async function fetchText()
 {
-    let response = await fetch('http://localhost:5000/status');
+    let response = await fetch('https://api-mfikria.vercel.app/status');
 
     console.log(response.status); // 200
 
