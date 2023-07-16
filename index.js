@@ -7,6 +7,7 @@ const cors = require('cors');
 var favicon = require('serve-favicon');
 var path = require('path');
 const rateLimit = require('express-rate-limit');
+const router = express.Router();
 
 const github = require('./routes/v2/github/api');
 const anime = require('./routes/v2/anime/api');
@@ -42,7 +43,7 @@ app.use(function (req, res, next)
      res.setHeader('Vary', '*');
      res.set('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
      res.setHeader('Access-Control-Allow-Credentials', true);
-     res.cookie('mfikria', randomNumber, { maxAge: 900000, httpOnly: true });
+     res.cookie('mfikria', randomValue, { maxAge: 100000, httpOnly: true, sameSite: true, secure: true });
      next()
 });
 
@@ -57,15 +58,20 @@ app.use('/v2/github', github);
 app.use('/v3/anime', animeII);
 app.use('/v3/lk21/movies', movies);
 app.use('/v3/lk21/series', series);
-app.use('/v3/lk21/s', searchM)
-app.use('/v3/lk21/', about)
+app.use('/v3/lk21/s', searchM);
+app.use('/v3/lk21/', about);
 
-
+app.use('/status', function (req, res)
+{
+     res.status(200).send({ Number: randomNumber })
+})
 
 app.get('*', function (req, res)
 {
      res.status(404).sendFile(path.join(__dirname + '/public/404.html'))
 })
+
+
 
 app.listen(port, () =>
 {
@@ -86,3 +92,19 @@ function errorHandler(err, req, res, next)
 
 var randomNumber = Math.random().toString();
 randomNumber = randomNumber.substring(2, randomNumber.length);
+
+
+
+function randomString(len, charSet)
+{
+     charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+     var randomString = '';
+     for (var i = 0; i < len; i++)
+     {
+          var randomPoz = Math.floor(Math.random() * charSet.length);
+          randomString += charSet.substring(randomPoz, randomPoz + 1);
+     }
+     return randomString;
+}
+
+var randomValue = randomString(5);
