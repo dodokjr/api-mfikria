@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const dari = 'website=mfikria.netlify.app'
+const dari = 'staus'
 const port = 'https:'
 const ytb = `${port}//www.youtube.com/channel/UCLP0I71nvbJ2D_Y5y-mwbEw?sub_confirmation=1&${dari}`;
 const ig = `${port}//www.instagram.com/fkri__17/?hl=en&${dari}`;
@@ -19,7 +19,6 @@ router.get("/", function (res, req)
           discord: dc,
           steam: st
      })
-})
-
+});
 
 module.exports = router

@@ -18,7 +18,8 @@ const animeII = require('./routes/v3/anime/api');
 const movies = require('./routes/v3/movies/api');
 const series = require('./routes/v3/movies/seris-api');
 const searchM = require('./routes/v3/movies/search');
-const about = require('./routes/v3/movies/about')
+const about = require('./routes/v3/movies/about');
+const status = require('./routes/status')
 
 const port = 5000
 
@@ -43,7 +44,7 @@ app.use(function (req, res, next)
      res.setHeader('Vary', '*');
      res.set('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
      res.setHeader('Access-Control-Allow-Credentials', true);
-     res.cookie(cookieName, randomValue, { maxAge: 100000, httpOnly: true, sameSite: 'lax', secure: true });
+     res.cookie(randomValue, randomNumber, { maxAge: 100000, httpOnly: true, sameSite: 'lax', secure: true });
      next()
 });
 
@@ -61,10 +62,12 @@ app.use('/v3/lk21/series', series);
 app.use('/v3/lk21/s', searchM);
 app.use('/v3/lk21/', about);
 
-app.use('/status', function (req, res)
-{
-     res.status(200).send({ Number: randomNumber })
-})
+app.use('/status', status);
+
+// app.use('/status', function (req, res)
+// {
+//      res.status(200).send({ Number: randomNumber })
+// })
 
 app.get('*', function (req, res)
 {
@@ -107,6 +110,6 @@ function randomString(len, charSet)
      return randomString;
 }
 
-var randomValue = randomString(25);
+var randomValue = randomString(5);
 
 var cookieName = 'Root'
