@@ -1,3 +1,4 @@
+
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
@@ -14,11 +15,6 @@ const anime = require('./routes/v2/anime/api');
 const crypto = require('./routes/v2/crypto/api');
 const link = require('./routes/v2/link-media/api');
 const users = require('./routes/v3/users/api');
-const animeII = require('./routes/v3/anime/api');
-const movies = require('./routes/v3/movies/api');
-const series = require('./routes/v3/movies/seris-api');
-const searchM = require('./routes/v3/movies/search');
-const about = require('./routes/v3/movies/about');
 const status = require('./routes/status')
 
 const port = 5000
@@ -44,7 +40,7 @@ app.use(function (req, res, next)
      res.setHeader('Vary', '*');
      res.set('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
      res.setHeader('Access-Control-Allow-Credentials', true);
-     res.cookie(randomValue, randomNumber, { maxAge: 100000, httpOnly: true, sameSite: 'lax', secure: true });
+     res.cookie('mfikria', randomValue, { maxAge: 100000, httpOnly: true, sameSite: 'lax', secure: true });
      next()
 });
 
@@ -56,11 +52,7 @@ app.use('/v2/crypto', crypto);
 app.use('/v2/anime', anime);
 app.use('/v2/github', github);
 // V3
-app.use('/v3/anime', animeII);
-app.use('/v3/lk21/movies', movies);
-app.use('/v3/lk21/series', series);
-app.use('/v3/lk21/s', searchM);
-app.use('/v3/lk21/', about);
+
 
 app.use('/status', status);
 
@@ -113,3 +105,6 @@ function randomString(len, charSet)
 var randomValue = randomString(5);
 
 var cookieName = 'Root'
+
+
+
