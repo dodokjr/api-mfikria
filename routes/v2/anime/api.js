@@ -43,12 +43,11 @@ router.get('/:quer', async function (req, res)
      })
 })
 
-router.get('/videos/:ida', async function (req, res)
+router.get('/populer', async function (req, res)
 {
-     const ida = req.params.ida;
      const options = {
           hostname: `${url}`,
-          path: '/v4/anime/' + ida + '/videos',
+          path: '/v4/top/anime',
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
