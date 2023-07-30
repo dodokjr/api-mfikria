@@ -4,6 +4,7 @@ const router = express.Router();
 router.get("/", function (res, req)
 {
     req.json({
+        offlinefile: offlineFile,
         status: statusreq,
         key: randomValue,
     })
@@ -24,6 +25,7 @@ function randomString(len, charSet)
 var randomValue = randomString(15);
 
 let statusreq = '200'
+let offlineFile = 'v3'
 
 
 

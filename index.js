@@ -19,6 +19,12 @@ const status = require('./routes/status')
 
 const port = 5000
 
+app.listen(port, () =>
+{
+     console.log(`http://localhost:${port}`)
+});
+
+
 const limiter = rateLimit({
      windowMs: 5 * 60 * 1000, // 5 minutes
      max: 25, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -54,7 +60,7 @@ app.use('/v2/github', github);
 // V3
 
 
-app.use('/status', status);
+app.use('/status', limiter, status);
 
 // app.use('/status', function (req, res)
 // {
@@ -67,11 +73,6 @@ app.get('*', function (req, res)
 })
 
 
-
-app.listen(port, () =>
-{
-     console.log(`masuk ${port}`)
-});
 
 function errorHandler(err, req, res, next)
 {
