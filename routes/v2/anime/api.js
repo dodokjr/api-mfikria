@@ -16,6 +16,7 @@ router.get('/', async function (req, res)
      https.get(options, function (apiResponse)
      {
           apiResponse.pipe(res);
+          res.set('Content-Type', 'application/json')
      }).on('error', (e) =>
      {
           console.log(e);
@@ -36,6 +37,7 @@ router.get('/:quer', async function (req, res)
      https.get(options, function (apiResponse)
      {
           apiResponse.pipe(res);
+          res.set('Content-Type', 'application/json')
      }).on('error', (e) =>
      {
           console.log(e);
@@ -55,6 +57,7 @@ router.get('/populer', async function (req, res)
      https.get(options, function (apiResponse)
      {
           apiResponse.pipe(res);
+          res.set('Content-Type', 'application/json')
      }).on('error', (e) =>
      {
           console.log(e);

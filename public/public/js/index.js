@@ -12,14 +12,14 @@ function OnclickCloseMenu()
   document.getElementById("open-menu").style.display = "block";
 }
 
-window.onscroll = function ()
-{
-  scrollFunction();
-};
-function scrollFunction()
-{
-  window.scrollTo({ bottom: 0, behavior: "smooth" });
-}
+// // window.onscroll = function ()
+// // {
+// //   scrollFunction();
+// // };
+// // function scrollFunction()
+// // {
+// //   window.scrollTo({ bottom: 0, behavior: "smooth" });
+// }
 
 (function ()
 {

@@ -16,6 +16,10 @@ const crypto = require('./routes/v2/crypto/api');
 const link = require('./routes/v2/link-media/api');
 const users = require('./routes/v3/users/api');
 const status = require('./routes/status')
+const movies = require('./routes/v3/lk21/Movies');
+const dramaseries = require('./routes/v3/lk21/DramaSeries')
+const alat = require('./routes/v3/lk21/AlatApi');
+const redirectt = require('./routes/v3/mediasocial/redirect')
 
 const port = 5000
 
@@ -58,6 +62,16 @@ app.use('/v2/crypto', crypto);
 app.use('/v2/anime', anime);
 app.use('/v2/github', github);
 // V3
+app.use('/v3/lk21/', alat)
+app.use('/v3/lk21/movies', movies)
+app.use('/v3/lk21/dramaseries', dramaseries)
+
+app.get("/website", (req, res) =>
+{
+
+     res.status(301).redirect("https://mfikria.vercel.app/")
+
+})
 
 
 app.use('/status', limiter, status);

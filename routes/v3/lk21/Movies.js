@@ -2,19 +2,18 @@ const express = require('express');
 const router = express.Router();
 const https = require('https');
 
-let url = "api.github.com"
+
+let urlMovies = "lk21-api.cyclic.app";
 
 
-router.get('/:user', async function (req, res)
+router.get('/', async function (req, res)
 {
-    const user = req.params.user;
     const options = {
-        hostname: `${url}`,
-        path: '/users/' + user,
+        hostname: `${urlMovies}`,
+        path: '/movies',
         headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
         },
-        OAuth: "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"
     }
     https.get(options, function (apiResponse)
     {
@@ -25,19 +24,17 @@ router.get('/:user', async function (req, res)
         console.log(e);
         res.status(500).send('Api Salah');
     })
-})
+});
 
-router.get('/:user/:user/:reponame', async function (req, res)
+router.get('/:idmovies', async function (req, res)
 {
-    const user = req.params.user;
-    const reponame = req.params.reponame;
+    const idmovies = req.params.idmovies;
     const options = {
-        hostname: 'api.github.com',
-        path: '/users/repos' + user,
+        hostname: `${urlMovies}`,
+        path: '/movies/' + idmovies,
         headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
         },
-        OAuth: "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"
     }
     https.get(options, function (apiResponse)
     {
@@ -45,23 +42,19 @@ router.get('/:user/:user/:reponame', async function (req, res)
         res.set('Content-Type', 'application/json')
     }).on('error', (e) =>
     {
-        console.log(ee);
-        res.status(500).send('Api salah')
+        console.log(e);
+        res.status(500).send('Api Salah');
     })
-})
+});
 
-router.get('/:user/repos', async function (req, res)
+router.get('/popular/movies', async function (req, res)
 {
-    const user = req.params.user;
-    const username = req.params.username;
-    const repos = req.params.repos;
     const options = {
-        hostname: 'api.github.com',
-        path: '/users/' + user + '/repos',
+        hostname: `${urlMovies}`,
+        path: '/popular/movies',
         headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
         },
-        OAuth: "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"
     }
     https.get(options, function (apiResponse)
     {
@@ -69,9 +62,9 @@ router.get('/:user/repos', async function (req, res)
         res.set('Content-Type', 'application/json')
     }).on('error', (e) =>
     {
-        console.log(ee);
-        res.status(500).send('Api salah')
+        console.log(e);
+        res.status(500).send('Api Salah');
     })
-})
+});
 
 module.exports = router;
