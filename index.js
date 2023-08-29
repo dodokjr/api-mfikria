@@ -71,10 +71,39 @@ app.get("/website", (req, res) =>
 
      res.status(301).redirect("https://mfikria.vercel.app/")
 
-})
+});
 
+app.get('/instagram', (req, res) =>
+{
+     res.status(302).redirect('https://www.instagram.com/fkri__17/')
+});
 
-app.use('/status', limiter, status);
+app.get('/github', (req, res) =>
+{
+     res.status(302).redirect('https://github.com/dodokjr')
+});
+
+app.get('/linkedin', (req, res) =>
+{
+     res.status(302).redirect('https://www.linkedin.com/in/muhammad-fikri-ardiyansah-952752194/')
+});
+
+app.get('/discord', (req, res) =>
+{
+     res.status(302).redirect('https://discord.gg/xHQhrDm4dA')
+});
+
+app.get('/steam', (req, res) =>
+{
+     res.status(302).redirect('https://steamcommunity.com/id/hokage_17/')
+});
+
+app.get('/youtube', (req, res) =>
+{
+     res.status(302).redirect('https://www.youtube.com/channel/UCLP0I71nvbJ2D_Y5y-mwbEw?sub_confirmation=1')
+});
+
+// app.use('/status', limiter, status);
 
 // app.use('/status', function (req, res)
 // {
