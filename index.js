@@ -12,9 +12,8 @@ const router = express.Router();
 
 const github = require('./routes/v2/github/api');
 const anime = require('./routes/v2/anime/api');
-const crypto = require('./routes/v2/crypto/api');
 const link = require('./routes/v2/link-media/api');
-const users = require('./routes/v3/users/api');
+const youtube = require('./routes/v3/youtube/api');
 const status = require('./routes/status')
 const movies = require('./routes/v3/lk21/Movies');
 const dramaseries = require('./routes/v3/lk21/DramaSeries')
@@ -57,8 +56,7 @@ app.use(function (req, res, next)
 app.use(favicon(path.join(__dirname, 'public', 'logo.ico')));
 app.use('/', express.static(__dirname + "/public"));
 app.use('/link', link);
-app.use('/v3/users', users)
-app.use('/v2/crypto', crypto);
+app.use('/v3/youtube', youtube)
 app.use('/v2/anime', anime);
 app.use('/v2/github', github);
 // V3
