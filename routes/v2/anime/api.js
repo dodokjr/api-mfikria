@@ -45,12 +45,12 @@ router.get('/full/:id', async function (req, res)
      })
 });
 
-router.get('/:quer', async function (req, res)
+router.get('/s/:name', async function (req, res)
 {
-     const quer = req.params.quer;
+     const name = req.params.name;
      const options = {
           hostname: `${url}`,
-          path: '/v4/anime?q=' + quer + '&sfw',
+          path: '/v4/anime?q=' + name + '&sfw',
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
@@ -65,6 +65,7 @@ router.get('/:quer', async function (req, res)
           res.status(500).send('Api Salah');
      })
 })
+
 
 router.get('/populer', async function (req, res)
 {

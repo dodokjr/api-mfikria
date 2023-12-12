@@ -1,6 +1,4 @@
 
-const bodyParser = require('body-parser');
-const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const app = express();
@@ -9,22 +7,14 @@ var favicon = require('serve-favicon');
 var path = require('path');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
+require('dotenv').config();
 
-const github = require('./routes/v2/github/api');
-const anime = require('./routes/v2/anime/api');
-const link = require('./routes/v2/link-media/api');
-const youtube = require('./routes/v3/youtube/api');
-const status = require('./routes/status')
-const movies = require('./routes/v3/lk21/Movies');
-const dramaseries = require('./routes/v3/lk21/DramaSeries')
-const alat = require('./routes/v3/lk21/AlatApi');
-const redirectt = require('./routes/v3/mediasocial/redirect')
 
-const port = 5000
+const PORT = process.env.PORT || 5000
 
-app.listen(port, () =>
+app.listen(PORT, () =>
 {
-     console.log(`http://localhost:${port}`)
+     console.log(`http://localhost:${PORT}`)
 });
 
 
@@ -34,11 +24,8 @@ const limiter = rateLimit({
      standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
      legacyHeaders: false,
 })
-app.use(bodyParser.urlencoded({
-     extended: true
-}))
+
 app.use(cookieParser());
-app.use(bodyParser.json());
 app.use(cors());
 app.use(function (req, res, next)
 {
@@ -55,14 +42,11 @@ app.use(function (req, res, next)
 
 app.use(favicon(path.join(__dirname, 'public', 'logo.ico')));
 app.use('/', express.static(__dirname + "/public"));
-app.use('/link', link);
-app.use('/v3/youtube', youtube)
-app.use('/v2/anime', anime);
-app.use('/v2/github', github);
-// V3
-app.use('/v3/lk21/', alat)
-app.use('/v3/lk21/movies', movies)
-app.use('/v3/lk21/dramaseries', dramaseries)
+app.use('/link', require('./routes/v2/link-media/api'));
+app.use('/v3/youtube', require('./routes/v3/youtube/api'))
+app.use('/v2/anime', require('./routes/v2/anime/api'));
+app.use('/v2/github', require('./routes/v2/github/api'));
+
 
 app.get("/website", (req, res) =>
 {
@@ -101,7 +85,7 @@ app.get('/youtube', (req, res) =>
      res.status(302).redirect('https://www.youtube.com/channel/UCLP0I71nvbJ2D_Y5y-mwbEw?sub_confirmation=1')
 });
 
-app.use('/status', limiter, status);
+app.use('/status', limiter, require('./routes/status'));
 
 // app.use('/status', function (req, res)
 // {
