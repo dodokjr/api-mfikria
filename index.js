@@ -47,6 +47,27 @@ app.use('/v3/youtube', require('./routes/v3/youtube/api'))
 app.use('/v2/anime', require('./routes/v2/anime/api'));
 app.use('/v2/github', require('./routes/v2/github/api'));
 
+const v2 = "v2 program by api-mfikria.vercel.app"
+app.use('/v2', (req, res) =>
+{
+     res.status(200).send({
+          id: randomNumber,
+          messager: v2, "data": {
+               "gihub": {
+                    "profile": "/v2/github/{name}",
+                    "repos": "/v2/github/{name}/repos"
+               },
+               "anime": {
+                    "top": "/v2/anime/populer",
+                    "panigation": "/v2/anime/populer/page/:id",
+                    "seacrh": "/v2/anime/s/{your-seacrh}",
+                    "character": "/v2/anime/character/:id",
+                    "character-people": "/v2/anime/character/people/:id"
+               }
+          }
+     })
+})
+
 
 app.get("/website", (req, res) =>
 {

@@ -10,12 +10,41 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="./public/js/index.js"></script>
-
     <script>
       tailwind.config = {
         darkMode: 'class',
       };
     </script>
+    <style>
+      pre {
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	overflow: auto;
+	overflow-y: hidden;
+	font-size: 12px;
+	line-height: 20px;
+	background: #efefef;
+	border: 1px solid #777;
+	background: url(lines.png) repeat 0 0;
+}
+pre code {
+	padding: 10px;
+	color: #333;
+}
+@media print {
+	pre {
+		overflow-x: auto;
+		white-space: pre-wrap;
+		white-space: -moz-pre-wrap !important;
+		white-space: -pre-wrap;
+		white-space: -o-pre-wrap;
+		word-wrap: break-word;
+		background: #fff;
+	}
+}
+
+    </style>
     <title>Mfikria Docs</title>
   </head>
   <body style="font-family: 'Poppins', sans-serif" class="dark:bg-slate-900 bg-white dark:text-white">
@@ -152,7 +181,7 @@
                     fetchProfile()
                   }, [user])
 
-                  return(
+                    return(
                     < h1 style={{ fontSize: "2.1em", paddingBottom: "20px" }}>
                       Know Who < strong className="purple">I'M</ strong>
                     </ h1>
