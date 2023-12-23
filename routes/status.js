@@ -6,6 +6,7 @@ router.get("/", function (res, req)
     req.json({
         status: statusreq,
         key: randomValue,
+        offline_url: offlineFile,
     })
 })
 

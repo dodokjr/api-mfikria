@@ -40,8 +40,8 @@ app.use(function (req, res, next)
      next()
 });
 
-app.use(favicon(path.join(__dirname, 'public', 'logo.ico')));
-app.use('/', express.static(__dirname + "/public"));
+app.use(favicon(path.join(__dirname, '/__public', 'logo.ico')));
+app.use('/', express.static(__dirname + "/__public/"));
 app.use('/link', require('./routes/v2/link-media/api'));
 app.use('/v3/youtube', require('./routes/v3/youtube/api'))
 app.use('/v2/anime', require('./routes/v2/anime/api'));
@@ -115,7 +115,7 @@ app.use('/status', limiter, require('./routes/status'));
 
 app.get('*', function (req, res)
 {
-     res.status(404).sendFile(path.join(__dirname + '/public/404.html'))
+     res.status(404).sendFile(path.join(__dirname + '/__public/404.html'))
 })
 
 
