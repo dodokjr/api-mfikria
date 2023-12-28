@@ -45,9 +45,9 @@ router.get('/full/:id', async function (req, res)
      })
 });
 
-router.get('/s/:name', async function (req, res)
+router.get('/s', async function (req, res)
 {
-     const name = req.params.name;
+     const name = req.query.name;
      const options = {
           hostname: `${url}`,
           path: '/v4/anime?q=' + name + '&sfw',
@@ -69,9 +69,10 @@ router.get('/s/:name', async function (req, res)
 
 router.get('/populer', async function (req, res)
 {
+     const page = req.query.page
      const options = {
           hostname: `${url}`,
-          path: '/v4/top/anime',
+          path: '/v4/top/anime?page=' + page,
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
@@ -87,26 +88,6 @@ router.get('/populer', async function (req, res)
      })
 })
 
-router.get('/populer/page/:id', async function (req, res)
-{
-     const id = req.params.id;
-     const options = {
-          hostname: `${url}`,
-          path: '/v4/top/anime?page=' + id,
-          headers: {
-               'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
-          },
-     }
-     https.get(options, function (apiResponse)
-     {
-          apiResponse.pipe(res);
-          res.set('Content-Type', 'application/json')
-     }).on('error', (e) =>
-     {
-          console.log(e);
-          res.status(500).send('Api Salah');
-     })
-})
 
 router.get('/character/:query', async function (req, res)
 {

@@ -47,27 +47,10 @@ app.use('/v3/youtube', require('./routes/v3/youtube/api'))
 app.use('/v2/anime', require('./routes/v2/anime/api'));
 app.use('/v2/github', require('./routes/v2/github/api'));
 
-const v2 = "v2 program by api-mfikria.vercel.app"
-app.use('/v2', (req, res) =>
+app.get('*', function (req, res)
 {
-     res.status(200).send({
-          id: randomNumber,
-          messager: v2, "data": {
-               "gihub": {
-                    "profile": "/v2/github/{name}",
-                    "repos": "/v2/github/{name}/repos"
-               },
-               "anime": {
-                    "top": "/v2/anime/populer",
-                    "panigation": "/v2/anime/populer/page/:id",
-                    "seacrh": "/v2/anime/s/{your-seacrh}",
-                    "character": "/v2/anime/character/:id",
-                    "character-people": "/v2/anime/character/people/:id"
-               }
-          }
-     })
+     res.status(404).sendFile(path.join(__dirname + '/__public/404.html'))
 })
-
 
 app.get("/website", (req, res) =>
 {
@@ -106,6 +89,11 @@ app.get('/youtube', (req, res) =>
      res.status(302).redirect('https://www.youtube.com/channel/UCLP0I71nvbJ2D_Y5y-mwbEw?sub_confirmation=1')
 });
 
+app.get('/facebook', (req, res) =>
+{
+     res.status(302).redirect('https://www.facebook.com/muhammad.f.ardiyansah.16/')
+});
+
 app.use('/status', limiter, require('./routes/status'));
 
 // app.use('/status', function (req, res)
@@ -113,10 +101,7 @@ app.use('/status', limiter, require('./routes/status'));
 //      res.status(200).send({ Number: randomNumber })
 // })
 
-app.get('*', function (req, res)
-{
-     res.status(404).sendFile(path.join(__dirname + '/__public/404.html'))
-})
+
 
 
 
