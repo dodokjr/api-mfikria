@@ -46,10 +46,15 @@ app.use('/link', require('./routes/v2/link-media/api'));
 app.use('/v3/youtube', require('./routes/v3/youtube/api'))
 app.use('/v2/anime', require('./routes/v2/anime/api'));
 app.use('/v2/github', require('./routes/v2/github/api'));
+app.use('/status', require("./routes/status"))
 
-app.get('*', function (req, res)
+
+
+app.get("/servers", (req, res) =>
 {
-     res.status(404).sendFile(path.join(__dirname + '/__public/404.html'))
+     res.status(200).json({
+          "service": "OK"
+     })
 })
 
 app.get("/website", (req, res) =>
@@ -101,9 +106,10 @@ app.use('/status', limiter, require('./routes/status'));
 //      res.status(200).send({ Number: randomNumber })
 // })
 
-
-
-
+app.get('*', function (req, res)
+{
+     res.status(404).sendFile(path.join(__dirname + '/__public/404.html'))
+})
 
 function errorHandler(err, req, res, next)
 {

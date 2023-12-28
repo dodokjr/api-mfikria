@@ -67,6 +67,7 @@ router.get('/s', async function (req, res)
 })
 
 
+
 router.get('/populer', async function (req, res)
 {
      const page = req.query.page
@@ -87,6 +88,7 @@ router.get('/populer', async function (req, res)
           res.status(500).send('Api Salah');
      })
 })
+
 
 
 router.get('/character/:query', async function (req, res)

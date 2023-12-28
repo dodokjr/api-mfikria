@@ -26,13 +26,13 @@ Geting Url
 | ------------------------ | -------------------- |
 | /v2/github/{YourProfile}        |      profile Your Github        |
 | /v2/github/{YourProfile}/repos  |      Repos Your Github   |
+| /v2/github/{YourProfile}/repos/{repos Name}  |      Repos detail Your Github   |
 | Anime  |      Anime   |
 | /v2/anime/  |      Page Anime   |
 | /v2/anime/full/{mal_id}  | detail anime      |
-| /v2/anime/{query}  | search anime      |
-| /v2/anime/popular | Top Anime      |
-| /v2/anime/page/id |  pagination top anime |
-| /v2/anime/character/:id | detail character |
-| /v2/anime/character/people/:id | people anime Character|
+| /v2/anime/s?name={query}  | search anime      |
+| /v2/anime/popular?page=1 | Top Anime and pagination      |
+| /v2/anime/character/:mal_id | detail character |
+| /v2/anime/character/people/:mal_id | people anime Character|
 
 Thank you very much <a href="https://api-mfikria.vercel.app/instagram">Instagram Me</a>

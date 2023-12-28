@@ -13,7 +13,7 @@ router.get('/:user', async function (req, res)
         headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
         },
-        OAuth: "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"
+        OAuth: "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"
     }
     https.get(options, function (apiResponse)
     {
@@ -37,7 +37,7 @@ router.get('/:user/repos', async function (req, res)
         headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
         },
-        OAuth: "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"
+        OAuth: "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"
     }
     https.get(options, function (apiResponse)
     {
@@ -61,7 +61,7 @@ router.get('/:user/repos/:reposname', async function (req, res)
         headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
         },
-        OAuth: "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"
+        OAuth: "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"
     }
     https.get(options, function (apiResponse)
     {
@@ -86,7 +86,7 @@ router.get('/l/limit', async function (req, res)
         headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
         },
-        OAuth: "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"
+        OAuth: "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"
     }
     https.get(options, function (apiResponse)
     {
