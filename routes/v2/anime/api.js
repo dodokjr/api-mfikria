@@ -6,9 +6,10 @@ let url = 'api.jikan.moe'
 
 router.get('/', async function (req, res)
 {
+     const limit = req.query.limit;
      const options = {
           hostname: `${url}`,
-          path: '/v4/anime',
+          path: '/v4/anime?limit=' + limit,
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
