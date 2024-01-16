@@ -28,9 +28,9 @@ Geting Url
 | /v2/github/{YourProfile}/repos  |      Repos Your Github   |
 | /v2/github/{YourProfile}/repos/{repos Name}  |      Repos detail Your Github   |
 | Anime  |      Anime   |
-| /v2/anime?limit={your limit}  |      Page Anime, max value (25)   |
+| /v2/anime?page={your Page}&limit={your limit}  |      Page Anime, max value (25)   |
 | /v2/anime/full/{mal_id}  | detail anime      |
-| /v2/anime/s?name={query}  | search anime      |
+| /v2/anime/search?q={query}  | search anime      |
 | /v2/anime/popular?page=1 | Top Anime and pagination      |
 | /v2/anime/character/:mal_id | detail character |
 | /v2/anime/character/people/:mal_id | people anime Character|

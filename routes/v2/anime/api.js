@@ -6,10 +6,11 @@ let url = 'api.jikan.moe'
 
 router.get('/', async function (req, res)
 {
+     const page = req.query.page;
      const limit = req.query.limit;
      const options = {
           hostname: `${url}`,
-          path: '/v4/anime?limit=' + limit,
+          path: '/v4/anime?' + `page=${page}&limit=${limit}`,
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
@@ -46,12 +47,12 @@ router.get('/full/:id', async function (req, res)
      })
 });
 
-router.get('/s', async function (req, res)
+router.get('/search', async function (req, res)
 {
-     const name = req.query.name;
+     const q = req.query.q;
      const options = {
           hostname: `${url}`,
-          path: '/v4/anime?q=' + name + '&sfw',
+          path: '/v4/anime?q=' + q + '&sfw',
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
@@ -134,4 +135,62 @@ router.get('/character/people/:query', async function (req, res)
      })
 })
 
+router.get('/seasons', async function (req, res)
+{
+     const options = {
+          hostname: `${url}`,
+          path: '/v4/seasons',
+          headers: {
+               'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
+          },
+     }
+     https.get(options, function (apiResponse)
+     {
+          apiResponse.pipe(res);
+          res.set('Content-Type', 'application/json')
+     }).on('error', (e) =>
+     {
+          console.log(e);
+          res.status(500).send('Api Salah');
+     })
+})
+router.get('/seasons/upcoming', async function (req, res)
+{
+     const page = req.query.page
+     const options = {
+          hostname: `${url}`,
+          path: '/v4/seasons/upcoming?' + `page=${page}`,
+          headers: {
+               'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
+          },
+     }
+     https.get(options, function (apiResponse)
+     {
+          apiResponse.pipe(res);
+          res.set('Content-Type', 'application/json')
+     }).on('error', (e) =>
+     {
+          console.log(e);
+          res.status(500).send('Api Salah');
+     })
+})
+router.get('/seasons', async function (req, res)
+{
+     const options = {
+          hostname: `${url}`,
+          path: '/v4/seasons',
+          headers: {
+               'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
+          },
+     }
+     https.get(options, function (apiResponse)
+     {
+          apiResponse.pipe(res);
+          res.set('Content-Type', 'application/json')
+     }).on('error', (e) =>
+     {
+          console.log(e);
+          res.status(500).send('Api Salah');
+     })
+})
 module.exports = router;

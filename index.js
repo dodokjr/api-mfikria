@@ -51,11 +51,10 @@ app.use('/status', require("./routes/status"))
 
 
 
-app.get("/servers", (req, res) =>
+app.get("/mediasosial", (req, res) =>
 {
-     res.status(200).json({
-          "service": "OK"
-     })
+     const q = req.query.q
+     res.status(301).redirect(`/${q}`)
 })
 
 app.get("/website", (req, res) =>
@@ -102,10 +101,6 @@ app.get('/facebook', (req, res) =>
 
 app.use('/status', limiter, require('./routes/status'));
 
-// app.use('/status', function (req, res)
-// {
-//      res.status(200).send({ Number: randomNumber })
-// })
 
 app.get('*', function (req, res)
 {
@@ -144,5 +139,7 @@ function randomString(len, charSet)
 var randomValue = randomString(5);
 
 var cookieName = 'Root'
+
+
 
 
