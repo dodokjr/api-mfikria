@@ -57,6 +57,12 @@ app.get("/mediasosial", (req, res) =>
      res.status(301).redirect(`/${q}`)
 })
 
+app.get("/mediasosial/github", (req, res) =>
+{
+     const q = req.query.q
+     res.status(301).redirect(`/github/${q}`)
+})
+
 app.get("/website", (req, res) =>
 {
 
@@ -97,6 +103,12 @@ app.get('/youtube', (req, res) =>
 app.get('/facebook', (req, res) =>
 {
      res.status(302).redirect('https://www.facebook.com/muhammad.f.ardiyansah.16/')
+});
+
+app.get('/github/:name', (req, res) =>
+{
+     const name = req.params.name
+     res.status(302).redirect(`https://github.com/${name}`)
 });
 
 app.use('/status', limiter, require('./routes/status'));
