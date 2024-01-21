@@ -48,6 +48,7 @@ app.use('/v3/youtube', require('./routes/v3/youtube/api'))
 app.use('/v2/anime', require('./routes/v2/anime/api'));
 app.use('/v2/github', require('./routes/v2/github/api'));
 app.use('/status', require("./routes/status"))
+app.use('/ig', require("./routes/i/index"))
 
 
 
