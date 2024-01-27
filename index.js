@@ -52,7 +52,7 @@ app.use('/ig', require("./routes/i/index"))
 
 
 
-app.get("/mediasosial", (req, res) =>
+app.get("/m", (req, res) =>
 {
      const q = req.query.q
      res.status(301).redirect(`/${q}`)
