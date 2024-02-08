@@ -8,7 +8,8 @@ const ig = `${port}//${domain}/m?q=instagram`;
 const gb = `${port}//${domain}/m?q=github`;
 const ld = `${port}//${domain}/m?q=linkedin`;
 const dc = `${port}//${domain}/m?q=discord`;
-const st = `${port}//${domain}/m?q=steam`
+const st = `${port}//${domain}/m?q=steam`;
+const tw = `${port}//${domain}/m?q=twitter`;
 router.get("/", function (res, req)
 {
      req.json({
@@ -17,7 +18,8 @@ router.get("/", function (res, req)
           youtube: ytb,
           linkedin: ld,
           discord: dc,
-          steam: st
+          steam: st,
+          twitter: tw
      })
 });
 module.exports = router

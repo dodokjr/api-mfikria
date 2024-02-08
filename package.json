@@ -25,5 +25,8 @@
     "mongoose": "^7.0.1",
     "needle": "^3.3.1",
     "serve-favicon": "^2.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
   }
 }

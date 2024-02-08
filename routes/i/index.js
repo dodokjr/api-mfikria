@@ -7,14 +7,16 @@ router.get("/", function (res, req)
             "name": "fkri__17",
             "name_prop": "MFikriA",
             "bio": "while(! ( succes = try() ) );",
-            "url_Image": "https://scontent-cgk1-2.cdninstagram.com/v/t51.2885-19/408873429_758386519655805_3213863272797711709_n.jpg?stp=dst-jpg_s150x150&_nc_ht=scontent-cgk1-2.cdninstagram.com&_nc_cat=109&_nc_ohc=HoT5R2vN18AAX-TwqxR&edm=ACWDqb8BAAAA&ccb=7-5&oh=00_AfBgoB2wx1zX-wpMMsdLmxVr32VQHtXLJMYtKDYwKdeiAA&oe=65B1D6D0&_nc_sid=ee9879",
-            "followers": 51,
+            "url_Image": "https://scontent.cdninstagram.com/v/t51.2885-19/422836613_1616421772500362_5028064086655393004_n.jpg?stp=dst-jpg_s150x150&_nc_ht=scontent.cdninstagram.com&_nc_cat=102&_nc_ohc=q2cXu9Ij51YAX9legRt&edm=APs17CUBAAAA&ccb=7-5&oh=00_AfA2huy5WJngKrEqJ6828h35qegn2C8FMBGrhnnAW86xvQ&oe=65CA3F00&_nc_sid=10d13b",
+            "followers": 54,
             "following": 37,
-            "post": 3,
-            "link_sosial": {
-                "id": 1,
-                "link_url": "https://mfikria.vercel.app/"
-            },
+            "post": 4,
+            "link_sosial": [
+                {
+                    "id": 1,
+                    "link_url": "https://mfikria.vercel.app/"
+                }
+            ],
         },
         "data": [
             {

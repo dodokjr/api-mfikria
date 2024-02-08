@@ -8,8 +8,8 @@ var path = require('path');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
 
-require('dotenv').config();
 
+require('dotenv').config();
 
 const PORT = process.env.PORT || 5000
 
@@ -30,15 +30,15 @@ app.use(cookieParser());
 app.use(cors());
 app.use(function (req, res, next)
 {
-     res.setHeader('Access-Control-Allow-Origin', '*');
      res.setHeader('Access-Control-Allow-Methods', 'GET');
      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-     res.setHeader('age', '15')
-     res.setHeader('Vary', '*');
-     res.set('Cache-Control', 's-maxage=1, stale-while-revalidate=59');
      res.setHeader('Access-Control-Allow-Credentials', true);
-     res.cookie('mfikria', randomValue, { maxAge: 100000, httpOnly: true, sameSite: 'lax', secure: true });
-     next()
+     res.setHeader('age', '20')
+     res.setHeader("Content-Language", "id-ID")
+     res.setHeader('Date', new Date());
+     res.cookie('mfikria', randomValue, { maxAge: 20000, httpOnly: true, sameSite: 'lax', secure: true });
+     if (req.method === "OPTIONS") res.send(200);
+     else next();
 });
 
 app.use(favicon(path.join(__dirname, '/__public', 'logo.ico')));
@@ -49,62 +49,15 @@ app.use('/v2/anime', require('./routes/v2/anime/api'));
 app.use('/v2/github', require('./routes/v2/github/api'));
 app.use('/status', require("./routes/status"))
 app.use('/ig', require("./routes/i/index"))
-
-
-
+app.use('/otaku', require("./routes/otakudesu/api"))
+app.use('/lk21', require("./routes/v3/lk21/api"))
+app.use("/u", require("./routes/v2/link-media/link"))
 app.get("/m", (req, res) =>
 {
      const q = req.query.q
-     res.status(301).redirect(`/${q}`)
+     res.status(301).redirect(`/u/${q}`)
 })
 
-app.get("/mediasosial/github", (req, res) =>
-{
-     const q = req.query.q
-     res.status(301).redirect(`/github/${q}`)
-})
-
-app.get("/website", (req, res) =>
-{
-
-     res.status(301).redirect("https://mfikria.vercel.app/")
-
-});
-
-app.get('/instagram', (req, res) =>
-{
-     res.status(302).redirect('https://www.instagram.com/fkri__17/')
-});
-
-app.get('/github', (req, res) =>
-{
-     res.status(302).redirect('https://github.com/dodokjr')
-});
-
-app.get('/linkedin', (req, res) =>
-{
-     res.status(302).redirect('https://www.linkedin.com/in/muhammad-fikri-ardiyansah-952752194/')
-});
-
-app.get('/discord', (req, res) =>
-{
-     res.status(302).redirect('https://discord.gg/xHQhrDm4dA')
-});
-
-app.get('/steam', (req, res) =>
-{
-     res.status(302).redirect('https://steamcommunity.com/id/hokage_17/')
-});
-
-app.get('/youtube', (req, res) =>
-{
-     res.status(302).redirect('https://www.youtube.com/channel/UCLP0I71nvbJ2D_Y5y-mwbEw?sub_confirmation=1')
-});
-
-app.get('/facebook', (req, res) =>
-{
-     res.status(302).redirect('https://www.facebook.com/muhammad.f.ardiyansah.16/')
-});
 
 app.get('/github/:name', (req, res) =>
 {
@@ -114,6 +67,12 @@ app.get('/github/:name', (req, res) =>
 
 app.use('/status', limiter, require('./routes/status'));
 
+app.get('/id', function (req, res)
+{
+     res.json({
+          mesagger: "hello"
+     })
+})
 
 app.get('*', function (req, res)
 {
