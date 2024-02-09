@@ -1,0 +1,25 @@
+{
+    "title": "Api Mfikria",
+    "releases": "Jan 29, 2023",
+    "update": "Feb 08, 2024",
+    "status": "Online",
+    "language": [
+        {
+            "name": "Html"
+        },
+        {
+            "name": "JavaScript"
+        }
+    ],
+    "views": [
+        {
+            "days_30": "24"
+        },
+        {
+            "days_7": "3"
+        },
+        {
+            "24_Hours": "1"
+        }
+    ]
+}

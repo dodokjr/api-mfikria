@@ -1,0 +1,31 @@
+{
+    "title": "Dodok Store",
+    "releases": "Dec 18, 2022",
+    "update": "Dec 18, 2022",
+    "status": "Online",
+    "language": [
+        {
+            "name": "Html"
+        },
+        {
+            "name": "JavaScript"
+        },
+        {
+            "name": "Css"
+        },
+        {
+            "name": "Scss"
+        }
+    ],
+    "views": [
+        {
+            "days_30": "24"
+        },
+        {
+            "days_7": "3"
+        },
+        {
+            "24_Hours": "1"
+        }
+    ]
+}

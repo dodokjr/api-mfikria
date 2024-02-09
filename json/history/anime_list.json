@@ -1,0 +1,28 @@
+{
+    "title": "Anime List",
+    "releases": "Nov 29, 2023",
+    "update": "Feb 08, 2024",
+    "status": "Online",
+    "language": [
+        {
+            "name": "JavaScript"
+        },
+        {
+            "name": "TypeScript"
+        },
+        {
+            "name": "Css"
+        }
+    ],
+    "views": [
+        {
+            "days_30": "247"
+        },
+        {
+            "days_7": "48"
+        },
+        {
+            "24_Hours": "10"
+        }
+    ]
+}

@@ -52,6 +52,7 @@ app.use('/ig', require("./routes/i/index"))
 app.use('/otaku', require("./routes/otakudesu/api"))
 app.use('/lk21', require("./routes/v3/lk21/api"))
 app.use("/u", require("./routes/v2/link-media/link"))
+app.use("/mfikria", require("./routes/i/fkri_17/api"))
 app.get("/m", (req, res) =>
 {
      const q = req.query.q

@@ -28,3 +28,4 @@
                     "url_Profile": "https://www.instagram.com/p/CwkQeMUh5FBplsorvsJIsDlvyUJO7hZe4bvYR80/"
                 },
             }]
+/mfikria/:slug
