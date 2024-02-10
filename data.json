@@ -5,7 +5,7 @@
             "id" : "1",
             "slug": "dodok-store",
             "title":"Dodok Store",
-            "img_url": "https://api-mfikria.vercel.app/public/assets/project/Dodokstore.webp",
+            "img_url": "https://api-mfikria.vercel.app/public/assets/project/DodokStore.webp",
             "descriptions": "Store Project with Html Css Javascript",
             "url_github": "https://github.com/dodokjr/dodok-store",
             "url_demo" : "https://dodokvapestore.netlify.app/"
