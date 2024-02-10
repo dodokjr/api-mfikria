@@ -31,4 +31,9 @@ router.get("/api-mfikria", function (res, req)
     req.send(api_mfikria);
 })
 
+router.get("*", function (res, req)
+{
+    req.status(404).json({ status: 404 });
+})
+
 module.exports = router
