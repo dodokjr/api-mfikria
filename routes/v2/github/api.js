@@ -98,4 +98,9 @@ router.get('/l/limit', async function (req, res)
         res.status(500).send('Api salah')
     })
 })
+
+router.get('*', async function (req, res)
+{
+    req.status(404).json({ status: 404 });
+})
 module.exports = router;
