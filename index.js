@@ -20,8 +20,8 @@ app.listen(PORT, () =>
 
 
 const limiter = rateLimit({
-     windowMs: 5 * 60 * 1000, // 5 minutes
-     max: 25, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+     windowMs: 3 * 60 * 1000, // 5 minutes
+     max: 105, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
      standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
      legacyHeaders: false,
 })
@@ -43,27 +43,39 @@ app.use(function (req, res, next)
 
 app.use(favicon(path.join(__dirname, '/__public', 'logo.ico')));
 app.use('/', express.static(__dirname + "/__public/"));
-app.use('/link', require('./routes/v2/link-media/api'));
-app.use('/v3/youtube', require('./routes/v3/youtube/api'))
-app.use('/v2/anime', require('./routes/v2/anime/api'));
-app.use('/v2/github', require('./routes/v2/github/api'));
-app.use('/status', require("./routes/status"))
-app.use('/ig', require("./routes/i/index"))
-app.use('/otaku', require("./routes/otakudesu/api"))
-app.use('/lk21', require("./routes/v3/lk21/api"))
-app.use("/u", require("./routes/v2/link-media/link"))
-app.use("/mfikria", require("./routes/i/fkri_17/api"))
+app.use('/link', limiter, require('./routes/v2/link-media/api'));
+app.use('/v3/youtube', limiter, require('./routes/v3/youtube/api'))
+app.use('/v2/anime', limiter, require('./routes/v2/anime/api'));
+app.use('/v2/github', limiter, require('./routes/v2/github/api'));
+app.use('/status', limiter, require("./routes/status"))
+app.use('/ig', limiter, require("./routes/i/index"))
+app.use('/otaku', limiter, require("./routes/otakudesu/api"))
+app.use('/lk21', limiter, require("./routes/v3/lk21/api"))
+app.use("/u", limiter, require("./routes/v2/link-media/link"))
+app.use("/mfikria", limiter, require("./routes/i/fkri_17/api"))
 app.get("/m", (req, res) =>
 {
      const q = req.query.q
      res.status(301).redirect(`/u/${q}`)
 })
 
+app.get("/op", (req, res) =>
+{
+     const mediaS = req.query.mediaS
+     const name = req.query.name
+     res.status(301).redirect(`/${mediaS}/${name}?fop=${randomNumber}&value=${randomValue}`)
+})
 
 app.get('/github/:name', (req, res) =>
 {
      const name = req.params.name
      res.status(302).redirect(`https://github.com/${name}`)
+});
+
+app.get('/instagram/:name', (req, res) =>
+{
+     const name = req.params.name
+     res.status(302).redirect(`https://www.instagram.com/${name}/?hl=en-en`)
 });
 
 app.use('/status', limiter, require('./routes/status'));
@@ -93,7 +105,7 @@ function errorHandler(err, req, res, next)
 
 
 var randomNumber = Math.random().toString();
-randomNumber = randomNumber.substring(2, randomNumber.length);
+randomNumber = randomNumber.substring(1 || randomNumber.length);
 
 
 

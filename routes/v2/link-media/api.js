@@ -22,4 +22,12 @@ router.get("/", function (res, req)
           twitter: tw
      })
 });
+
+router.get("/mfanimelist", function (res, req)
+{
+     req.json({
+          instagram: ig,
+          discord: "comming Soon",
+     })
+});
 module.exports = router

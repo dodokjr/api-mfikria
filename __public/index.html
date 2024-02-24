@@ -11,6 +11,7 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="public/js/index.js"></script>
+    <script src="public/js/api.js"></script>
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -24,6 +25,19 @@
         };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
+    <style>
+      img {
+ transition: .3s ease all ;
+ -webkit-transition: .3s ease all ;
+ -moz-transition: .3s ease all ;
+ -ms-transition: .3s ease all ;
+ -o-transition: .3s ease all ;
+}
+
+img:hover{
+  scale: 102%;
+}
+    </style>
     <title>Mfikria Docs</title>
   </head>
   <body style="font-family: 'Poppins', sans-serif" class="dark:bg-slate-900 bg-white dark:text-white">
@@ -88,6 +102,12 @@
       <div class="w-full flex justify-center p-6 flex-col items-center">
         <p class="p-5 text-xl">Ayo Mulai</p>
         <a href="./docs.html" class="text-white h-50 bg-red-600 p-2 w-44 rounded text-center"> Memulai itu mudah! </a>
+      </div>
+
+      <div class="w-full flex justify-center p-6 flex-col items-center">
+        <p class="p-5 text-xl">Test Api</p>
+        <button onclick="testApi()" id="hidden" class="text-white h-50 bg-red-600 p-2 w-44 rounded text-center">Test Api</button>
+        <div id="res" class="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 px-4"></div>
       </div>
 
       <div class="w-full flex justify-center items-center mt-20 mb-20">
