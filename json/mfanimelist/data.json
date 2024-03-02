@@ -1,0 +1,64 @@
+{
+    "status": "ok",
+    "data": {
+        "type":"data home",
+        "about_us":{
+            "messages": "mfanime adalah anime List, Search, dan Streaming subtitle indonesia",
+            "about_data": [
+                {"name": "Page Watch", "value": 550},
+                {"name":"user", "value": 120},
+                {"name":"anime_sub", "value":[
+                    "Indonesia, ",
+                    "English"
+                ]},
+                {"name":"anime_api", "value":"cooming Soon"}
+            ]
+        },
+        "anime":{
+            "anime_data":[
+                {
+                "mal_id": 52299,
+                "title" : "ore dake Level Up na Ken",
+                "slug": "/anime/52299",
+                "score": 8.44,
+                "episodes": 12,
+                "images": "https://cdn.myanimelist.net/images/anime/1926/140799.jpg"
+                },
+               {
+                "mal_id": 33,
+                "title": "Kenpuu Denki Berserk",
+                "slug": "/anime/33",
+                "score": 8.58,
+                "episodes": 25,
+                "images": "https://cdn.myanimelist.net/images/anime/1384/119988.jpg"
+               },
+               {
+                "mal_id": 10010,
+                "title":"Kenpuu Denki Berserk",
+                "slug": "/manga/10010",
+                "images": "https://cdn.myanimelist.net/images/manga/3/188942.jpg"
+               },
+               {
+                "title": "Pon no Michi",
+                "slug": "/otakudesu/pon-michi-sub-indo",
+                "images": "https://otakudesu.cloud/wp-content/uploads/2024/01/PNM.jpg"
+               }
+            ]
+        },
+        "team":[
+            {
+                "id": 1,
+                "name": "dodokjr",
+                "img": "https://avatars.githubusercontent.com/u/67883705?v=4",
+                "position": "owner, Devloper",
+                "media_sosial": {
+                    "twitter": "https://twitter.com/bintangFikri3",
+                    "instagram": "https://www.instagram.com/fkri__17/",
+                    "youtube": "https://www.youtube.com/@fkri__17",
+                    "github": "https://github.com/dodokjr/",
+                    "linkedin": "https://www.linkedin.com/in/muhammad-fikri-ardiyansah/"
+                }
+            }
+        ]
+    }
+}
