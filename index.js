@@ -20,10 +20,17 @@ app.listen(PORT, () =>
 
 
 const limiter = rateLimit({
-     windowMs: 3 * 60 * 1000, // 5 minutes
-     max: 105, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+     windowMs: 5 * 60 * 1000, // 5 minutes
+     max: 550, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
      standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
      legacyHeaders: false,
+     statusCode: 500,
+     message: {
+          status: 500, // optional, of course
+          limiter: true,
+          type: "error",
+          message: 'You are doing that too much. Please try again in 5 minutes.'
+     }
 })
 
 app.use(cookieParser());
