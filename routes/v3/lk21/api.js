@@ -143,4 +143,12 @@ router.get('/search', async function (req, res)
         });
     })
 });
+
+// error 
+router.get("*", (req, res) =>
+{
+    res.json({
+        status: "404"
+    })
+})
 module.exports = router

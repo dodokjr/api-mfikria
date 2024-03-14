@@ -16,32 +16,37 @@
         },
         "anime":{
             "anime_data":[
-                {
-                "mal_id": 52299,
-                "title" : "ore dake Level Up na Ken",
-                "slug": "/anime/52299",
-                "score": 8.44,
-                "episodes": 12,
-                "images": "https://cdn.myanimelist.net/images/anime/1926/140799.jpg"
-                },
                {
-                "mal_id": 33,
-                "title": "Kenpuu Denki Berserk",
-                "slug": "/anime/33",
-                "score": 8.58,
-                "episodes": 25,
-                "images": "https://cdn.myanimelist.net/images/anime/1384/119988.jpg"
+                "mal_id": 51039,
+                "title": "Doupo Cangqiong: Nian Fan Or Battle Through The Heavens",
+                "slug": "/anime/51039",
+                "score": 8.11,
+                "episodes": 104,
+                "images": "https://cdn.myanimelist.net/images/anime/1419/126374.jpg"
                },
                {
-                "mal_id": 10010,
-                "title":"Kenpuu Denki Berserk",
-                "slug": "/manga/10010",
-                "images": "https://cdn.myanimelist.net/images/manga/3/188942.jpg"
+                "mal_id": 52741,
+                "title": "Undead Unluck ",
+                "slug": "/anime/52741",
+                "score": 7.74,
+                "episodes": 24,
+                "images": "https://cdn.myanimelist.net/images/anime/1136/138410.jpg"
                },
                {
-                "title": "Pon no Michi",
-                "slug": "/otakudesu/pon-michi-sub-indo",
-                "images": "https://otakudesu.cloud/wp-content/uploads/2024/01/PNM.jpg"
+                "mal_id": 142997,
+                "title":"The Fable: The Second Contact",
+                "slug": "/manga/142997",
+                "images": "https://cdn.myanimelist.net/images/manga/1/254075.jpg"
+               },
+               {
+                "title": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e Season 3",
+                "slug": "/otakudesu/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e-s3-sub-indo",
+                "images": "https://otakudesu.cloud/wp-content/uploads/2024/01/Youkoso-Jitsuryoku-Shijou-Shugi-no-Kyoushitsu-e-Season-3-Sub-Indo.jpg"
+               },
+               {
+                "title": "Shaman King: Flowers ",
+                "slug": "/otakudesu/shaman-king-flowers-sub-indo",
+                "images": "https://otakudesu.cloud/wp-content/uploads/2024/01/Shaman-King-Flowers-Sub-Indo.jpg"
                }
             ]
         },

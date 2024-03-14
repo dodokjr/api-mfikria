@@ -61,6 +61,7 @@ app.use('/lk21', limiter, require("./routes/v3/lk21/api"))
 app.use("/u", limiter, require("./routes/v2/link-media/link"))
 app.use("/mfikria", limiter, require("./routes/i/fkri_17/api"))
 app.use("/mfanimelist", limiter, require("./routes/mfanimelist"))
+app.use("/contributors", limiter, require("./routes/web/contributors"))
 app.get("/m", (req, res) =>
 {
      const q = req.query.q

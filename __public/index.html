@@ -107,6 +107,7 @@ img:hover{
       <div class="w-full flex justify-center p-6 flex-col items-center">
         <p class="p-5 text-xl">Test Api</p>
         <button onclick="testApi()" id="hidden" class="text-white h-50 bg-red-600 p-2 w-44 rounded text-center">Test Api</button>
+        <div id="loading" style="display: none;">Loding</div>
         <div id="res" class="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 px-4"></div>
       </div>
 
@@ -207,21 +208,11 @@ img:hover{
             <div class="lg:w-1/2 flex flex-col justify-center items-center mb-10">
               <h1 class="text-3xl lg:text-4xl xl:text-5xl font-bold text-center text-white">Meet our contributors</h1>
             </div>
-            <div role="list" aria-label="Team members" class="grid grid-flow-row md:grid-flow-col gap-10">
-              <div role="listitem" class="relative flex justify-center items-center">
-                <a href="/mediasosial?q=github" target="_blank">
-                  <div class="relative h-40 bg-white hover:drop-shadow-2xl w-48 flex justify-center rounded-md">
-                    <img src="./public/svgs/github.svg" class="absolute top-16 h-6 w-6" alt="github.img" />
-                    <img src="https://avatars.githubusercontent.com/u/67883705?v=4" class="absolute w-20 h-20 -top-8 rounded-full" alt="display avatar" role="img" title="dodokj" />
-                    <p class="absolute top-24 text-center text-black">@dodokjr</p>
-                  </div>
-                </a>
-              </div>
+            <div role="list" id="ress" aria-label="Team members" class="grid grid-flow-row md:grid-flow-col gap-10">
             </div>
           </div>
         </div>
       </section>
-
       <footer>
         <div class="bg-white dark:bg-slate-900 h-38 py-1 px-1 mt-5">
           <div tabindex="0" aria-label="footer" class="focus:outline-none mx-auto container flex flex-col items-center justify-center">
