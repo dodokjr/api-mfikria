@@ -52,7 +52,7 @@ router.get('/search', async function (req, res)
      const q = req.query.q;
      const options = {
           hostname: `${url}`,
-          path: '/v4/anime?q=' + q + '&sfw',
+          path: '/v4/anime?q=' + q + '&limit=5&sfw',
           headers: {
                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
           },
@@ -68,6 +68,27 @@ router.get('/search', async function (req, res)
      })
 })
 
+
+router.get('/search/manga', async function (req, res)
+{
+     const q = req.query.q;
+     const options = {
+          hostname: `${url}`,
+          path: '/v4/manga?q=' + q + '&limit=5&sfw',
+          headers: {
+               'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1521.3 Safari/537.36'
+          },
+     }
+     https.get(options, function (apiResponse)
+     {
+          apiResponse.pipe(res);
+          res.set('Content-Type', 'application/json')
+     }).on('error', (e) =>
+     {
+          console.log(e);
+          res.status(500).send('Api Salah');
+     })
+})
 
 
 router.get('/populer', async function (req, res)

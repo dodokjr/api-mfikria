@@ -21,7 +21,7 @@ app.listen(PORT, () =>
 
 const limiter = rateLimit({
      windowMs: 5 * 60 * 1000, // 5 minutes
-     max: 550, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+     max: 50, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
      standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
      legacyHeaders: false,
      statusCode: 500,

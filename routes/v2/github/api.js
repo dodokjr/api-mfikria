@@ -99,8 +99,12 @@ router.get('/l/limit', async function (req, res)
     })
 })
 
-router.get('*', async function (req, res)
+router.get('/', async function (req, res)
 {
-    req.status(404).json({ status: 404 });
+    res.status(404).json({
+        status: 404,
+        message: "No Data :(",
+        slug: "/v2/github/:users"
+    });
 })
 module.exports = router;

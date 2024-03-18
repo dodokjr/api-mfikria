@@ -11,7 +11,7 @@ programming language
 Installation App
 <ul>
   <li>Npm Install</li>
-  <li>nodemon server (run the application)</li>
+  <li>npm start (run the application)</li>
   <li>Run in port 5000</li>
 </ul>
 Enjoy enjoying the application
