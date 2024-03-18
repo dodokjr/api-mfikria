@@ -11,11 +11,11 @@ router.get("/", function (res, req)
 router.get("/:search", async (req, res) =>
 {
     const Search = req.params.search
-    const datafetch = await fetch(`http://localhost:5000/v2/anime/search?q=${Search}`)
+    const datafetch = await fetch(`https://api-mfikria.vercel.app/v2/anime/search?q=${Search}`)
     const data = await datafetch.json()
     const datafetching = await fetch(`https://otakudesu-tau.vercel.app/v1/search/${Search}`)
     const dataotakudesu = await datafetching.json()
-    const dataManga = await fetch(`http://localhost:5000/v2/anime/search?q=${Search}`)
+    const dataManga = await fetch(`http://api-mfikria.vercel.app/v2/anime/search?q=${Search}`)
     const datamanga = await dataManga.json()
     if (!data, dataotakudesu, dataManga == "data")
     {
