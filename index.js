@@ -55,11 +55,11 @@ app.use('/v3/youtube', limiter, require('./routes/v3/youtube/api'))
 app.use('/v2/anime', limiter, require('./routes/v2/anime/api'));
 app.use('/v2/github', limiter, require('./routes/v2/github/api'));
 app.use('/status', limiter, require("./routes/status"))
-app.use('/ig', limiter, require("./routes/i/index"))
 app.use('/otaku', limiter, require("./routes/otakudesu/api"))
 app.use('/lk21', limiter, require("./routes/v3/lk21/api"))
 app.use("/u", limiter, require("./routes/v2/link-media/link"))
-app.use("/mfikria", limiter, require("./routes/i/fkri_17/api"))
+app.use('/mfikria/c/', require("./routes/i/index"))
+app.use("/mfikria/p/", limiter, require("./routes/i/fkri_17/api"))
 app.use("/mfanimelist", limiter, require("./routes/mfanimelist"))
 app.use("/contributors", limiter, require("./routes/web/contributors"))
 app.get("/m", (req, res) =>
@@ -98,7 +98,12 @@ app.get('/id', function (req, res)
 
 app.get('*', function (req, res)
 {
-     res.status(404).sendFile(path.join(__dirname + '/__public/404.html'))
+     const time = Date.now()
+     res.status(404).json({
+          status: "404",
+          TimeStatus: time,
+          mesagge: "error Trobel"
+     })
 })
 
 function errorHandler(err, req, res, next)
