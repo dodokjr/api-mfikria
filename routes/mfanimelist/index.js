@@ -4,10 +4,7 @@ const data = require("../../json/mfanimelist/data.json")
 
 router.get("/", function (res, req)
 {
-    req.status(200).json({
-        status: req.statusCode,
-        res: data
-    })
+    req.status(200).send(data)
 })
 
 // api-mfikria.vercel.app
