@@ -78,7 +78,7 @@ router.get("/blog/post_1", (res, req) =>
                     "As I stand out here in the wonders of the unknown at Hadley, I sort of realize there’s a fundamental truth to our nature, Man must explore, and this is exploration at its greatest.",
                 ],
                 copyright: "Placeholder text by Space Ipsum · Images by NASA on The Commons",
-                iframe_yt: "https://www.youtube.com/embed/YncQyAb1xBQ?si=MCfg1rz0Fq3lsrUe"
+                iframe_yt: "https://www.youtube.com/embed/sV5mqMEnC0I?si=hKD4HdSLAv8Rp-vl"
             }
         }
     })
