@@ -54,8 +54,12 @@ router.get("/blog/post_1", (res, req) =>
     req.status(200).send({
         status: req.statusCode,
         data: {
+            postBy: {
+                creator: "Admin",
+                img_profile: "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
+                status_creator: "Founder Devloper "
+            },
             title: "Man must explore, and this is exploration at its greatest",
-            creator: "Admin",
             time_post: "March 30, 2024",
             subtitle: "Problems look mighty small from 150 miles up",
             img_background: "https://startbootstrap.github.io/startbootstrap-clean-blog/assets/img/post-bg.jpg",
