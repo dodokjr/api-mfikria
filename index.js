@@ -87,7 +87,6 @@ app.get('/instagram/:name', (req, res) =>
      res.status(302).redirect(`https://www.instagram.com/${name}/?hl=en-en`)
 });
 
-app.use('/status', limiter, require('./routes/status'));
 
 app.get('/id', function (req, res)
 {
@@ -96,15 +95,18 @@ app.get('/id', function (req, res)
      })
 })
 
-app.get('*', function (req, res)
+
+app.get('*', (req, res, err) => 
 {
-     const time = Date.now()
+     const time = new Date()
      res.status(404).json({
-          status: "404",
-          TimeStatus: time,
-          mesagge: "error Trobel"
+          status: res.statusCode,
+          code_for_message: randomValue,
+          TimeStatus: `${time}`,
+          mesagge: "error 404 please contact https://mfikria.vercel.app",
      })
 })
+
 
 function errorHandler(err, req, res, next)
 {

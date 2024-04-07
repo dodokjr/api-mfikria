@@ -1,14 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
-router.get("/", function (res, req)
+module.exports = router.get('/', (res, req) =>
 {
-    req.json({
-        status: statusreq,
-        key: randomValue,
-        offline_url: offlineFile,
+    req.status(200).send({
+        status: req.statusCode,
+        key: randomValue + randomNumber,
+        offlineUrl: [
+            "v3",
+        ]
     })
-})
+});
 
 function randomString(len, charSet)
 {
@@ -22,11 +24,8 @@ function randomString(len, charSet)
     return randomString;
 }
 
-var randomValue = randomString(15);
+var randomValue = randomString(5);
 
-let statusreq = '200'
-let offlineFile = 'v3'
+var randomNumber = Math.random().toString();
+randomNumber = randomNumber.substring(1 || randomNumber.length);
 
-
-
-module.exports = router
