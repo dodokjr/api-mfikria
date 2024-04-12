@@ -5,6 +5,7 @@ const anime_list = require("../../../json/history/anime_list.json")
 const api_mfikria = require("../../../json/history/api_mfikria.json")
 const dodok_store = require("../../../json/history/dodok_store.json")
 const token_and_password_random = require("../../../json/history/token_and_password_random.json")
+const portofolioTamplate = require("../../../json/history/portofolioTamplate.json")
 
 router.get("/", function (res, req)
 {
@@ -29,6 +30,11 @@ router.get("/anime-list", function (res, req)
 router.get("/api-mfikria", function (res, req)
 {
     req.send(api_mfikria);
+})
+
+router.get("/Portofolio-Tamplate", function (res, req)
+{
+    req.send(portofolioTamplate);
 })
 
 router.get("*", function (res, req)

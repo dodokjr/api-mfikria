@@ -36,6 +36,15 @@
             "descriptions": "Project with Backend Express js",
             "url_github": "https://github.com/dodokjr/api-mfikria",
             "url_demo" :  "https://api-mfikria.vercel.app/"
+        },
+        {
+            "id":"5",
+            "slug": "Portofolio-Tamplate",
+            "title":"Tamplate Portofolio",
+            "img_url": "https://api-mfikria.vercel.app/public/assets/project/portofolio.png",
+            "descriptions": "Project with Vite Rect js and Tailwindui Daisyui",
+            "url_github": "https://github.com/dodokjr/mfikriaPorto/",
+            "url_demo" :  "https://mfikria-porto.vercel.app/"
         }
     ]
 }
