@@ -46,7 +46,33 @@ router.get("/ig", function (res, req)
 
 router.get("/blog", (res, req) =>
 {
-    req.status(200).send(blogHome)
+    req.status(200).send({
+        status: res.statusCode,
+        "data": [
+            {
+                "id": "01",
+                "title": "Man must explore, and this is exploration at its greatest",
+                "subtitle": "Problems look mighty small from 150 miles up",
+                "slug": "post_1",
+                "postBy": {
+                    "title": "Posted by",
+                    "name": "Admin",
+                    "time": "on March 30, 2024"
+                }
+            },
+            {
+                "id": "02",
+                "title": "Music that I like to hear",
+                "subtitle": "The music I like to listen to is mostly pop and rock music",
+                "slug": "post_2",
+                "postBy": {
+                    "title": "Posted by",
+                    "name": "Admin",
+                    "time": "on April 12, 2024"
+                }
+            }
+        ]
+    })
 })
 
 router.get("/blog/post_1", (res, req) =>
@@ -88,6 +114,34 @@ router.get("/blog/post_1", (res, req) =>
     })
 })
 
+router.get("/blog/post_2", (res, req) =>
+{
+    req.status(200).send({
+        status: req.statusCode,
+        data: {
+            postBy: {
+                creator: "Admin",
+                img_profile: "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
+                status_creator: "Founder Devloper "
+            },
+            title: "Music that I like to hear",
+            time_post: "April 12, 2024",
+            subtitle: "The music I like to listen to is mostly pop and rock music",
+            img_background: "https://img.freepik.com/free-photo/volumetric-musical-background-with-treble-clef-notes-generative-ai_169016-29576.jpg",
+            content:
+            {
+                descriptions: [
+                    "The first thing I like about the pop and rock genres is music that has high artistic value and I like that in my mind and I have to have good taste in choosing the music I like.",
+                    "The second thing I like in terms of pop and rock genre music is artists who are very popular among young people today and I like that😁",
+                    "The last thing in liking pop rock genre music is the high tempo of the music and the music is very popular among many people",
+                    "That's my short blog, I would like to say thank you"
+                ],
+                copyright: "Placeholder text by Mfikria · Images by Freepik",
+                iframe_yt: "https://www.youtube.com/embed/A-nV1o_IBmk?si=Fg-cb_YBwwF3k3Yv"
+            }
+        }
+    })
+})
 
 router.get("/*", (res, req) =>
 {

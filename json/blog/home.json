@@ -1,15 +1,3 @@
 {
-    "data":[
-        {
-            "id": "01",
-            "title": "Man must explore, and this is exploration at its greatest",
-            "subtitle": "Problems look mighty small from 150 miles up",
-            "slug": "post_1",
-            "postBy": {
-                "title": "Posted by",
-                "name": "Admin",
-                "time": "on March 30, 2024"
-            }
-        }
-    ]
+   
 }
