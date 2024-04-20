@@ -4,48 +4,47 @@
         "about_us":{
             "messages": "mfanime adalah anime List, Search, dan Streaming subtitle indonesia",
             "about_data": [
-                {"name": "Page Watch", "value": 550},
-                {"name":"user", "value": 120},
+                {"name": "Page Watch", "value": 1550},
+                {"name":"user", "value": 150},
                 {"name":"anime_sub", "value":[
                     "Indonesia, ",
                     "English"
-                ]},
-                {"name":"anime_api", "value":"cooming Soon"}
+                ]}
             ]
         },
         "anime":{
             "anime_data":[
                {
-                "mal_id": 51039,
-                "title": "Doupo Cangqiong: Nian Fan Or Battle Through The Heavens",
-                "slug": "/anime/51039",
-                "score": 8.11,
-                "episodes": 104,
-                "images": "https://cdn.myanimelist.net/images/anime/1419/126374.jpg"
+                "mal_id": 32281,
+                "title": "Kimi no Na wa.",
+                "slug": "/anime/32281",
+                "score": 8.84,
+                "episodes": 1,
+                "images": "https://cdn.myanimelist.net/images/anime/5/87048.jpg"
                },
                {
-                "mal_id": 52741,
-                "title": "Undead Unluck ",
-                "slug": "/anime/52741",
-                "score": 7.74,
-                "episodes": 24,
-                "images": "https://cdn.myanimelist.net/images/anime/1136/138410.jpg"
+                "mal_id": 43608,
+                "title": "Kaguya-sama wa Kokurasetai: Ultra Romantic ",
+                "slug": "/anime/43608",
+                "score":  9.01,
+                "episodes": 13,
+                "images": "https://cdn.myanimelist.net/images/anime/1160/122627.jpg"
                },
                {
-                "mal_id": 142997,
-                "title":"The Fable: The Second Contact",
-                "slug": "/manga/142997",
-                "images": "https://cdn.myanimelist.net/images/manga/1/254075.jpg"
+                "mal_id": 126479,
+                "title":"Mikkakan no Koufuku",
+                "slug": "/manga/126479",
+                "images": "https://cdn.myanimelist.net/images/manga/3/248674.jpg"
                },
                {
-                "title": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e Season 3",
-                "slug": "/otakudesu/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e-s3-sub-indo",
-                "images": "https://otakudesu.cloud/wp-content/uploads/2024/01/Youkoso-Jitsuryoku-Shijou-Shugi-no-Kyoushitsu-e-Season-3-Sub-Indo.jpg"
+                "title": "Bartender: Kami no Glass",
+                "slug": "/otakudesu/brtender-kami-glass-sub-indo",
+                "images": "https://otakudesu.cloud/wp-content/uploads/2024/04/Bartender-Kami-no-Glass.jpg"
                },
                {
-                "title": "Shaman King: Flowers ",
-                "slug": "/otakudesu/shaman-king-flowers-sub-indo",
-                "images": "https://otakudesu.cloud/wp-content/uploads/2024/01/Shaman-King-Flowers-Sub-Indo.jpg"
+                "title": "Ishura ",
+                "slug": "/otakudesu/ishura-sub-indo",
+                "images": "https://otakudesu.cloud/wp-content/uploads/2024/03/Ishura-Sub-Indo.jpg"
                }
             ]
         },
