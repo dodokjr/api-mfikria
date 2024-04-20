@@ -40,6 +40,16 @@ router.get("/ig", function (res, req)
                 "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_4.webp",
                 "url_Profile": "https://www.instagram.com/p/CwkQeMUh5FBplsorvsJIsDlvyUJO7hZe4bvYR80/"
             },
+            {
+                "id": 4,
+                "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_5.webp",
+                "url_Profile": "https://www.instagram.com/p/C5yUzhmBGCr/"
+            },
+            {
+                "id": 5,
+                "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_6.webp",
+                "url_Profile": "https://www.instagram.com/p/C5yUzhmBGCr/"
+            },
         ]
     });
 })
