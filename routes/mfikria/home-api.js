@@ -116,17 +116,32 @@ router.get("/home", async (res, req) =>
                 }
             ],
             blog: [
-                {
-                    id: "01",
+               {
+                    id: 1,
                     title: "Man must explore, and this is exploration at its greatest",
                     descriptions: "Problems look mighty small from 150 miles up, Never in all their history have men been able truly to conceive of the world as one: a single sphere, a globe, having the qualities of a globe, a round earth in which all the directions eventually meet, in which there is no center because every point, or none, is center — an equal earth which all men occupy as equals. The airman's earth, if free men make it, will be truly round: a globe in practice, not in theory....",
                     slug: "post_1",
+                    img_src: "https://startbootstrap.github.io/startbootstrap-clean-blog/assets/img/post-bg.jpg",
                     type: "Article",
                     postBy: {
                         title: "Posted by",
                         name: "Admin",
                         img_src: "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
                         time: "on March 30, 2024"
+                    }
+                },
+                {
+                    id: 2,
+                    title: "Music that I like to hear",
+                    descriptions: "The first thing I like about the pop and rock genres is music that has high artistic value and I like that in my mind and I have to have good....",
+                    slug: "post_2",
+                    img_src: "https://img.freepik.com/free-photo/volumetric-musical-background-with-treble-clef-notes-generative-ai_169016-29576.jpg",
+                    type: "Article",
+                    postBy: {
+                        title: "Posted by",
+                        name: "Admin",
+                        img_src: "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
+                        time: "on April 12, 2024"
                     }
                 }
             ],
