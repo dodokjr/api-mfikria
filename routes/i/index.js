@@ -60,10 +60,11 @@ router.get("/blog", (res, req) =>
         status: res.statusCode,
         "data": [
             {
-                "id": "01",
+                "id": 1,
                 "title": "Man must explore, and this is exploration at its greatest",
                 "subtitle": "Problems look mighty small from 150 miles up",
                 "slug": "post_1",
+                "img_src": "https://startbootstrap.github.io/startbootstrap-clean-blog/assets/img/post-bg.jpg",
                 "postBy": {
                     "title": "Posted by",
                     "name": "Admin",
@@ -71,10 +72,11 @@ router.get("/blog", (res, req) =>
                 }
             },
             {
-                "id": "02",
+                "id": 2,
                 "title": "Music that I like to hear",
                 "subtitle": "The music I like to listen to is mostly pop and rock music",
                 "slug": "post_2",
+                "img_src": "https://img.freepik.com/free-photo/volumetric-musical-background-with-treble-clef-notes-generative-ai_169016-29576.jpg",
                 "postBy": {
                     "title": "Posted by",
                     "name": "Admin",
