@@ -19,44 +19,9 @@ router.get("/home", async (res, req) =>
             name: "Muhammad Fikri Ardiyansah",
             img_src: "https://i.pinimg.com/564x/d7/86/63/d78663d102ad37f45f0b6efa721aace3.jpg",
             about: "Saya Suka Sekali Tentang Bahasa Pemograman,  Bahasa Pemograman Yang Saya sukai adalah",
-            code: "Html, Javascript, Css, Python, C++, Java, Typescript",
-            code_card: [
-                {
-                    id: "01",
-                    title: "Html",
-                    img_src: "http://localhost:5000/public/assets/code/html.png",
-                    progress: 100,
-                    project_code_progress: 100,
-                },
-                {
-                    id: "02",
-                    title: "Javascript",
-                    img_src: "http://localhost:5000/public/assets/code/js.png",
-                    progress: 80,
-                    project_code_progress: 95,
-                },
-                {
-                    id: "03",
-                    title: "CSS",
-                    img_src: "http://localhost:5000/public/assets/code/css.png",
-                    progress: 100,
-                    project_code_progress: 100,
-                },
-                {
-                    id: "04",
-                    title: "React Javascript",
-                    img_src: "http://localhost:5000/public/assets/code/react.png",
-                    progress: 85,
-                    project_code_progress: 80,
-                },
-                {
-                    id: "05",
-                    title: "Python",
-                    img_src: "http://localhost:5000/public/assets/code/py.png",
-                    progress: 40,
-                    project_code_progress: 10,
-                }
-            ],
+            code: "Html, Javascript, Css, Python, C++, Java, Typescript.",
+            about_and: "dan selain itu saya juga suka tentang",
+            skill: "editing photo dan video, excel, ms word, power point dan trampil menggunakan komputer",
             project: [
                 {
                     "id": "1",
@@ -145,7 +110,15 @@ router.get("/home", async (res, req) =>
                     }
                 }
             ],
-            media_sosial: ms
+            media_sosial: {
+                "github": "https://api-mfikria.vercel.app/m?q=github",
+                "instagram": "https://api-mfikria.vercel.app/m?q=instagram",
+                "youtube": "https://api-mfikria.vercel.app/m?q=youtube",
+                "linkedin": "https://api-mfikria.vercel.app/m?q=linkedin",
+                "discord": "https://api-mfikria.vercel.app/m?q=discord",
+                "steam": "https://api-mfikria.vercel.app/m?q=steam",
+                "twitter": "https://api-mfikria.vercel.app/m?q=twitter"
+            }
         }
     })
 })
