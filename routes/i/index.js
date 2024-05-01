@@ -57,7 +57,7 @@ router.get("/ig", function (res, req)
 router.get("/blog", (res, req) =>
 {
     req.status(200).send({
-        status: res.statusCode,
+        status: req.statusCode,
         "data": [
             {
                 "id": 1,
