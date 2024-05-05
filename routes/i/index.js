@@ -50,6 +50,21 @@ router.get("/ig", function (res, req)
                 "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_6.webp",
                 "url_Profile": "https://www.instagram.com/p/C5yUzhmBGCr/"
             },
+            {
+                "id": 6,
+                "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_7.webp",
+                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/"
+            },
+            {
+                "id": 7,
+                "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_8.webp",
+                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/"
+            },
+            {
+                "id": 8,
+                "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_9.webp",
+                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/"
+            },
         ]
     });
 })
