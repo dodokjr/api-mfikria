@@ -81,7 +81,7 @@ router.get("/home", async (res, req) =>
                 }
             ],
             blog: [
-               {
+                {
                     id: 1,
                     title: "Man must explore, and this is exploration at its greatest",
                     descriptions: "Problems look mighty small from 150 miles up, Never in all their history have men been able truly to conceive of the world as one: a single sphere, a globe, having the qualities of a globe, a round earth in which all the directions eventually meet, in which there is no center because every point, or none, is center — an equal earth which all men occupy as equals. The airman's earth, if free men make it, will be truly round: a globe in practice, not in theory....",
@@ -133,6 +133,60 @@ router.get("/blog/post/:id", async (res, req) =>
         status: req.statusCode,
         id: id,
         data: data
+    })
+})
+
+router.get("/link", (res, req) =>
+{
+    req.status(200).json({
+        status: req.statusCode,
+        data: {
+            name: "Muhammad Fikri Ardiyansah",
+            img_src: "https://mfikria.vercel.app/assets/pp-kEHpuUDM.jpeg",
+            quetes: "Saya Muhammad Fikri Ardiyansah, Pernah Menjadi seorang freelancer diSuatu Aplikasi yang bernama linkedin.com dan freepik.com selama 1 tahun, dan saya seorang pengembang web developer diBagian front end developer.",
+            link_one: [
+                {
+                    id: 1,
+                    title: "Github",
+                    href: "https://github.com/dodokjr"
+                },
+                {
+                    id: 2,
+                    title: "Linkedin",
+                    href: "https://www.linkedin.com/in/muhammad-fikri-ardiyansah/"
+                },
+                {
+                    id: 3,
+                    title: "Instagram",
+                    href: "https://instagram.com/fkri__17"
+                },
+                {
+                    id: 4,
+                    title: "Twitter or X",
+                    href: "https://x.com/bintangFikri3"
+                },
+                {
+                    id: 5,
+                    title: "Sociabuzz or Cofy",
+                    href: "https://sociabuzz.com/muhammadfikriardiyansah"
+                },
+                {
+                    id: 6,
+                    title: "My Personal Website",
+                    href: "https://mfikria.vercel.app/"
+                },
+                {
+                    id: 7,
+                    title: "Spotify",
+                    href: "https://open.spotify.com/user/31n75unhqxw7q747ihdkwwznupua"
+                },
+                {
+                    id: 8,
+                    title: "Youtube",
+                    href: "https://www.youtube.com/@fkri__17?sub_confirmation=1"
+                }
+            ]
+        }
     })
 })
 
