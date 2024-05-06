@@ -43,27 +43,27 @@ router.get("/ig", function (res, req)
             {
                 "id": 4,
                 "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_5.webp",
-                "url_Profile": "https://www.instagram.com/p/C5yUzhmBGCr-bQFdHAkZbBUvQhWmepkGS3pJRw0/"
+                "url_Profile": "https://www.instagram.com/p/C5yUzhmBGCr-bQFdHAkZbBUvQhWmepkGS3pJRw0/?img_index=2"
             },
             {
                 "id": 5,
                 "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_6.webp",
-                "url_Profile": "https://www.instagram.com/p/C5yUzhmBGCr-bQFdHAkZbBUvQhWmepkGS3pJRw0/"
+                "url_Profile": "https://www.instagram.com/p/C5yUzhmBGCr-bQFdHAkZbBUvQhWmepkGS3pJRw0/?img_index=1"
             },
             {
                 "id": 6,
                 "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_7.webp",
-                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/"
+                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/?img_index=2"
             },
             {
                 "id": 7,
                 "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_8.webp",
-                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/"
+                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/?img_index=1"
             },
             {
                 "id": 8,
                 "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/ig_9.webp",
-                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/"
+                "url_Profile": "https://www.instagram.com/p/C6jGCPXBg8IdLO_NqVbV_eOpbqE7vpIrPqIabk0/?img_index=3"
             },
         ]
     });
