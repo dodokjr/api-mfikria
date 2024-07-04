@@ -109,7 +109,22 @@ router.get("/home", async (res, req) =>
                         time: "on April 12, 2024"
                     }
                 }
+                {
+                    id: 3,
+                    title: "My World Blog life",
+                    descriptions: "Im Happy",
+                    slug: "post_3",
+                    img_src: "https://images.theconversation.com/files/378097/original/file-20210111-23-bqsfwl.jpg?ixlib=rb-4.1.0&rect=36%2C84%2C7980%2C5072&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip",
+                    type: "Article",
+                    postBy: {
+                        title: "Posted by",
+                        name: "Admin",
+                        img_src: "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
+                        time: "on July 04, 2024"
+                    }
+                }
             ],
+
             media_sosial: {
                 "github": "https://api-mfikria.vercel.app/m?q=github",
                 "instagram": "https://api-mfikria.vercel.app/m?q=instagram",
