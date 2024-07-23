@@ -2,9 +2,15 @@ const express = require('express');
 const router = express.Router();
 const data = require("../../json/mfanimelist/data.json")
 
-router.get("/", function (res, req)
+router.get("/", async function (res, req)
 {
-    req.status(200).send(data)
+    const dataone = await fetch("https://otakudesu-tau.vercel.app/v1/ongoing-anime")
+    const { data } = await dataone.json()
+
+    req.status(200).json({
+        status: 200,
+        data
+    })
 })
 
 // api-mfikria.vercel.app
