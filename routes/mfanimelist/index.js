@@ -5,11 +5,42 @@ const data = require("../../json/mfanimelist/data.json")
 router.get("/", async function (res, req)
 {
     const dataone = await fetch("https://otakudesu-tau.vercel.app/v1/ongoing-anime")
-    const { data } = await dataone.json()
+    const data = await dataone.json()
 
     req.status(200).json({
         status: 200,
-        data
+        "data": {
+        "type":"data home",
+        "about_us":{
+            "messages": "mfanime adalah anime List, Search, dan Streaming subtitle indonesia",
+            "about_data": [
+                {"name": "Page Watch", "value": 1550},
+                {"name":"user", "value": 150},
+                {"name":"anime_sub", "value":[
+                    "Indonesia, ",
+                    "English"
+                ]}
+            ]
+        },
+        "anime":{
+            "anime_data": data.data
+        },
+        "team":[
+            {
+                "id": 1,
+                "name": "dodokjr",
+                "img": "https://avatars.githubusercontent.com/u/67883705?v=4",
+                "position": "owner, Devloper",
+                "media_sosial": {
+                    "twitter": "https://twitter.com/bintangFikri3",
+                    "instagram": "https://www.instagram.com/fkri__17/",
+                    "youtube": "https://www.youtube.com/@fkri__17",
+                    "github": "https://github.com/dodokjr/",
+                    "linkedin": "https://www.linkedin.com/in/muhammad-fikri-ardiyansah/"
+                }
+            }
+        ]
+    }
     })
 })
 
