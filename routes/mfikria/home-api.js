@@ -157,7 +157,7 @@ router.get("/link", (res, req) =>
         status: req.statusCode,
         data: {
             name: "Muhammad Fikri Ardiyansah",
-            img_src: "https://mfikria.vercel.app/assets/pp-kEHpuUDM.jpeg",
+            img_src: "https://mfikria.vercel.app/assets/pp_merah_new-DRIg1PY2.jpg",
             quetes: "Saya Muhammad Fikri Ardiyansah, Pernah Menjadi seorang freelancer diSuatu Aplikasi yang bernama linkedin.com dan freepik.com selama 1 tahun, dan saya seorang pengembang web developer diBagian front end developer.",
             link_one: [
                 {
