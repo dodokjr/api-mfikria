@@ -1,4 +1,5 @@
 const express = require('express');
+const status = require('../status');
 const router = express.Router();
 router.get("/", function (res, req)
 {
@@ -149,6 +150,58 @@ router.get("/blog/post/:id", async (res, req) =>
         id: id,
         data: data
     })
+})
+
+router.get("/github", async (res, req) =>
+{
+    const data = await fetch("https://api-mfikria.vercel.app/v2/github/dodokjr")
+    const body = await data.json()
+    if (body)
+    {
+        req.status(200).send({
+            body
+        })
+    } else
+    {
+        req.sendStatus(404);
+    }
+});
+
+router.get("/github/repos", async (res, req) =>
+{
+    const data = await fetch("https://api-mfikria.vercel.app/v2/github/dodokjr/repos")
+    const body = await data.json()
+    if (body)
+    {
+        req.status(200).send({
+            body
+        })
+    } else
+    {
+        req.sendStatus(404);
+    }
+})
+
+router.get("/github/details", async (res, req) =>
+{
+    const rn = res.query.rn;
+    const data = await fetch(`https://api.github.com/repos/dodokjr/${rn}/events`)
+    const body = await data.json();
+    const reposName = await fetch(`https://api.github.com/repos/dodokjr/${rn}`)
+    const bodyReposName = await reposName.json()
+    if (body && bodyReposName)
+    {
+        req.status(200).send({
+            status: "ok",
+            data: {
+                bodyReposName,
+                body,
+            }
+        })
+    } else
+    {
+        req.sendStatus(404);
+    }
 })
 
 router.get("/link", (res, req) =>

@@ -35,7 +35,8 @@ router.get("/api-mfikria", function (res, req)
 router.get("/Portofolio-Tamplate", function (res, req)
 {
     req.send(portofolioTamplate);
-})
+});
+
 
 router.get("*", function (res, req)
 {
