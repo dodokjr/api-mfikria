@@ -7,9 +7,8 @@ var favicon = require('serve-favicon');
 var path = require('path');
 const rateLimit = require('express-rate-limit');
 const router = express.Router();
-
-
-require('dotenv').config();
+const dotenv = require("dotenv");
+const db = require('./config/db');
 
 const PORT = process.env.PORT || 5000
 
@@ -17,6 +16,10 @@ app.listen(PORT, () =>
 {
      console.log(`http://localhost:${PORT}`)
 });
+
+
+
+dotenv.config();
 
 
 const limiter = rateLimit({
@@ -32,7 +35,6 @@ const limiter = rateLimit({
           message: 'You are doing that too much. Please try again in 5 minutes.'
      }
 })
-
 app.use(cookieParser());
 app.use(cors());
 app.use(function (req, res, next)
@@ -62,6 +64,7 @@ app.use("/mfikria/p/", limiter, require("./routes/i/fkri_17/api"))
 app.use("/mfanimelist", limiter, require("./routes/mfanimelist"))
 app.use("/contributors", limiter, require("./routes/web/contributors"))
 app.use("/v1/", require("./routes/mfikria/home-api"))
+app.use("/api/v1/", require("./users/routes/users.router.js"))
 app.get("/m", (req, res) =>
 {
      const q = req.query.q
@@ -106,6 +109,8 @@ app.get('*', (req, res, err) =>
           mesagge: "error 404 please contact https://mfikria.vercel.app",
      })
 })
+
+
 
 
 function errorHandler(err, req, res, next)
