@@ -10,9 +10,6 @@ router.get("/", function (res, req)
 });
 router.get("/home", async (res, req) =>
 {
-    const api = await fetch("https://api-mfikria.vercel.app/link")
-    const ms = await api.json()
-
     req.status(200).json({
         status: req.statusCode,
         data: {

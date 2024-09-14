@@ -6,9 +6,7 @@ const cors = require('cors');
 var favicon = require('serve-favicon');
 var path = require('path');
 const rateLimit = require('express-rate-limit');
-const router = express.Router();
 const dotenv = require("dotenv");
-const db = require('./config/db');
 
 const PORT = process.env.PORT || 5000
 
@@ -41,7 +39,6 @@ app.use(function (req, res, next)
 {
      res.setHeader('Access-Control-Allow-Methods', 'GET');
      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-     res.setHeader('Access-Control-Allow-Credentials', true);
      res.setHeader('age', '20')
      res.setHeader("Content-Language", "id-ID")
      res.setHeader('Date', new Date());
@@ -51,7 +48,7 @@ app.use(function (req, res, next)
 });
 
 app.use(favicon(path.join(__dirname, '/__public', 'logo.ico')));
-app.use('/', express.static(__dirname + "/__public/"));
+// app.use('/', express.static(__dirname + "/__public/"));
 app.use('/link', limiter, require('./routes/v2/link-media/api'));
 app.use('/v3/youtube', limiter, require('./routes/v3/youtube/api'))
 app.use('/v2/anime', limiter, require('./routes/v2/anime/api'));
@@ -64,7 +61,15 @@ app.use("/mfikria/p/", limiter, require("./routes/i/fkri_17/api"))
 app.use("/mfanimelist", limiter, require("./routes/mfanimelist"))
 app.use("/contributors", limiter, require("./routes/web/contributors"))
 app.use("/v1/", require("./routes/mfikria/home-api"))
-app.use("/api/v1/", require("./users/routes/users.router.js"))
+
+app.get("/", (req, res) =>
+{
+     res.status(200).send({
+          status: 200,
+          message: "Wellcom To Api Mfikria Official"
+     })
+})
+
 app.get("/m", (req, res) =>
 {
      const q = req.query.q
@@ -113,17 +118,6 @@ app.get('*', (req, res, err) =>
 
 
 
-function errorHandler(err, req, res, next)
-{
-     if (req.xhr)
-     {
-          res.ststus(500).sand({ error: 'Api Tidak Ditemukan' })
-     } else
-     {
-          next(err)
-     }
-}
-
 
 var randomNumber = Math.random().toString();
 randomNumber = randomNumber.substring(1 || randomNumber.length);
@@ -144,7 +138,6 @@ function randomString(len, charSet)
 
 var randomValue = randomString(5);
 
-var cookieName = 'Root'
 
 
 
