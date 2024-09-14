@@ -48,7 +48,7 @@ app.use(function (req, res, next)
 });
 
 app.use(favicon(path.join(__dirname, '/__public', 'logo.ico')));
-// app.use('/', express.static(__dirname + "/__public/"));
+app.use(express.static(__dirname + "/__public/"));
 app.use('/link', limiter, require('./routes/v2/link-media/api'));
 app.use('/v3/youtube', limiter, require('./routes/v3/youtube/api'))
 app.use('/v2/anime', limiter, require('./routes/v2/anime/api'));
