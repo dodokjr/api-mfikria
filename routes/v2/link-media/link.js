@@ -8,7 +8,7 @@ router.get('/website', async function (req, res)
 
 router.get('/instagram', async function (req, res)
 {
-    res.status(302).redirect('https://www.instagram.com/fkri__22/')
+    res.status(302).redirect('https://www.instagram.com/fkri.ardn/')
 });
 
 router.get('/github', function (req, res)
