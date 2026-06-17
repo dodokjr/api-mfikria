@@ -121,7 +121,7 @@ router.get("/blog/post_1", (res, req) =>
         data: {
             postBy: {
                 creator: "Admin",
-                img_profile: "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
+                img_profile: "https://yt3.googleusercontent.com/Sq6fZZ3v8ksDDOgfULa3LK28CpNTa-kLu1VFyhmHACvG2AfQtkXCwyYl64LpoSMTeTeBCz23=s160-c-k-c0x00ffffff-no-rj",
                 status_creator: "Founder Devloper "
             },
             title: "Man must explore, and this is exploration at its greatest",
@@ -160,7 +160,7 @@ router.get("/blog/post_2", (res, req) =>
         data: {
             postBy: {
                 creator: "Admin",
-                img_profile: "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
+                img_profile: "https://yt3.googleusercontent.com/Sq6fZZ3v8ksDDOgfULa3LK28CpNTa-kLu1VFyhmHACvG2AfQtkXCwyYl64LpoSMTeTeBCz23=s160-c-k-c0x00ffffff-no-rj",
                 status_creator: "Founder Devloper "
             },
             title: "Music that I like to hear",
@@ -189,11 +189,39 @@ router.get("/blog/post_3", (res, req) =>
         data: {
             postBy: {
                 creator: "Admin",
-                img_profile: "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
+                img_profile: "https://yt3.googleusercontent.com/Sq6fZZ3v8ksDDOgfULa3LK28CpNTa-kLu1VFyhmHACvG2AfQtkXCwyYl64LpoSMTeTeBCz23=s160-c-k-c0x00ffffff-no-rj",
                 status_creator: "Founder Devloper "
             },
             title: "My World Blog",
             time_post: "July 04, 2024",
+            subtitle: "Blog Life My Personal",
+            img_background: "https://images.theconversation.com/files/378097/original/file-20210111-23-bqsfwl.jpg?ixlib=rb-4.1.0&rect=36%2C84%2C7980%2C5072&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip",
+            content:
+            {
+                descriptions: [
+                    "I like to make a surprise out of myself and I want to be what makes me happy",
+                    "and I want to scream as much as I want",
+                    "and this is my short blog and I hope to become a good person physically and mentally"
+                ],
+                copyright: "Personal Blog My World",
+                iframe_yt: "https://www.youtube.com/embed/E1SBwfT2Jsw?si=TFekOHJdhP6iwbuz"
+            }
+        }
+    })
+})
+
+router.get("/blog/post_4", (res, req) =>
+{
+    req.status(200).send({
+        status: req.statusCode,
+        data: {
+            postBy: {
+                creator: "Admin",
+                img_profile: "https://yt3.googleusercontent.com/Sq6fZZ3v8ksDDOgfULa3LK28CpNTa-kLu1VFyhmHACvG2AfQtkXCwyYl64LpoSMTeTeBCz23=s160-c-k-c0x00ffffff-no-rj",
+                status_creator: "Founder Devloper "
+            },
+            title: "Title",
+            time_post: "Juni 17, 2026",
             subtitle: "Blog Life My Personal",
             img_background: "https://images.theconversation.com/files/378097/original/file-20210111-23-bqsfwl.jpg?ixlib=rb-4.1.0&rect=36%2C84%2C7980%2C5072&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip",
             content:
