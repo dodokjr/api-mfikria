@@ -110,6 +110,18 @@ router.get("/blog", (res, req) =>
                     "time": "on July 04, 2024"
                 }
             },
+            {
+                "id": 4,
+                "title": "Harga Game Fifa 22",
+                "subtitle": "Game Sepak Bola FIFA 22 Sudah Bisa Dipesan, Ini Harganya",
+                "slug": "post_4",
+                "img_src": "https://asset.kompas.com/crops/gPfFu9EefFnrMAf-FZDCLYDd_jo=/50x0:601x367/1200x800/data/photo/2021/07/13/60ed04b51e6fa.png",
+                "postBy": {
+                    "title": "Posted by",
+                    "name": "Admin",
+                    "time": "on Juni 18, 2024"
+                }
+            },
         ]
     })
 })
@@ -220,19 +232,19 @@ router.get("/blog/post_4", (res, req) =>
                 img_profile: "https://yt3.googleusercontent.com/Sq6fZZ3v8ksDDOgfULa3LK28CpNTa-kLu1VFyhmHACvG2AfQtkXCwyYl64LpoSMTeTeBCz23=s160-c-k-c0x00ffffff-no-rj",
                 status_creator: "Founder Devloper "
             },
-            title: "Title",
-            time_post: "Juni 17, 2026",
-            subtitle: "Blog Life My Personal",
-            img_background: "https://images.theconversation.com/files/378097/original/file-20210111-23-bqsfwl.jpg?ixlib=rb-4.1.0&rect=36%2C84%2C7980%2C5072&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip",
+            title: "Harga Game Fifa 22",
+            time_post: "Juni 18, 2026",
+            subtitle: "Game Sepak Bola FIFA 22 Sudah Bisa Dipesan, Ini Harganya",
+            img_background: "https://asset.kompas.com/crops/gPfFu9EefFnrMAf-FZDCLYDd_jo=/50x0:601x367/1200x800/data/photo/2021/07/13/60ed04b51e6fa.png",
             content:
             {
                 descriptions: [
-                    "I like to make a surprise out of myself and I want to be what makes me happy",
-                    "and I want to scream as much as I want",
-                    "and this is my short blog and I hope to become a good person physically and mentally"
+                    "Meski baru akan meluncur 1 Oktober nanti, FIFA 22 sudah bisa dipesan oleh para penggemar dari sekarang.", 
+                    "Ada dua edisi yang ditawarkan EA, yaitu FIFA 22 - Standard Edition dan FIFA 22 - Ultimate Edition. Di Indonesia, pengguna sudah bisa memesan game tersebut di situs web resmi EA, atau di perangkat dan konsolnya masing-masing, dengan harga sebagai berikut. FIFA 22 - Standard Edition Baca juga: Alasan Belanda Hobi Tanam Pohon Asam Jawa di Pinggir Jalan - PS4: Rp 849.000 - PS5: Rp 1.009.000 - PC: Rp 659.000 FIFA 22 - Ultimate Edition - PS4 & PS5: Rp 1.409.000 - PC: Rp 999.000 Pengguna yang memesan FIFA 22 - Ultimate Edition tentunya bakal mendapatkan sejumlah benefit ekstra, salah satunya adalah "Dual Entitlement". Artinya, apabila membeli edisi "Ultimate Edition", pengguna bakal mendapatkan FIFA 22 untuk dua versi konsol game sekaligus secara cuma-cuma (free upgrade), yaitu untuk PS4 dan PS5 atau Xbox One dan Xbox Series X/S. Baca juga: Sony Diskon Harga Game hingga 80 Persen di PlayStation Store, Ini Rekomendasinya Lalu, mereka juga bakal mendapatkan sejumlah hadiah edisi terbatas, seperti in-game items berupa FUT Heroes Player, 4.600 FIFA Points, Team of the Week 1 Player, dan masih banyak lagi. Selain itu, mereka yang memesan FIFA 22 - Ultimate Edition juga bakal bisa memainkan game tersebut lebih awal pada 27 September 2021,",
+                    "sebagaimana dirangkum KompasTekno dari EA.com, Selasa (13/7/2021)."
                 ],
-                copyright: "Personal Blog My World",
-                iframe_yt: "https://www.youtube.com/embed/E1SBwfT2Jsw?si=TFekOHJdhP6iwbuz"
+                copyright: "Kompas.com",
+                iframe_yt: "https://www.youtube.com/embed/vUJis1UBI5w?si=LZ-RVn5O2y42VDUL"
             }
         }
     })
