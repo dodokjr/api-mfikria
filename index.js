@@ -8,7 +8,7 @@ var path = require('path');
 const rateLimit = require('express-rate-limit');
 const dotenv = require("dotenv");
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5991
 
 app.listen(PORT, () =>
 {
@@ -56,11 +56,15 @@ app.use('/v2/github', limiter, require('./routes/v2/github/api'));
 app.use('/status', limiter, require("./routes/status"))
 app.use('/lk21', limiter, require("./routes/v3/lk21/api"))
 app.use("/u", limiter, require("./routes/v2/link-media/link"))
-app.use('/mfikria/c/', require("./routes/i/index"))
-app.use("/mfikria/p/", limiter, require("./routes/i/fkri_17/api"))
+
 app.use("/mfanimelist", limiter, require("./routes/mfanimelist"))
 app.use("/contributors", limiter, require("./routes/web/contributors"))
 app.use("/v1/", require("./routes/mfikria/home-api"))
+
+// Portofolio
+app.use('/mfikria/c/', require("./routes/i/index"))
+app.use("/mfikria/p/", limiter, require("./routes/i/fkri_17/api"))
+app.use("/mfikria/store", limiter, require("./routes/mfikria/Store/store-file"))
 
 app.get("/", (req, res) =>
 {
