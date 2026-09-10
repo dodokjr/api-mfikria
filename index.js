@@ -111,25 +111,31 @@ app.get('/id', function (req, res)
 app.get('*', (req, res) => {
   const now = new Date();
 
-  // Format hari, tanggal, dan jam sesuai locale/waktu perangkat sistem
-  const formattedTime = new Intl.DateTimeFormat('id-ID', {
-    weekday: 'long',   // Hari (misal: Kamis)
-    day: 'numeric',     // Tanggal (misal: 10)
-    month: 'long',      // Bulan (misal: September)
-    year: 'numeric',    // Tahun (misal: 2026)
-    hour: '2-digit',    // Jam (misal: 23)
-    minute: '2-digit',  // Menit (misal: 26)
-    second: '2-digit',  // Detik (misal: 08)
-    hour12: false
-  }).format(now);
+  // 1. Format Hari & Tanggal
+  const hariTanggal = now.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  // 2. Format Jam:Menit:Detik (Contoh: 23:28:30)
+  const jam = String(now.getHours()).padStart(2, '0');
+  const menit = String(now.getMinutes()).padStart(2, '0');
+  const detik = String(now.getSeconds()).padStart(2, '0');
+  const jamFormat = `${jam}:${menit}:${detik}`;
+
+  // 3. Generate Random Value tanpa crypto (misal hasil: "8f3a9b2c")
+  const randomValue = Math.random().toString(36).substring(2, 10);
 
   res.status(404).json({
     status: res.statusCode,
     code_for_message: randomValue,
-    TimeStatus: formattedTime, // Hasil: "Kamis, 10 September 2026 23.26.08"
+    TimeStatus: `${hariTanggal} - ${jamFormat}`, // Hasil: "Kamis, 10 September 2026 - 23:28:30"
     message: "error 404 please contact https://mfikria.vercel.app"
   });
 });
+
 
 
 
