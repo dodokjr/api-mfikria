@@ -108,16 +108,28 @@ app.get('/id', function (req, res)
 })
 
 
-app.get('*', (req, res, err) => 
-{
-     const time = new Date()
-     res.status(404).json({
-          status: res.statusCode,
-          code_for_message: randomValue,
-          TimeStatus: `${time}`,
-          mesagge: "error 404 please contact https://mfikria.vercel.app",
-     })
-})
+app.get('*', (req, res) => {
+  const now = new Date();
+
+  // Format hari, tanggal, dan jam sesuai locale/waktu perangkat sistem
+  const formattedTime = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',   // Hari (misal: Kamis)
+    day: 'numeric',     // Tanggal (misal: 10)
+    month: 'long',      // Bulan (misal: September)
+    year: 'numeric',    // Tahun (misal: 2026)
+    hour: '2-digit',    // Jam (misal: 23)
+    minute: '2-digit',  // Menit (misal: 26)
+    second: '2-digit',  // Detik (misal: 08)
+    hour12: false
+  }).format(now);
+
+  res.status(404).json({
+    status: res.statusCode,
+    code_for_message: randomValue,
+    TimeStatus: formattedTime, // Hasil: "Kamis, 10 September 2026 23.26.08"
+    message: "error 404 please contact https://mfikria.vercel.app"
+  });
+});
 
 
 
