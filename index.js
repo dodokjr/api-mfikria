@@ -111,27 +111,31 @@ app.get('/id', function (req, res)
 app.get('*', (req, res) => {
   const now = new Date();
 
-  // 1. Format Hari & Tanggal
+  // Memaksa zona waktu ke Asia/Jakarta (WIB)
+  const timeZone = 'Asia/Jakarta';
+
   const hariTanggal = now.toLocaleDateString('id-ID', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone
   });
 
-  // 2. Format Jam:Menit:Detik (Contoh: 23:28:30)
-  const jam = String(now.getHours()).padStart(2, '0');
-  const menit = String(now.getMinutes()).padStart(2, '0');
-  const detik = String(now.getSeconds()).padStart(2, '0');
-  const jamFormat = `${jam}:${menit}:${detik}`;
+  const jamFormat = now.toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone
+  }).replace(/\./g, ':'); // Mengubah titik bawaan id-ID menjadi titik dua (:)
 
-  // 3. Generate Random Value tanpa crypto (misal hasil: "8f3a9b2c")
   const randomValue = Math.random().toString(36).substring(2, 10);
 
   res.status(404).json({
     status: res.statusCode,
     code_for_message: randomValue,
-    TimeStatus: `${hariTanggal} - ${jamFormat}`, // Hasil: "Kamis, 10 September 2026 - 23:28:30"
+    TimeStatus: `${hariTanggal} - ${jamFormat}`,
     message: "error 404 please contact https://mfikria.vercel.app"
   });
 });
