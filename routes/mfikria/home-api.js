@@ -76,6 +76,20 @@ router.get("/home", async (res, req) =>
                         name_css: "css", skillCss: 20,
                         name_js: "Javascript", skillJs: 10
                     }
+                },
+                {
+                    "id": "4",
+                    "slug": "S3Com",
+                    "title": "Company Profile S3",
+                    "img_url": "https://api-mfikria.vercel.app/public/assets/project/S3com.png",
+                    "descriptions": "Project Company Profile FrontEnd and Backend With Vite ReactTS For FrontEnd and Backend ExpressJs",
+                    "url_github": "https://github.com/dodokjr/S3-Frontend",
+                    "url_demo": "https://s3com.vercel.app/",
+                    code: {
+                        name_html: "html", skillHtml: 40,
+                        name_css: "css", skillCss: 40,
+                        name_js: "Javascript", skillJs: 45
+                    }
                 }
             ],
             blog: [

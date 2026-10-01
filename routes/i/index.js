@@ -5,13 +5,13 @@ router.get("/ig", function (res, req)
 {
     req.json({
         owner: {
-            "name": "fkri__17",
+            "name": "fkri.ardn",
             "name_prop": "MFikriA",
             "bio": "while(! ( succes = try() ) );",
             "url_Image": "https://api-mfikria.vercel.app/public/assets/ig/profile_ig.jpg",
-            "followers": "54",
-            "following": 37,
-            "post": 4,
+            "followers": "91",
+            "following": 54,
+            "post": 8,
             "link_sosial": [
                 {
                     "id": 1,
