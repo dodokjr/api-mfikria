@@ -7,6 +7,8 @@ var favicon = require('serve-favicon');
 var path = require('path');
 const rateLimit = require('express-rate-limit');
 const dotenv = require("dotenv");
+const multer = require('multer');
+const { uploadFile, getAllFiles, getFileDetail } = require('./routes/mfikria/controllers/driveController');
 
 const PORT = process.env.PORT || 5991
 
@@ -17,7 +19,7 @@ app.listen(PORT, () =>
 
 
 
-dotenv.config();
+require('dotenv').config();
 
 
 const limiter = rateLimit({
@@ -66,6 +68,13 @@ app.use('/mfikria/c/', require("./routes/i/index"))
 app.use("/mfikria/p/", limiter, require("./routes/i/fkri_17/api"))
 app.use("/mfikria/store", limiter, require("./routes/mfikria/Store/store-file"))
 app.use("/mfikria/myhobbies", limiter, require("./routes/mfikria/MyHobbies/MyHobbies-file"))
+const upload = multer({ storage: multer.memoryStorage() });
+// Rute API
+app.post('/mfikria/api/v1/upload', upload.single('file'), uploadFile);
+// 2. GET: Mendapatkan daftar semua file yang ada di folder Google Drive
+app.get('/mfikria/api/v1/get', getAllFiles);
+// 3. GET: Mendapatkan detail / tautan file berdasarkan ID
+app.get('/mfikria/api/v1:nameOrId', getFileDetail);
 
 
 app.get("/", (req, res) =>
