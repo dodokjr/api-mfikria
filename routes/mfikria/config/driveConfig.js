@@ -92,10 +92,37 @@ async function getFileStream(fileId) {
   }
 }
 
+/**
+ * Scan folder Drive: cari satu file berdasarkan nama persis (mis. logo.png)
+ */
+async function findFileByName(name, folderId = DRIVE_FOLDER_ID) {
+  if (!folderId) {
+    throw new Error('DRIVE_FOLDER_ID belum diset');
+  }
+
+  try {
+    const esc = (v) => String(v).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const query = `name = '${esc(name)}' and '${esc(folderId)}' in parents and trashed = false`;
+
+    const response = await drive.files.list({
+      q: query,
+      pageSize: 1,
+      fields: 'files(id, name, mimeType)',
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true,
+    });
+
+    return (response.data.files || [])[0] || null;
+  } catch (error) {
+    throw new Error('Gagal mencari file di folder Drive: ' + error.message);
+  }
+}
+
 module.exports = {
   drive,
   defaultFolderId: DRIVE_FOLDER_ID,
   getPhotosFromFolder,
+  findFileByName,
   getFileMetadata,
   getFileStream,
 };
