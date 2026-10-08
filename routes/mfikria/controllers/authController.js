@@ -1,7 +1,7 @@
 require('dotenv').config();
 const crypto = require('crypto');
 const { spreadsheetId, sheets } = require('../config/spreadsheetConfig');
-const { drive, defaultFolderId, uploadPhotoToDrive, getPhotosFromFolder } = require('../config/driveConfig');
+const { drive, defaultFolderId, getPhotosFromFolder, getFileMetadata } = require('../config/driveConfig');
 
 const ADMIN_SECRET_TOKEN = process.env.ADMIN_SECRET_TOKEN;
 const USER_SECRET_TOKEN = process.env.USER_SECRET_TOKEN;
@@ -12,15 +12,10 @@ if (!ADMIN_SECRET_TOKEN || !USER_SECRET_TOKEN) {
 }
 
 const APP_TIMEZONE = process.env.APP_TIMEZONE || 'Asia/Jakarta';
-const SHEET_RANGE = 'Sheet1!A2:H'; // tanpa batas baris (sebelumnya A2:H100)
+const SHEET_RANGE = 'Sheet1!A2:H'; // tanpa batas baris
 const IV_LENGTH = 12; // standar untuk AES-GCM
-const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_PHOTO_TYPES = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-};
+// Foto default jika user tidak punya foto di Drive (disajikan lewat express.static di app.js)
+const DEFAULT_PHOTO_PATH = '/photoProfile/logo.png';
 
 /* ========================= HELPER ========================= */
 
@@ -143,12 +138,14 @@ async function readRows() {
 }
 
 /* ========================= REGISTER ========================= */
+// Tidak ada upload ke Drive. Foto dipilih dari file yang SUDAH ada di folder Drive
+// lewat body.photoId (daftar foto bisa diambil dari endpoint getFolderPhotos).
 
 exports.registerUser = async (req, res) => {
   const body = req.body || {};
   const username = typeof body.username === 'string' ? body.username.trim() : '';
   const requestedRole = String(body.role || 'user').toLowerCase();
-  const photoFile = req.files && req.files.photo ? [].concat(req.files.photo)[0] : null;
+  const photoId = typeof body.photoId === 'string' ? body.photoId.trim() : '';
 
   if (!username || username.length > 50) {
     return res.status(400).json({ status: 'error', message: 'Username wajib diisi (maksimal 50 karakter).' });
@@ -158,17 +155,21 @@ exports.registerUser = async (req, res) => {
     return res.status(400).json({ status: 'error', message: 'Role tidak valid.' });
   }
 
-  // Sebelumnya siapa pun bisa mendaftar sebagai admin lewat body.role
+  // Hanya admin yang boleh membuat akun admin
   if (requestedRole === 'admin' && getRoleFromToken(getClientToken(req)) !== 'admin') {
     return res.status(403).json({ status: 'error', message: '403 Forbidden: Hanya admin yang dapat membuat akun admin.' });
   }
 
-  if (photoFile) {
-    if (!ALLOWED_PHOTO_TYPES[photoFile.mimetype]) {
-      return res.status(400).json({ status: 'error', message: 'Format foto harus JPG, PNG, WEBP, atau GIF.' });
-    }
-    if (photoFile.size > MAX_PHOTO_SIZE) {
-      return res.status(400).json({ status: 'error', message: 'Ukuran foto maksimal 5 MB.' });
+  // Validasi foto: harus ada di Drive, berupa gambar, dan berada di folder yang diizinkan
+  if (photoId) {
+    try {
+      const meta = await getFileMetadata(photoId);
+      const inFolder = !defaultFolderId || (meta.parents || []).includes(defaultFolderId);
+      if (!String(meta.mimeType).startsWith('image/') || !inFolder) {
+        return res.status(400).json({ status: 'error', message: 'photoId bukan gambar di folder yang diizinkan.' });
+      }
+    } catch (err) {
+      return res.status(400).json({ status: 'error', message: 'Foto dengan photoId tersebut tidak ditemukan di Drive.' });
     }
   }
 
@@ -190,33 +191,17 @@ exports.registerUser = async (req, res) => {
       }, 0);
       const newUserId = `U${String(maxNumber + 1).padStart(3, '0')}`;
 
-      let photoId = '';
-      if (photoFile) {
-        const safeName = username.replace(/[^a-zA-Z0-9_-]/g, '_');
-        const fileName = `${safeName}_profile_${Date.now()}.${ALLOWED_PHOTO_TYPES[photoFile.mimetype]}`;
-        const uploadedFile = await uploadPhotoToDrive(photoFile, fileName, defaultFolderId);
-        photoId = uploadedFile.id;
-      }
-
       const { tgllogin, pukullogin } = nowStamp();
 
-      try {
-        await sheets.spreadsheets.values.append({
-          spreadsheetId,
-          range: 'Sheet1!A:H',
-          // RAW: mencegah Sheets mengubah "0850" jadi 850 dan mencegah injeksi formula (=...)
-          valueInputOption: 'RAW',
-          requestBody: {
-            values: [[newUserId, username, '-', requestedRole, photoId, STATUS_OFFLINE, tgllogin, pukullogin]],
-          },
-        });
-      } catch (appendError) {
-        // Jangan sisakan foto yatim di Drive kalau simpan ke sheet gagal
-        if (photoId) {
-          await drive.files.delete({ fileId: photoId, supportsAllDrives: true }).catch(() => {});
-        }
-        throw appendError;
-      }
+      await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: 'Sheet1!A:H',
+        // RAW: mencegah Sheets mengubah "0850" jadi 850 dan mencegah injeksi formula (=...)
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [[newUserId, username, '-', requestedRole, photoId, STATUS_OFFLINE, tgllogin, pukullogin]],
+        },
+      });
 
       return res.status(200).json({
         status: 'success',
@@ -293,7 +278,7 @@ exports.loginUser = async (req, res) => {
         spreadsheetId,
         range: `Sheet1!F${rowIndex}:H${rowIndex}`,
         valueInputOption: 'RAW',
-        requestBody: { values: [[statusLogin, tgllogin, pukullogin]] }, // sebelumnya "resource"
+        requestBody: { values: [[statusLogin, tgllogin, pukullogin]] },
       });
 
       const encryptedQuery = encryptPayload(
@@ -304,11 +289,12 @@ exports.loginUser = async (req, res) => {
       const baseUrl = `${req.protocol}://${req.get('host')}`;
       const photoUrl = foundUser.photoId
         ? `${baseUrl}/assets/photo/${foundUser.photoId}?query=${encodeURIComponent(encryptedQuery)}`
-        : null;
+        : `${baseUrl}${DEFAULT_PHOTO_PATH}`;
 
+      // Drive bersifat view-only untuk semua role (tidak ada upload)
       const dashboardCapabilities =
         userRoleType === 'admin'
-          ? { canUploadFile: true, canModifyData: true, accessLevel: 'Full Control (Admin)' }
+          ? { canUploadFile: false, canModifyData: true, accessLevel: 'Admin (Drive: View Only)' }
           : { canUploadFile: false, canModifyData: false, accessLevel: 'View Only (User)' };
 
       return res.status(200).json({
@@ -334,7 +320,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-/* ========================= LOGOUT (BARU) ========================= */
+/* ========================= LOGOUT ========================= */
 // Logout: status_login jadi 'false', tanggal & pukul logout dicatat di kolom G dan H.
 // Body: { username, encryptedQueryToken } + header Authorization: Bearer <token>
 // Daftarkan di router: router.post('/logout', logoutUser)
@@ -394,7 +380,6 @@ exports.logoutUser = async (req, res) => {
 /* ========================= DAFTAR FOTO ========================= */
 
 exports.getFolderPhotos = async (req, res) => {
-  // Sebelumnya endpoint ini terbuka untuk siapa saja
   if (!getRoleFromToken(getClientToken(req))) {
     return res.status(403).json({ status: 'error', message: '403 Forbidden: Akses Token tidak valid atau tidak disertakan!' });
   }
@@ -444,7 +429,7 @@ exports.getPhotoAsset = async (req, res) => {
           nama: payload.nama,
           tgllogin: payload.tgllogin,
           pukullogin: payload.pukullogin,
-          statusLogin: row[5] || 'online',
+          statusLogin: row[5] || STATUS_ONLINE,
           photoId: row[4],
         };
         break;
@@ -500,7 +485,6 @@ exports.getPhotoAsset = async (req, res) => {
 
     fileStream.data.pipe(res);
   } catch (error) {
-    // Sebelumnya SEMUA error (Drive mati, kuota, dll.) dilaporkan sebagai 403, menyulitkan debugging
     console.error('getPhotoAsset:', error);
     const code = error.code || (error.response && error.response.status);
     if (code === 404) {

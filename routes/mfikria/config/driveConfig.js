@@ -1,5 +1,4 @@
 const { google } = require('googleapis');
-const stream = require('stream');
 require('dotenv').config();
 
 const DRIVE_FOLDER_ID = process.env.DRIVE_FOLDER_ID;
@@ -15,6 +14,7 @@ try {
   throw new Error('GOOGLE_CREDENTIALS bukan JSON yang valid: ' + err.message);
 }
 
+// Scope READ-ONLY: token yang dihasilkan tidak bisa upload/ubah/hapus apa pun
 const auth = new google.auth.GoogleAuth({
   credentials: {
     client_email: credentials.client_email,
@@ -22,50 +22,12 @@ const auth = new google.auth.GoogleAuth({
     private_key: credentials.private_key.replace(/\\n/g, '\n'),
   },
   scopes: [
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/drive.readonly',
+    'https://www.googleapis.com/auth/spreadsheets.readonly',
   ],
 });
 
 const drive = google.drive({ version: 'v3', auth });
-
-/**
- * Mengunggah file foto ke Google Drive
- * Mendukung express-fileupload (.data) dan multer (.buffer)
- */
-async function uploadPhotoToDrive(fileObject, fileName, folderId = DRIVE_FOLDER_ID) {
-  const buffer = fileObject.data || fileObject.buffer;
-  if (!buffer || buffer.length === 0) {
-    throw new Error(
-      'Data file kosong. Jika memakai express-fileupload dengan useTempFiles: true, ' +
-      'matikan opsi itu atau baca file dari tempFilePath.'
-    );
-  }
-
-  const bufferStream = new stream.PassThrough();
-  bufferStream.end(buffer);
-
-  const requestBody = {
-    name: fileName,
-    mimeType: fileObject.mimetype,
-  };
-
-  if (folderId) {
-    requestBody.parents = [folderId];
-  }
-
-  const response = await drive.files.create({
-    requestBody,
-    media: {
-      mimeType: fileObject.mimetype,
-      body: bufferStream,
-    },
-    fields: 'id, name, webViewLink',
-    supportsAllDrives: true, // wajib untuk Shared Drive
-  });
-
-  return response.data;
-}
 
 /**
  * Mengambil daftar foto dari folder Google Drive
@@ -76,7 +38,7 @@ async function getPhotosFromFolder(folderId = DRIVE_FOLDER_ID) {
   }
 
   try {
-    const safeId = String(folderId).replace(/'/g, "\\'");
+    const safeId = String(folderId).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     const query = `'${safeId}' in parents and mimeType contains 'image/' and trashed = false`;
 
     const response = await drive.files.list({
@@ -94,9 +56,46 @@ async function getPhotosFromFolder(folderId = DRIVE_FOLDER_ID) {
   }
 }
 
+/**
+ * Mengambil metadata satu file berdasarkan ID
+ */
+async function getFileMetadata(fileId) {
+  try {
+    const response = await drive.files.get({
+      fileId,
+      fields: 'id, name, mimeType, size, webViewLink, createdTime, parents',
+      supportsAllDrives: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Gagal mengambil metadata file: ' + error.message);
+  }
+}
+
+/**
+ * Mengambil isi file sebagai stream (untuk ditampilkan/proxy ke client)
+ * Contoh pemakaian di Express:
+ *   const { stream, mimeType } = await getFileStream(id);
+ *   res.setHeader('Content-Type', mimeType);
+ *   stream.pipe(res);
+ */
+async function getFileStream(fileId) {
+  try {
+    const meta = await getFileMetadata(fileId);
+    const response = await drive.files.get(
+      { fileId, alt: 'media', supportsAllDrives: true },
+      { responseType: 'stream' }
+    );
+    return { stream: response.data, mimeType: meta.mimeType, name: meta.name };
+  } catch (error) {
+    throw new Error('Gagal mengambil isi file: ' + error.message);
+  }
+}
+
 module.exports = {
   drive,
   defaultFolderId: DRIVE_FOLDER_ID,
-  uploadPhotoToDrive,
   getPhotosFromFolder,
+  getFileMetadata,
+  getFileStream,
 };
