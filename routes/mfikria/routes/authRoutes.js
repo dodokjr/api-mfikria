@@ -5,6 +5,7 @@ const {
   logoutUser,
   getFolderPhotos,
   getPhotoAsset,
+  getProfilePhoto,
 } = require('../controllers/authController');
 
 const router = express.Router();
@@ -16,7 +17,14 @@ router.post('/logout', logoutUser);
 // Daftar foto dari folder Google Drive (butuh Bearer token)
 router.get('/photos', getFolderPhotos);
 
-// Stream foto dari Google Drive (butuh ?query=<encryptedQueryToken>)
-router.get('/assets/photo/:photoId', getPhotoAsset);
+// Foto dari Google Drive:
+// - /assets/photo/{photoId}?q={token}          -> avatar; token = googleDrivePhoto.token, divalidasi, gagal -> 404
+// - /assets/photo/{photoId}?query=<token sesi> -> galeri Photos (cara lama)
+router.get('/assets/photo/:photoId', (req, res, next) => {
+  if (typeof req.query.q === 'string' && req.query.q) {
+    return getProfilePhoto(req, res, next);
+  }
+  return getPhotoAsset(req, res, next);
+});
 
 module.exports = router;

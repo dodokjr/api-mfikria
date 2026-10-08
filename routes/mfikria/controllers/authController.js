@@ -323,7 +323,7 @@ exports.registerUser = async (req, res) => {
       return res.status(200).json({
         status: 'success',
         message: 'Registrasi berhasil!',
-        data: { userId: newUserId, username, role: requestedRole, photoToken },
+        data: { userId: newUserId, username, role: requestedRole, photoId: logoId || null, photoToken },
       });
     });
   } catch (error) {
@@ -413,7 +413,9 @@ exports.loginUser = async (req, res) => {
       // - user punya foto di sheet  -> token terikat ke data user + sesi login ini
       // - user tanpa foto           -> scan Drive, pakai logo.png sebagai default
       let photoToken = null;
+      let photoUrlId = null;
       if (foundUser.photoId) {
+        photoUrlId = foundUser.photoId;
         photoToken = createPhotoToken({
           p: foundUser.photoId,
           u: foundUser.userId,
@@ -426,7 +428,10 @@ exports.loginUser = async (req, res) => {
           console.error('findLogoId:', err.message);
           return null;
         });
-        if (logoId) photoToken = createPhotoToken({ p: logoId });
+        if (logoId) {
+          photoUrlId = logoId;
+          photoToken = createPhotoToken({ p: logoId });
+        }
       }
 
       // Drive bersifat view-only untuk semua role (tidak ada upload)
@@ -448,8 +453,8 @@ exports.loginUser = async (req, res) => {
           },
           permissions: dashboardCapabilities,
           sessionTokens: { accessToken: clientToken, encryptedQueryToken: encryptedQuery },
-          // Front end memakai: /mfikria/photoProfile/{token}
-          googleDrivePhoto: { token: photoToken },
+          // Front end memakai: /mfikria/v1/assets/photo/{photoId}?q={token}
+          googleDrivePhoto: { photoId: photoUrlId, token: photoToken },
         },
       });
     });
@@ -551,8 +556,12 @@ exports.getProfilePhoto = async (req, res) => {
   const notFound = () => res.status(404).json({ status: 'error', message: '404 Not Found' });
 
   try {
-    const data = readPhotoToken(req.params.token);
+    // Dua bentuk URL: /photoProfile/{token}  atau  /assets/photo/{photoId}?q={token}
+    const data = readPhotoToken(req.params.token || req.query.q);
     if (!data || typeof data.p !== 'string' || !data.p) return notFound();
+
+    // Pada bentuk ?q=, photoId di path harus sama dengan isi token
+    if (req.params.photoId && req.params.photoId !== data.p) return notFound();
 
     if (data.u) {
       // Foto milik user: seluruh data di token harus cocok dengan baris di Google Sheet
