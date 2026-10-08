@@ -8,7 +8,8 @@ var path = require('path');
 const rateLimit = require('express-rate-limit');
 const dotenv = require("dotenv");
 const multer = require('multer');
-const { uploadFile, getAllFiles, getFileDetail } = require('./routes/mfikria/controllers/driveController');
+const fileUpload = require('express-fileupload');
+const authRoutes = require("./routes/mfikria/routes/authRoutes")
 
 const PORT = process.env.PORT || 5991
 
@@ -64,18 +65,24 @@ app.use("/contributors", limiter, require("./routes/web/contributors"))
 app.use("/v1/", require("./routes/mfikria/home-api"))
 
 // Portofolio
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(fileUpload());
 app.use('/mfikria/c/', require("./routes/i/index"))
 app.use("/mfikria/p/", limiter, require("./routes/i/fkri_17/api"))
 app.use("/mfikria/store", limiter, require("./routes/mfikria/Store/store-file"))
 app.use("/mfikria/myhobbies", limiter, require("./routes/mfikria/MyHobbies/MyHobbies-file"))
 const upload = multer({ storage: multer.memoryStorage() });
 // Rute API
-app.post('/mfikria/api/v1/upload', upload.single('file'), uploadFile);
-// 2. GET: Mendapatkan daftar semua file yang ada di folder Google Drive
-app.get('/mfikria/api/v1/get', getAllFiles);
-// 3. GET: Mendapatkan detail / tautan file berdasarkan ID
-app.get('/mfikria/api/v1:nameOrId', getFileDetail);
-
+app.use('/mfikria/v1', authRoutes);
+app.get('/mfikria/v1', (req, res) =>
+     {
+          res.status(200).send({
+               succes: true,
+               status: 200,
+               message: "Wellcom To Api Mfikria Official"
+          })
+     });
 
 app.get("/", (req, res) =>
 {
