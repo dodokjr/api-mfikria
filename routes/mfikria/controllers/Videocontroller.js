@@ -10,7 +10,7 @@ const {
   safeEqual,
   padDate,
   withLock,
-} = require('../utilitis/Common');
+} = require('../utils/common');
 
 /* ========================= HELPER ========================= */
 
@@ -88,7 +88,7 @@ function readVideoToken(token) {
 // Buat dulu tab bernama "GuestTokens" (header baris 1: userId, Access_Token, tanggal, pukul)
 // di spreadsheet yang sama. Tanggal & pukul = waktu user masuk ke website.
 
-const GUEST_SHEET_RANGE = process.env.GUEST_SHEET_RANGE || 'GuestTokens!A:D';
+const GUEST_SHEET = process.env.GUEST_SHEET_NAME || 'GuestTokens';
 const GUEST_TOKEN_TTL_MS = Number(process.env.GUEST_TOKEN_TTL_MS ?? 24 * 60 * 60 * 1000);
 const GUEST_TOKEN_MAX_PER_HOUR = Number(process.env.GUEST_TOKEN_MAX_PER_HOUR ?? 10);
 // Endpoint video SELALU wajib menyertakan ?query=<Access_Token guest>&tgl=<tanggal guest>
@@ -98,9 +98,19 @@ const GUEST_TOKEN_KEY = crypto
   .update(process.env.GUEST_TOKEN_SECRET || `guest|${ADMIN_SECRET_TOKEN}|${USER_SECRET_TOKEN}`)
   .digest();
 
-// ID guest acak (tanpa baca sheet, jadi tidak ada risiko balapan): contoh "G3F9A12C0"
-function newGuestId() {
-  return `G${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+// ID guest urut berdasarkan isi sheet: angka terbesar di kolom A + 1 (sama dengan jumlah baris
+// selama tidak ada baris yang dihapus). Contoh: G001, G002, ... Dipanggil di dalam withLock.
+async function nextGuestId() {
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${GUEST_SHEET}!A2:A`,
+  });
+  const rows = response.data.values || [];
+  const maxNumber = rows.reduce((max, row) => {
+    const n = parseInt(String(row[0] || '').replace(/\D/g, ''), 10);
+    return Number.isNaN(n) ? max : Math.max(max, n);
+  }, 0);
+  return `G${String(maxNumber + 1).padStart(3, '0')}`;
 }
 
 function createGuestToken(userId, tanggal, expiresAt) {
@@ -358,18 +368,23 @@ exports.issueGuestToken = async (req, res) => {
   }
 
   try {
-    const userId = newGuestId();
-    const { tgllogin, pukullogin } = nowStamp();
-    const expiresAt = GUEST_TOKEN_TTL_MS > 0 ? Date.now() + GUEST_TOKEN_TTL_MS : 0;
-    const accessToken = createGuestToken(userId, tgllogin, expiresAt);
+    // Baca-lalu-tulis diantre lewat withLock supaya dua guest tidak dapat ID yang sama
+    const { userId, accessToken, tgllogin, pukullogin } = await withLock(async () => {
+      const userId = await nextGuestId();
+      const { tgllogin, pukullogin } = nowStamp();
+      const expiresAt = GUEST_TOKEN_TTL_MS > 0 ? Date.now() + GUEST_TOKEN_TTL_MS : 0;
+      const accessToken = createGuestToken(userId, tgllogin, expiresAt);
 
-    // RAW: "0850" tetap string dan tidak bisa jadi formula
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: GUEST_SHEET_RANGE,
-      valueInputOption: 'RAW',
-      requestBody: { values: [[userId, accessToken, tgllogin, pukullogin]] },
+      // RAW: "0850" tetap string dan tidak bisa jadi formula
+      await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: `${GUEST_SHEET}!A:D`,
+        valueInputOption: 'RAW',
+        requestBody: { values: [[userId, accessToken, tgllogin, pukullogin]] },
+      });
+      return { userId, accessToken, tgllogin, pukullogin };
     });
+    guestViewCache.at = 0; // guest baru masuk: hitungan /guest-view dibaca ulang
 
     return res.status(200).json({
       status: 'success',
@@ -386,13 +401,48 @@ exports.issueGuestToken = async (req, res) => {
     const msg = String(error.message || '');
     let hint = null;
     if (/Unable to parse range/i.test(msg)) {
-      hint = `Tab Google Sheet tidak ditemukan. Buat tab dengan nama sesuai range "${GUEST_SHEET_RANGE}" (default: GuestTokens).`;
+      hint = `Tab Google Sheet "${GUEST_SHEET}" tidak ditemukan. Buat tab dengan nama itu.`;
     } else if (error.code === 403 || /permission|caller does not have/i.test(msg)) {
       hint = 'Service account belum punya akses Editor ke spreadsheet.';
     }
     return res.status(500).json({
       status: 'error',
       message: 'Terjadi kesalahan pada server saat membuat guest token.',
+      ...(hint ? { hint } : {}),
+    });
+  }
+};
+
+/* ========================= GUEST VIEW (jumlah guest di Google Sheet) ========================= */
+// GET /guest-view  -> { status, view } : jumlah baris di tab "GuestTokens" yang kolom A (userId) terisi.
+// Di-cache 30 detik supaya endpoint publik ini tidak menghabiskan kuota Sheets API.
+
+const GUEST_VIEW_CACHE_MS = 30 * 1000;
+let guestViewCache = { count: 0, at: 0 };
+
+exports.getGuestView = async (req, res) => {
+  try {
+    if (guestViewCache.at && Date.now() - guestViewCache.at < GUEST_VIEW_CACHE_MS) {
+      return res.status(200).json({ status: 'success', view: guestViewCache.count });
+    }
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${GUEST_SHEET}!A2:A`, // lewati header baris 1
+    });
+    const rows = response.data.values || [];
+    const count = rows.filter((row) => row[0] && String(row[0]).trim() !== '').length;
+
+    guestViewCache = { count, at: Date.now() };
+    return res.status(200).json({ status: 'success', view: count });
+  } catch (error) {
+    console.error('getGuestView:', error.message, error.errors || '');
+    const hint = /Unable to parse range/i.test(String(error.message))
+      ? `Tab Google Sheet "${GUEST_SHEET}" tidak ditemukan. Buat tab dengan nama itu.`
+      : null;
+    return res.status(500).json({
+      status: 'error',
+      message: 'Terjadi kesalahan pada server saat mengambil jumlah view.',
       ...(hint ? { hint } : {}),
     });
   }

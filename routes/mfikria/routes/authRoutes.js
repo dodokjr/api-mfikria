@@ -15,6 +15,7 @@ router.get('/assets/session-photo/:photoId', auth.getPhotoAsset);  // validasi s
 
 // video
 router.post('/guest-token', video.issueGuestToken);
+router.get('/guest-view', video.getGuestView);
 router.get('/videos', video.getFolderVideos);
 router.get('/video/:token', video.getVideo);
 router.get('/video-info/:token', video.getVideoInfo);
