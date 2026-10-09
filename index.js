@@ -21,7 +21,7 @@ app.listen(PORT, () =>
 const allowedOrigins = [
      'http://localhost:5173',
      'https://5173-firebase-api-mfikria-1781747502400.cluster-ikxjzjhlifcwuroomfkjrx437g.cloudworkstations.dev/app',
-     'https://domain-front-end-kamu.com',          // domain produksi
+     'https://mfikria.vercel.app/',          // domain produksi
      process.env.FRONTEND_ORIGIN,                   // opsional, dari env
    ].filter(Boolean);
    
