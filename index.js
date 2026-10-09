@@ -18,7 +18,29 @@ app.listen(PORT, () =>
      console.log(`http://localhost:${PORT}`)
 });
 
-
+const allowedOrigins = [
+     'http://localhost:5173',
+     'https://5173-firebase-api-mfikria-1781747502400.cluster-ikxjzjhlifcwuroomfkjrx437g.cloudworkstations.dev/app',
+     'https://domain-front-end-kamu.com',          // domain produksi
+     process.env.FRONTEND_ORIGIN,                   // opsional, dari env
+   ].filter(Boolean);
+   
+   const corsOptions = {
+     origin(origin, callback) {
+       // tanpa origin (curl/Postman) boleh; *.cloudworkstations.dev = preview Firebase Studio
+       if (!origin || allowedOrigins.includes(origin) || /\.cloudworkstations\.dev$/.test(new URL(origin).hostname)) {
+         return callback(null, true);
+       }
+       return callback(new Error('Origin tidak diizinkan oleh CORS'));
+     },
+     methods: ['GET', 'POST', 'OPTIONS'],
+     allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-Token'],
+     maxAge: 86400,
+   };
+   
+   app.use(cors(corsOptions));
+   app.options('*', cors(corsOptions)); // balas preflight
+   app.set('trust proxy', 1);  
 
 require('dotenv').config();
 
@@ -37,7 +59,6 @@ const limiter = rateLimit({
      }
 })
 app.use(cookieParser());
-app.use(cors());
 app.use(function (req, res, next)
 {
      res.setHeader('Access-Control-Allow-Methods', 'GET');
