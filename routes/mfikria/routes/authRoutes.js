@@ -9,6 +9,7 @@ const {
   issueGuestToken,
   getFolderVideos,
   getVideo,
+  getVideoInfo,
 } = require('../controllers/authController');
 
 const router = express.Router();
@@ -37,8 +38,10 @@ router.get('/assets/photo/:photoId', (req, res, next) => {
 // Library video dari folder Google Drive (URL terenkripsi, tanpa Bearer token)
 // - /videos         -> daftar semua video + videoToken + videoUrl
 // - /video/{token}  -> stream video (mendukung Range/seek)
-// Kalau REQUIRE_GUEST_TOKEN_FOR_VIDEO=true, tambahkan header X-Guest-Token atau ?gt=<Access_Token>
+// Keduanya wajib query: ?query=<Access_Token guest>&tgl=<tanggal guest, DDMMYY>
 router.get('/videos', getFolderVideos);
 router.get('/video/:token', getVideo);
+// - /video-info/{token} -> judul & ukuran video (untuk halaman /video/watch?id={token})
+router.get('/video-info/:token', getVideoInfo);
 
 module.exports = router;

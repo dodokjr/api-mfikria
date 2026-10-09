@@ -963,6 +963,46 @@ exports.getVideo = async (req, res) => {
   }
 };
 
+// GET /video-info/:token?query=&tgl=  -> info video (judul, ukuran) dari token, dipakai halaman /video/watch?id=
+exports.getVideoInfo = async (req, res) => {
+  const notFound = () => res.status(404).json({ status: 'error', message: '404 Not Found' });
+
+  if (!checkGuestAccess(req, res)) return;
+
+  try {
+    const data = readVideoToken(req.params.token);
+    if (!data) return notFound();
+
+    let file;
+    try {
+      const result = await drive.files.get({
+        fileId: data.v,
+        fields: 'name, mimeType, size, parents',
+        supportsAllDrives: true,
+      });
+      file = result.data;
+    } catch (err) {
+      return notFound();
+    }
+
+    const inFolder = !defaultFolderId || (file.parents || []).includes(defaultFolderId);
+    if (!String(file.mimeType).startsWith('video/') || !inFolder) return notFound();
+
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        title: String(file.name || '').replace(/\.[^.]+$/, ''),
+        mimeType: file.mimeType,
+        size: Number(file.size) || null,
+        expiresAt: data.e ? new Date(data.e).toISOString() : null,
+      },
+    });
+  } catch (error) {
+    console.error('getVideoInfo:', error);
+    return res.status(500).json({ status: 'error', message: 'Terjadi kesalahan pada server saat mengambil info video.' });
+  }
+};
+
 /* ========================= GUEST TOKEN (tanpa login, dicatat di Google Sheet) ========================= */
 // POST /mfikria/guest-token  (tanpa Bearer token, tanpa body)
 // Dipanggil front end saat user pertama kali masuk ke website. Mengembalikan:
@@ -998,8 +1038,19 @@ exports.issueGuestToken = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('issueGuestToken:', error);
-    return res.status(500).json({ status: 'error', message: 'Terjadi kesalahan pada server saat membuat guest token.' });
+    console.error('issueGuestToken:', error.message, error.errors || '');
+    const msg = String(error.message || '');
+    let hint = null;
+    if (/Unable to parse range/i.test(msg)) {
+      hint = `Tab Google Sheet tidak ditemukan. Buat tab dengan nama sesuai range "${GUEST_SHEET_RANGE}" (default: GuestTokens).`;
+    } else if (error.code === 403 || /permission|caller does not have/i.test(msg)) {
+      hint = 'Service account belum punya akses Editor ke spreadsheet.';
+    }
+    return res.status(500).json({
+      status: 'error',
+      message: 'Terjadi kesalahan pada server saat membuat guest token.',
+      ...(hint ? { hint } : {}),
+    });
   }
 };
 
@@ -1007,4 +1058,5 @@ exports.issueGuestToken = async (req, res) => {
 router.post('/guest-token', issueGuestToken);
 router.get('/videos', getFolderVideos);
 router.get('/video/:token', getVideo);
+router.get('/video-info/:token', getVideoInfo);
 ================================================================================= */
