@@ -1,47 +1,23 @@
 const express = require('express');
-const {
-  registerUser,
-  loginUser,
-  logoutUser,
-  getFolderPhotos,
-  getPhotoAsset,
-  getProfilePhoto,
-  issueGuestToken,
-  getFolderVideos,
-  getVideo,
-  getVideoInfo,
-} = require('../controllers/authController');
+const auth = require('../controllers/authController');
+const video = require('../controllers/Videocontroller');
 
 const router = express.Router();
 
-router.post('/register', registerUser);
-router.post('/login', loginUser);
-router.post('/logout', logoutUser);
+// auth
+router.post('/register', auth.registerUser);
+router.post('/login', auth.loginUser);
+router.post('/logout', auth.logoutUser);
+router.get('/photos', auth.getFolderPhotos);
+router.get('/photoProfile/:token', auth.getProfilePhoto);
+router.get('/assets/photo/:photoId', auth.getProfilePhoto);        // dipakai front end: ?q={token}
+router.get('/assets/session-photo/:photoId', auth.getPhotoAsset);  // validasi sesi: ?query={encryptedQueryToken}
 
-// Guest token tanpa login (dicatat di tab "GuestTokens" Google Sheet)
-// Response: { userId, Access_Token, pukul, tanggal }
-router.post('/guest-token', issueGuestToken);
-
-// Daftar foto dari folder Google Drive (butuh Bearer token)
-router.get('/photos', getFolderPhotos);
-
-// Foto dari Google Drive:
-// - /assets/photo/{photoId}?q={token}          -> avatar; token = googleDrivePhoto.token, divalidasi, gagal -> 404
-// - /assets/photo/{photoId}?query=<token sesi> -> galeri Photos (cara lama)
-router.get('/assets/photo/:photoId', (req, res, next) => {
-  if (typeof req.query.q === 'string' && req.query.q) {
-    return getProfilePhoto(req, res, next);
-  }
-  return getPhotoAsset(req, res, next);
-});
-
-// Library video dari folder Google Drive (URL terenkripsi, tanpa Bearer token)
-// - /videos         -> daftar semua video + videoToken + videoUrl
-// - /video/{token}  -> stream video (mendukung Range/seek)
-// Keduanya wajib query: ?query=<Access_Token guest>&tgl=<tanggal guest, DDMMYY>
-router.get('/videos', getFolderVideos);
-router.get('/video/:token', getVideo);
-// - /video-info/{token} -> judul & ukuran video (untuk halaman /video/watch?id={token})
-router.get('/video-info/:token', getVideoInfo);
+// video
+router.post('/guest-token', video.issueGuestToken);
+router.get('/videos', video.getFolderVideos);
+router.get('/video/:token', video.getVideo);
+router.get('/video-info/:token', video.getVideoInfo);
+router.post('/video-view/:token', video.registerVideoView);
 
 module.exports = router;
