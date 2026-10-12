@@ -4,370 +4,440 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="./logo.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="public/js/index.js"></script>
+    <script src="public/js/nav.js"></script>
     <script>
       tailwind.config = {
         darkMode: 'class',
       };
     </script>
+    <script>
+      window.va =
+        window.va ||
+        function () {
+          (window.vaq = window.vaq || []).push(arguments);
+        };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
     <style>
-      pre {
-	width: 100%;
-	padding: 0;
-	margin: 0;
-	overflow: auto;
-	overflow-y: hidden;
-	font-size: 12px;
-	line-height: 20px;
-	background: #efefef;
-	border: 1px solid #777;
-	background: url(lines.png) repeat 0 0;
-}
-pre code {
-	padding: 10px;
-	color: #333;
-}
-@media print {
-	pre {
-		overflow-x: auto;
-		white-space: pre-wrap;
-		white-space: -moz-pre-wrap !important;
-		white-space: -pre-wrap;
-		white-space: -o-pre-wrap;
-		word-wrap: break-word;
-		background: #fff;
-	}
-}
-
+      html { scroll-behavior: smooth; }
     </style>
     <title>Mfikria Docs</title>
   </head>
-  <body style="font-family: 'Poppins', sans-serif" class="dark:bg-slate-900 bg-white dark:text-white">
-   <div>
-    <header class="w-full p-3 border-b dark:border-b flex">
-      <nav class="w-full flex flex-col lg:flex-row md:flex-row sm:flex-row items-start lg:item-center md:item-center sm:item-center lg:justify-between md:justify-between sm:justify-between justify-start">
-        <ul>
-          <li class="font-mono text-xl">Mfikria Docs</li>
-        </ul>
-        <ul id="header-nav" class="mr-6 sm:flex md:flex lg:flex hidden">
-          <li class="mr-5 mb-3 mt-5 sm:mb-0 sm:mt-0 md:mb-0 md:mt-0 lg:mb-0 lg:mt-0">
-            <a href="./index.html">Home</a>
-          </li>
-          <div>
-            <ul class="flex">
-              <!-- Change the href link to your respective social media accounts-->
-              <li class="mr-5 flex dark:hidden">
-                <p onclick="darkmode()">
-                  <img src="public/svgs/sun.svg" alt="sun Link" />
-                </p>
-              </li>
-              <li class="mr-5 hidden dark:flex">
-                <p onclick="lightmode()">
-                  <img src="public/svgs/sun-dark.svg" alt="sun Link" />
-                </p>
-              </li>
-              <li class="mr-5 flex dark:hidden">
-                <a href="/github"><img src="public/svgs/github.svg" alt="GitHub Link" /></a>
-              </li>
-              <li class="mr-5 hidden dark:flex">
-                <a href="/github"><img src="public/svgs/github-dark.svg" alt="GitHub Link" /></a>
-              </li>
-            </ul>
-          </div>
-        </ul>
-      </nav>
+  <body style="font-family: 'Poppins', sans-serif" class="bg-white text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-200">
+    <!-- Header -->
+    <header class="border-b border-slate-200 dark:border-slate-800 relative">
+      <div class="mx-auto flex max-w-4xl items-center justify-between px-5 py-4">
+        <a href="./index.html" class="font-semibold tracking-tight">Mfikria Docs</a>
 
-      <div class="sm:hidden flex" onclick="OnclickOpenMenu()" id="open-menu">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z" clip-rule="evenodd" />
-        </svg>
-      </div>
-      <div class="hidden" onclick="OnclickCloseMenu()" id="close-menu">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </div>
-    </header>
-    <div class="flex flex-col md:flex-row lg:flex-row">
-      <nav class="flex ml-10 mt-7 md:fixed lg:fixed" data-spy="affix" data-offset-top="300" data-offset-bottom="200" role="navigation">
-        <ul class="nav">
-          <li class="font-medium"><a href="#link1">Getting Started</a></li>
-          <li class="font-medium">
-            <a href="#1">Installation v2</a>
-            <ul class="nav">
-              <li class="text-[#111] dark:text-slate-300 pl-[20px] font-[400] border-l-[2px]">
-                <a href="#link3">Github</a>
-              </li>
-              <li class="text-[#111] dark:text-slate-300 pl-[20px] font-[400] border-l-[2px]">
-                <a href="#link4">Anime</a>
-              </li>
-            </ul>
-          </li>
-          <li class="font-medium">
-            <a href="#2">Installation v3</a>
-            <ul class="nav">
-              <li class="text-[#111] dark:text-slate-300 pl-[20px] font-[400] border-l-[2px]">
-                <a href="#lk21">Movies and series </a>
-              </li>
-            </ul>
-          </li>
-      </nav>
-
-      <div class="pl-5 md:pl-[250px] lg:pl-[250px]">
-        <!-- Link1 start -->
-        <section id="link1">
-          <div class="h-full mt-10">
-            <p class="font-normal text-2xl">Getting Started</p>
-            <p class="leading-0 w-3/4">Cara Install Gimana Bang ? Ini Ya Saya Kasih tahu</p>
-            <p class="text-sm pt-5 pb-4">Ikutin Langkah-langkah Berikut</p>
+        <!-- Navigation -->
+        <nav id="header-nav" class="hidden absolute top-full left-0 w-full flex-col gap-4 border-b border-slate-200 bg-white p-5 shadow-lg sm:static sm:flex sm:w-auto sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none dark:border-slate-800 dark:bg-slate-900">
+          <a href="./index.html" class="hover:text-red-600">Home</a>
+          <a href="./docs.html" class="hover:text-red-600">Documentation</a>
+          <a href="#contributors" class="hover:text-red-600">Contribution</a>
+          
+          <div class="flex items-center gap-6 sm:gap-4 pt-2 sm:pt-0 border-t sm:border-0 border-slate-200 dark:border-slate-800">
+            <p onclick="darkmode()" class="flex cursor-pointer dark:hidden"><img src="public/svgs/sun.svg" alt="Mode gelap" class="h-5 w-5" /></p>
+            <p onclick="lightmode()" class="hidden cursor-pointer dark:flex"><img src="public/svgs/sun-dark.svg" alt="Mode terang" class="h-5 w-5" /></p>
+            <a href="/github" class="flex dark:hidden"><img src="public/svgs/github.svg" alt="GitHub" class="h-5 w-5" /></a>
+            <a href="/github" class="hidden dark:flex"><img src="public/svgs/github-dark.svg" alt="GitHub" class="h-5 w-5" /></a>
           </div>
-        </section>
-        <!-- Link1 end -->
+        </nav>
 
-        <!-- Link2 Start -->
-       <section id="1">
-        <section id="link2">
-          <div class="h-full mt-5">
-            <p class="font-normal text-2xl">Installation version 2</p>
-            <p class="text-sm pb-4">Ikutin ya</p>
-          </div>
-          <section id="link2_1" class="border-l-[2px]">
-            <div class="leading-0 w-3/4">
-              cara untuk Installationnya cukup dengan masukkan url --> <b><a href="/v2/" target="_blank" class="underline break-words">https://api-mfikria.vercel.app/v2/</a></b>
-            </div>
-            <strong>
-              <p>Contoh Code dari api</p>
-            </strong>
-            <div class="leading-2">
-              <li><b>Javascript</b></li>
-              <pre>
-                const userAction = async () => {
-                  const response = await fetch('https://api-mfikria.vercel.app/v2/', {
-                    method: 'GET',
-                    body: myBody, // string or object
-                    headers: {
-                      'Content-Type': 'application/json'
-                    }
-                  });
-                  const myJson = await response.json(); //extract JSON from the http response
-                  // do something with myJson
-                }
-              </pre>
-              <hr/>
-              <li><b>React js</b></li>
-              <pre>
-                import React, { useState, useEffect } from "react";
-
-                function App(){
-                  const [profile, setProfile] = useState([])
-                  const [user] = useState("user-parameter")
-                
-                  useEffect(() =>
-                  {
-                    const fetchProfile = async () =>
-                    {
-                      const res = await fetch(
-                        `https://api-mfikria.vercel.app/v2/github/${user}` //<-- user yang ada didalam function
-                      )
-                      const data = await res.json()
-                      setProfile(data)
-                    }
-                
-                    fetchProfile()
-                  }, [user])
-
-                    return(
-                    < h1 style={{ fontSize: "2.1em", paddingBottom: "20px" }}>
-                      Know Who < strong className="purple">I'M</ strong>
-                    </ h1>
-                    < p>{profile.bio}</ p>
-                  )
-                }
-
-              </pre>
-              <hr/>
-            </div>
-          </section>
-        </section>
-        <section id="link3">
-          <div class="h-full mt-5">
-            <p class="font-normal text-2xl">GitHub Api</p>
-            <p class="text-sm pb-4">Github Api ini masih dalam perkembangan devloper</p>
-          </div>
-          <section id="link2_1" class="border-l-[2px]">
-            <div class="leading-0 w-3/4">
-              Untuk Cara GitHub ini cukup gampang tinggal masukin url diatas di tambahi /github/ <b><a href="/v2/github/" target="_blank" class="underline break-words">Link</a></b>
-            </div>
-            <div class="leading-0 w-3/3">
-              <p class="normal-case">fitur dari api ini Yaitu:p>
-              <li>github bassic <b>/github/{nama}</b> <-- didalam kurung itu tulis nama github kalian seperti <b>/github/dodokjr</b></li>
-              <li>github reppos <b>/github/{nama}/repos</b> <-- didalam kurung itu tulis nama github kalian dan ditambah kata <b>repos</b> seperti <b>/github/dodokjr/repos</b></li>
-              <p>Di atas itu adalah Installation api github.</p>
-              <p>akan datang terbaru / update terbaru dari mfikria untuk api github ini.</p>
-            </div>
-          </section>
-        </section>
-        <hr/>
-        <section id="link4">
-          <div class="h-full mt-5">
-            <p class="font-normal text-2xl">Anime Api</p>
-            <p class="text-sm pb-4">Anime Api ini masih dalam perkembangan devloper</p>
-          </div>
-          <section id="link2_1" class="border-l-[2px]">
-            <div class="leading-0 w-3/4">
-              Untuk Cara GitHub ini cukup gampang tinggal masukin url diatas di tambahi /anime <b><a href="/v2/anime" target="_blank" class="underline break-words">Link</a></b> secara index api ini langsung menampilkan halaman home.
-            </div>
-            <div class="leading-0 w-3/3">
-              <p class="normal-case">fitur dari api ini Yaitu:</p>
-              <li>Anime Home <b>/anime</b> secara default <b>/anime </b>ini udah home base dari api</li>
-              <li>Anime Full / details <b>/anime/full/:id</b></li>
-              <li>Anime Seacrh <b>/anime/{query}</b> <-- didalam kurung tulis query anime yang kamu cari seperti <b>/anime/naruto</b></li>
-              <li>Anime Populer dan pagination <b>/anime/popular(Top Anime) /anime/populer/page/:id </b></li>
-              <li>Anime Character Anime Full <b>/anime/character/:id</b></li>
-              <li>Anime Character pengisi suara <b>/anime/character/people/:id</b></li>
-              <p>Di atas itu adalah Installation api anime.</p>
-              <p>akan datang terbaru / update terbaru dari mfikria untuk api anime ini.</p>
-            </div>
-          </section>
-        </section>
-        <hr/>
-       </section>
-        <hr/>
-        <section id="2">
-          <section id="link2">
-            <div class="h-full mt-5">
-              <p class="font-normal text-2xl">Installation version 3</p>
-              <p class="text-sm pb-4">Ikutin ya</p>
-            </div>
-            <section id="link2_1" class="border-l-[2px]">
-              <div class="leading-0 w-3/4">
-                cara untuk Installationnya cukup dengan masukkan url --> <b><a href="/v3/" target="_blank" class="underline break-words">https://api-mfikria.vercel.app/v3/</a></b>
-              </div>
-              <strong>
-                <p>Contoh Code dari api</p>
-              </strong>
-              <div class="leading-2">
-                <li><b>Javascript</b></li>
-                <pre>
-                  const userAction = async () => {
-                    const response = await fetch('https://api-mfikria.vercel.app/v3/', {
-                      method: 'GET',
-                      body: myBody, // string or object
-                      headers: {
-                        'Content-Type': 'application/json'
-                      }
-                    });
-                    const myJson = await response.json(); //extract JSON from the http response
-                    // do something with myJson
-                  }
-                </pre>
-                <hr/>
-                <li><b>React js</b></li>
-                <pre>
-                  import React, { useState, useEffect } from "react";
-  
-                  function App(){
-                    const [profile, setProfile] = useState([])
-                    const [user] = useState("user-parameter")
-                  
-                    useEffect(() =>
-                    {
-                      const fetchProfile = async () =>
-                      {
-                        const res = await fetch(
-                          `https://api-mfikria.vercel.app/v3/lk21/movies` 
-                        )
-                        const data = await res.json()
-                        setProfile(data)
-                      }
-                  
-                      fetchProfile()
-                    }, [user])
-  
-                    return(
-                      < h1 style={{ fontSize: "2.1em", paddingBottom: "20px" }}>
-                        Know Who < strong className="purple">I'M</ strong>
-                      </ h1>
-                      < p>{profile.bio}</ p>
-                    )
-                  }
-  
-                </pre>
-                <hr/>
-              </div>
-            </section>
-          </section>
-          <section id="lk21">
-            <div class="h-full mt-5">
-              <p class="font-normal text-2xl">Movies and series Api </p>
-              <p class="text-sm pb-4">Movies and series Api ini masih dalam perkembangan devloper</p>
-            </div>
-            <section id="link2_1" class="border-l-[2px]">
-              <div class="leading-0 w-3/4">
-                Untuk Cara ini cukup gampang tinggal masukin url <strong>contoh</strong> /lk21/ <b><a href="/v3/lk21/" target="_blank" class="underline break-words">Link</a></b>
-              </div>
-              <div class="leading-0 w-3/3">
-                <p class="normal-case">fitur dari api ini Yaitu:<p>
-                  <div class="leading-2">(1). lk21 movies <b>/lk21/movies</b>
-                      <li>/lk21/movies <p>Respons dari url itu adalah menampilkan halaman movies</p></li>
-                      <li>/lk21/movies/populer <p>Respons dari url itu adalah menampilkan halaman movies yang popular saja</p></li>
-                      <li>/lk21/movies/d/{detailMovies} <p>respons dari url itu adalah menampilkan detail movies yang kalian cari seperti <strong>/d/superman</strong></p></li>
-                  </div>
-                  <br/>
-                  <div class="leading-2">(2). lk21 series <b>/lk21/series</b>
-                    <li>/lk21/series <p>Respons dari url itu adalah menampilkan halaman series</p></li>
-                    <li>/lk21/series/populer <p>Respons dari url itu adalah menampilkan halaman series yang popular saja</p></li>
-                    <li>/lk21/series/d/{detailMovies} <p>respons dari url itu adalah menampilkan detail series yang kalian cari seperti <strong>/d/pulau</strong></p></li>
-                  </div>
-                    <br/>
-                    <div class="leading-2">(2). lk21 lainnya <b>/lk21/</b>
-                      <li>/lk21/genres <p>Respons dari url itu adalah menampilkan genres movies atau series yang kalian cari</p></li>
-                      <li>/lk21/countries <p>Respons dari url itu adalah menampilkan negara/countries movies atau series yang kalian cari</p></li>
-                      <li>/lk21/years <p>respons dari url itu adalah menampilkan tahun/years movies atau series yang kalian cari </p></li>
-                      <li>/lk21/s/{MovieOrSeries} <p>respons dari url itu adalah Search sebuah movies atau series yang kalian cari Contoh dari query tersebut: <strong>/s/superman</strong></p></li>
-                    </div>
-              </div>
-            </section>
-          </section>
-          <hr/>
-        </section>
-    <!-- Footer starts here -->
-    <footer>
-      <div class="dark:bg-white bg-slate-900 h-38 py-1 px-1 mt-5">
-        <div tabindex="0" aria-label="footer" class="focus:outline-none mx-auto container flex flex-col items-center justify-center">
-          <div class="text-black flex flex-col md:items-center f-f-l pt-0">
-            <div class="my-6 text-base text-color f-f-l">
-              <ul class="md:flex items-center">
-                <li class="md:mr-6 cursor-pointer pt-4 lg:py-0">
-                  <a href="./index.html" class="text-white dark:text-black focus:outline-none focus:underline hover:text-gray-200">Home </a>
-                </li>
-                <li class="md:mr-6 cursor-pointer pt-4 lg:py-0">
-                  <a href="./docs.html" class="text-white dark:text-black focus:outline-none focus:underline hover:text-gray-200">Documentation </a>
-                </li>
-              </ul>
-            </div>
-            <div class="text-sm text-color mb-10 f-f-l">
-              <!-- Rename cleandocs with your respective name -->
-              <p tabindex="0" class="text-white dark:text-black focus:outline-none">Copyright &copy; <script>document.write(new Date().getFullYear())</script> Mfikria. All rights reserved</p>
-            </div>
-          </div>
+        <!-- Hamburger Button (Mobile Only) -->
+        <div class="flex sm:hidden cursor-pointer" onclick="OnclickOpenMenu()" id="open-menu">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        
+        <!-- Close Button (Mobile Only) -->
+        <div class="hidden cursor-pointer" onclick="OnclickCloseMenu()" id="close-menu">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </div>
       </div>
-    </footer>
-   </div>
+    </header>
 
-   <script>
-    window.va =
-      window.va ||
-      function () {
-        (window.vaq = window.vaq || []).push(arguments);
-      };
-  </script>
-  <script defer src="/_vercel/insights/script.js"></script>
+    <div class="mx-auto flex max-w-4xl flex-col gap-8 px-5 py-10 md:flex-row md:gap-12">
+      <!-- Menu samping -->
+      <aside class="md:w-44 md:shrink-0">
+        <nav class="flex gap-5 overflow-x-auto text-sm md:sticky md:top-20 md:flex-col md:gap-3" role="navigation">
+          <a href="#mulai" class="whitespace-nowrap hover:text-red-600">Getting Started</a>
+          <a href="#guest" class="whitespace-nowrap hover:text-red-600">Guest Token</a>
+          <a href="#contoh" class="whitespace-nowrap hover:text-red-600">Contoh Kode</a>
+          <a href="#github" class="whitespace-nowrap hover:text-red-600">GitHub</a>
+          <a href="#video" class="whitespace-nowrap hover:text-red-600">Video</a>
+          <a href="#share" class="whitespace-nowrap hover:text-red-600">Share &amp; Embed</a>
+          <a href="#akun" class="whitespace-nowrap hover:text-red-600">Akun</a>
+          <a href="#anime" class="whitespace-nowrap hover:text-red-600">Anime</a>
+          <a href="#movies" class="whitespace-nowrap hover:text-red-600">Movies &amp; Series</a>
+        </nav>
+      </aside>
+
+      <main class="min-w-0 flex-1 space-y-14">
+        <section id="mulai" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Getting Started</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Semua endpoint memakai method yang tertera dan membalas JSON. Respons sukses berisi <code>"status": "success"</code>, respons gagal berisi <code>"status": "error"</code> dan <code>"message"</code>.</p>
+          <h3 class="mt-6 text-sm font-semibold">Base URL</h3>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/mfikria/v1</code><span class="text-slate-500 dark:text-slate-400">Guest token, video, share/embed, dan akun</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/github</code><span class="text-slate-500 dark:text-slate-400">GitHub</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/anime</code><span class="text-slate-500 dark:text-slate-400">Anime</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v3/lk21</code><span class="text-slate-500 dark:text-slate-400">Movies &amp; Series</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Alur singkat</h3>
+          <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400"><li>Ambil guest token dengan <code>POST /mfikria/v1/guest-token</code>.</li><li>Tempelkan <code>?query={Access_Token}&amp;tgl={tanggal}</code> pada endpoint yang butuh token (GitHub, video, share-info).</li><li>Simpan token dan pakai ulang, jangan buat token baru di setiap request.</li></ol>
+          <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Endpoint publik tanpa guest token: <code>/guest-token</code>, <code>/guest-view</code>, <code>/share</code>, <code>/embed</code>, <code>/s/{id}/stream</code>, dan <code>/s/{id}/view</code>.</p>
+        </section>
+
+        <section id="guest" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Guest Token</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Token untuk pengunjung tanpa login. Setiap token tercatat di Google Sheet (tab <code>GuestTokens</code>).</p>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/guest-token</code><span class="text-slate-500 dark:text-slate-400">Buat guest token. Tanpa body dan tanpa header</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/guest-view</code><span class="text-slate-500 dark:text-slate-400">Jumlah guest yang pernah masuk (<code>view</code>), di-cache 30 detik</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+  "status": "success",
+  "message": "Guest token berhasil dibuat.",
+  "data": {
+    "userId": "G001",
+    "Access_Token": "...",
+    "pukul": "1535",
+    "tanggal": "091026"
+  }
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Cara memakai token</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Kirim sebagai query pada endpoint yang butuh guest token: <code>?query={Access_Token}&amp;tgl={tanggal}</code>, dengan nilai dari respons di atas.</p>
+          <h3 class="mt-6 text-sm font-semibold">Batasan</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Maksimal 10 token per IP per jam (lebih dari itu dibalas 429) dan token berlaku 24 jam secara default. Token yang salah atau kedaluwarsa dibalas 401.</p>
+        </section>
+
+        <section id="contoh" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Contoh Kode</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Ambil guest token, lalu pakai untuk mengambil 5 repository milik <code>dodokjr</code>.</p>
+
+          <div class="mt-5 flex gap-1 overflow-x-auto border-b border-slate-200 text-sm dark:border-slate-800">
+            <button type="button" data-tab="js" class="-mb-px whitespace-nowrap border-b-2 border-red-600 text-red-600 px-3 py-2 font-medium">JavaScript</button>
+            <button type="button" data-tab="react" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">React</button>
+            <button type="button" data-tab="node" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Node.js</button>
+            <button type="button" data-tab="python" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Python</button>
+            <button type="button" data-tab="go" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Go</button>
+          </div>
+
+          <div data-panel="js">
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">JavaScript vanilla (di browser)</p>
+            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
+
+async function getRepos() {
+  // 1. ambil guest token
+  const tokenRes = await fetch(`${API}/mfikria/v1/guest-token`, { method: 'POST' });
+  const { Access_Token, tanggal } = (await tokenRes.json()).data;
+
+  // 2. pakai token di endpoint GitHub
+  const params = new URLSearchParams({ per_page: 5, query: Access_Token, tgl: tanggal });
+  const res = await fetch(`${API}/v2/github/dodokjr/repos?${params}`);
+  console.log(await res.json());
+}
+
+getRepos().catch(console.error);</code></pre>
+          </div>
+
+          <div data-panel="react" class="hidden">
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">React (function component + hooks)</p>
+            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>import { useEffect, useState } from 'react';
+
+const API = 'https://api-mfikria.vercel.app';
+
+export default function Repos() {
+  const [repos, setRepos] = useState([]);
+
+  useEffect(() =&gt; {
+    async function load() {
+      const tokenRes = await fetch(`${API}/mfikria/v1/guest-token`, { method: 'POST' });
+      const { Access_Token, tanggal } = (await tokenRes.json()).data;
+
+      const params = new URLSearchParams({ per_page: 5, query: Access_Token, tgl: tanggal });
+      const res = await fetch(`${API}/v2/github/dodokjr/repos?${params}`);
+      const data = await res.json();
+      setRepos(Array.isArray(data) ? data : []);
+    }
+    load().catch(console.error);
+  }, []);
+
+  return (
+    &lt;ul&gt;
+      {repos.map((r) =&gt; (
+        &lt;li key={r.id}&gt;{r.name}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+          </div>
+
+          <div data-panel="node" class="hidden">
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Node.js 18 atau lebih baru (<code>fetch</code> sudah bawaan)</p>
+            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
+
+async function main() {
+  const tokenRes = await fetch(`${API}/mfikria/v1/guest-token`, { method: 'POST' });
+  const { Access_Token, tanggal } = (await tokenRes.json()).data;
+
+  const params = new URLSearchParams({ per_page: 5, query: Access_Token, tgl: tanggal });
+  const res = await fetch(`${API}/v2/github/dodokjr/repos?${params}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const repos = await res.json();
+  repos.forEach((r) =&gt; console.log(r.name));
+}
+
+main().catch(console.error);</code></pre>
+          </div>
+
+          <div data-panel="python" class="hidden">
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Python (<code>pip install requests</code>)</p>
+            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>import requests
+
+API = 'https://api-mfikria.vercel.app'
+
+# 1. ambil guest token
+token = requests.post(f'{API}/mfikria/v1/guest-token', timeout=10).json()['data']
+
+# 2. pakai token di endpoint GitHub
+res = requests.get(
+    f'{API}/v2/github/dodokjr/repos',
+    params={'per_page': 5, 'query': token['Access_Token'], 'tgl': token['tanggal']},
+    timeout=10,
+)
+res.raise_for_status()
+
+for repo in res.json():
+    print(repo['name'])</code></pre>
+          </div>
+
+          <div data-panel="go" class="hidden">
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Go (hanya library standar)</p>
+            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"net/url"
+)
+
+const api = "https://api-mfikria.vercel.app"
+
+func main() {
+	// 1. ambil guest token
+	res, err := http.Post(api+"/mfikria/v1/guest-token", "application/json", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+
+	var tok struct {
+		Data struct {
+			AccessToken string `json:"Access_Token"`
+			Tanggal	 string `json:"tanggal"`
+		} `json:"data"`
+	}
+	if err := json.NewDecoder(res.Body).Decode(&amp;tok); err != nil {
+		log.Fatal(err)
+	}
+
+	// 2. pakai token di endpoint GitHub
+	q := url.Values{}
+	q.Set("per_page", "5")
+	q.Set("query", tok.Data.AccessToken)
+	q.Set("tgl", tok.Data.Tanggal)
+
+	res2, err := http.Get(api + "/v2/github/dodokjr/repos?" + q.Encode())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res2.Body.Close()
+
+	var repos []struct {
+		Name string `json:"name"`
+	}
+	if err := json.NewDecoder(res2.Body).Decode(&amp;repos); err != nil {
+		log.Fatal(err)
+	}
+	for _, r := range repos {
+		fmt.Println(r.Name)
+	}
+}</code></pre>
+          </div>
+        </section>
+
+        <section id="github" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">GitHub</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Ganti <code>{nama}</code> dengan username GitHub dan <code>{repo}</code> dengan nama repository. Semua endpoint butuh guest token (<code>?query=&amp;tgl=</code>) dan dibatasi 60 request per menit per IP.</p>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}</code><span class="text-slate-500 dark:text-slate-400">Profil pengguna</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}/repos</code><span class="text-slate-500 dark:text-slate-400">Daftar repository</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}/repos/{repo}</code><span class="text-slate-500 dark:text-slate-400">Detail satu repository</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}/repos/{repo}/events</code><span class="text-slate-500 dark:text-slate-400">Aktivitas repository</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}/repos/{repo}/languages</code><span class="text-slate-500 dark:text-slate-400">Bahasa pemrograman yang dipakai</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/l/limit</code><span class="text-slate-500 dark:text-slate-400">Sisa kuota GitHub API (limit, remaining, reset)</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Parameter opsional</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Untuk <code>/repos</code> dan <code>/events</code>: <code>per_page</code> (1&ndash;100) dan <code>page</code> (1&ndash;1000). Contoh: <code>/v2/github/dodokjr/repos?per_page=5&amp;page=1&amp;query=...&amp;tgl=...</code></p>
+          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
+          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400">Username atau nama repo tidak valid</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">401</code><span class="text-slate-500 dark:text-slate-400">Guest token tidak ada atau tidak valid</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">User atau repository tidak ditemukan</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Batas request tercapai (server atau GitHub)</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">502</code><span class="text-slate-500 dark:text-slate-400">Gagal mengambil data dari GitHub</span></li>
+          </ul>
+          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Respons di-cache sekitar 60 detik, jadi data bisa terlambat sedikit dari GitHub.</p>
+        </section>
+
+        <section id="video" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Video</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Semua endpoint butuh guest token (<code>?query=&amp;tgl=</code>). <code>{token}</code> adalah <code>videoToken</code> (10 karakter) dari daftar video.</p>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/videos</code><span class="text-slate-500 dark:text-slate-400">Daftar video beserta views, tanggal upload, dan info share</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/video/{token}</code><span class="text-slate-500 dark:text-slate-400">Stream video (mendukung Range), pakai sebagai <code>src</code> elemen <code>&lt;video&gt;</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/video-info/{token}</code><span class="text-slate-500 dark:text-slate-400">Info satu video: judul, ukuran, views, tanggal upload, share</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/video-view/{token}</code><span class="text-slate-500 dark:text-slate-400">Catat 1 view. Panggil sekali setelah video diputar beberapa detik</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons /videos</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+  "status": "success",
+  "totalVideos": 1,
+  "data": [
+    {
+      "title": "the_weekend_Time",
+      "mimeType": "video/mp4",
+      "size": 12345678,
+      "videoToken": "k4n8lSIppy",
+      "views": 0,
+      "uploadedAt": "2026-10-09T08:35:00.000Z",
+      "uploadedAtLocal": { "tanggal": "09-10-2026", "pukul": "15:35" },
+      "videoUrl": "/mfikria/v1/video/k4n8lSIppy?query=...&amp;tgl=...",
+      "share": {
+        "shareId": "k4n8lSIppy",
+        "shareUrl": ".../mfikria/v1/share/k4n8lSIppy",
+        "embedUrl": ".../mfikria/v1/embed/k4n8lSIppy",
+        "embedCode": "&lt;iframe ...&gt;&lt;/iframe&gt;",
+        "social": { "whatsapp": "...", "facebook": "...", "twitter": "...", "telegram": "...", "linkedin": "..." }
+      }
+    }
+  ]
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Catatan</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>/video-view</code> membalas <code>{ views, counted }</code>. Satu guest hanya dihitung sekali untuk setiap video, jadi <code>counted</code> bernilai <code>false</code> pada panggilan berikutnya.</p>
+          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
+          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">401</code><span class="text-slate-500 dark:text-slate-400">Guest token tidak valid</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Video tidak ditemukan</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">500</code><span class="text-slate-500 dark:text-slate-400">Terjadi kesalahan di server</span></li>
+          </ul>
+        </section>
+
+        <section id="share" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Share &amp; Embed</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>{id}</code> adalah <code>shareId</code> dari objek <code>share</code> pada daftar video (sama dengan <code>videoToken</code>). Endpoint ini publik, tanpa guest token, kecuali <code>/share-info</code>.</p>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/share/{id}</code><span class="text-slate-500 dark:text-slate-400">Link untuk dibagikan. Langsung diarahkan ke halaman nonton di situs</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/embed/{id}</code><span class="text-slate-500 dark:text-slate-400">Player polos untuk <code>&lt;iframe&gt;</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/share-info/{id}</code><span class="text-slate-500 dark:text-slate-400">Link share, kode iframe, dan link media sosial satu video (butuh guest token)</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/s/{id}/stream</code><span class="text-slate-500 dark:text-slate-400">Stream video bertanda tangan (<code>?e=&amp;s=</code>), dipakai halaman embed</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/s/{id}/view</code><span class="text-slate-500 dark:text-slate-400">Catat view dari halaman embed (<code>?e=&amp;s=</code>)</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Contoh embed</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>&lt;iframe src="https://api-mfikria.vercel.app/mfikria/v1/embed/k4n8lSIppy" width="640" height="360" frameborder="0" allow="fullscreen; autoplay" allowfullscreen loading="lazy" title="Judul video"&gt;&lt;/iframe&gt;</code></pre>
+          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Bot media sosial (WhatsApp, Facebook, Telegram, dan lain-lain) tetap mendapat halaman dengan meta Open Graph supaya preview link muncul. Link stream bertanda tangan berlaku 6 jam.</p>
+        </section>
+
+        <section id="akun" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Akun</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Endpoint akun memakai header <code>Authorization: Bearer {token akses}</code> (token akses user atau admin). Body dikirim sebagai JSON.</p>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/register</code><span class="text-slate-500 dark:text-slate-400">Daftar akun. Body: <code>username</code>, <code>password</code>, <code>role</code> (opsional), <code>photoId</code> (opsional)</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/login</code><span class="text-slate-500 dark:text-slate-400">Masuk. Body: <code>username</code>, <code>password</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/logout</code><span class="text-slate-500 dark:text-slate-400">Keluar. Body: <code>username</code>, <code>encryptedQueryToken</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/photos</code><span class="text-slate-500 dark:text-slate-400">Daftar foto di folder Google Drive</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/photoProfile/{token}</code><span class="text-slate-500 dark:text-slate-400">Foto profil dari token terenkripsi</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/assets/photo/{photoId}?q={token}</code><span class="text-slate-500 dark:text-slate-400">Foto profil dengan <code>photoId</code> dan token</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/assets/session-photo/{photoId}?query={encryptedQueryToken}</code><span class="text-slate-500 dark:text-slate-400">Validasi sesi, atau ambil foto. Dengan <code>Accept: application/json</code> hanya data verifikasi</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Aturan</h3>
+          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400"><li>Username maksimal 50 karakter, password 6&ndash;128 karakter.</li><li>Akun <code>admin</code> hanya bisa dibuat dengan token akses admin.</li><li>Satu akun hanya bisa aktif di satu sesi. Login saat akun masih online dibalas 403.</li><li>Password disimpan sebagai hash (scrypt), bukan teks asli.</li></ul>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons /login</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+  "status": "success",
+  "message": "Login Berhasil sebagai USER",
+  "dashboardData": {
+    "profile": { "userId": "U001", "username": "...", "role": "user", "statusLogin": "true",
+                 "terakhirLogin": { "tanggal": "...", "pukul": "..." } },
+    "permissions": { "canUploadFile": false, "canModifyData": false, "accessLevel": "View Only (User)" },
+    "sessionTokens": { "accessToken": "...", "encryptedQueryToken": "..." },
+    "googleDrivePhoto": { "photoId": "...", "token": "..." }
+  }
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
+          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400">Data wajib tidak lengkap atau tidak valid</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">403</code><span class="text-slate-500 dark:text-slate-400">Token akses salah, username atau password salah, atau akun sedang online</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Username tidak ditemukan (logout)</span></li>
+            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">500</code><span class="text-slate-500 dark:text-slate-400">Terjadi kesalahan di server</span></li>
+          </ul>
+        </section>
+
+        <!-- Anime -->
+        <section id="anime" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Anime</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Endpoint dasar <code>/v2/anime</code> langsung menampilkan halaman home. Masih dalam pengembangan.</p>
+          <ul class="mt-4 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime</code><span class="text-slate-500 dark:text-slate-400">Halaman home</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/{query}</code><span class="text-slate-500 dark:text-slate-400">Cari anime, contoh <code>/v2/anime/naruto</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/full/{id}</code><span class="text-slate-500 dark:text-slate-400">Detail lengkap anime</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/popular</code><span class="text-slate-500 dark:text-slate-400">Anime populer (Top Anime)</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/populer/page/{id}</code><span class="text-slate-500 dark:text-slate-400">Anime populer per halaman</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/character/{id}</code><span class="text-slate-500 dark:text-slate-400">Karakter anime</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/character/people/{id}</code><span class="text-slate-500 dark:text-slate-400">Pengisi suara karakter</span></li>
+          </ul>
+        </section>
+
+        <!-- Movies & Series -->
+        <section id="movies" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Movies &amp; Series</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Ganti <code>{judul}</code> dengan judul yang dicari, misalnya <code>superman</code>. Masih dalam pengembangan.</p>
+          <ul class="mt-4 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/movies</code><span class="text-slate-500 dark:text-slate-400">Halaman movies</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/movies/populer</code><span class="text-slate-500 dark:text-slate-400">Movies populer</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/movies/d/{judul}</code><span class="text-slate-500 dark:text-slate-400">Detail movie</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/series</code><span class="text-slate-500 dark:text-slate-400">Halaman series</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/series/populer</code><span class="text-slate-500 dark:text-slate-400">Series populer</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/series/d/{judul}</code><span class="text-slate-500 dark:text-slate-400">Detail series</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/s/{judul}</code><span class="text-slate-500 dark:text-slate-400">Cari movie atau series</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/genres</code><span class="text-slate-500 dark:text-slate-400">Daftar genre</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/countries</code><span class="text-slate-500 dark:text-slate-400">Daftar negara</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v3/lk21/years</code><span class="text-slate-500 dark:text-slate-400">Daftar tahun</span></li>
+          </ul>
+        </section>
+      </main>
+    </div>
+
+    <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+      Copyright &copy;
+      <script>
+        document.write(new Date().getFullYear());
+      </script>
+      Mfikria. All rights reserved.
+    </footer>
   </body>
 </html>

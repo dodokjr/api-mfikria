@@ -3,12 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="icon" href="./logo.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="./logo.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="public/js/index.js"></script>
     <script src="public/js/api.js"></script>
@@ -25,224 +24,101 @@
         };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
-    <style>
-      img {
- transition: .3s ease all ;
- -webkit-transition: .3s ease all ;
- -moz-transition: .3s ease all ;
- -ms-transition: .3s ease all ;
- -o-transition: .3s ease all ;
-}
-
-img:hover{
-  scale: 102%;
-}
-    </style>
     <title>Mfikria Docs</title>
   </head>
-  <body style="font-family: 'Poppins', sans-serif" class="dark:bg-slate-900 bg-white dark:text-white">
-    <div>
-      <header class="w-full p-3 border-b dark:border-b flex">
-        <nav class="w-full flex flex-col lg:flex-row md:flex-row sm:flex-row items-start lg:item-center md:item-center sm:item-center lg:justify-between md:justify-between sm:justify-between justify-start dark:text-white">
-          <ul>
-            <li class="font-mono text-xl">Mfikria Docs</li>
-          </ul>
-          <ul id="header-nav" class="mr-6 sm:flex md:flex lg:flex hidden">
-            <li class="mr-5 mb-3 mt-5 sm:mb-0 sm:mt-0 md:mb-0 md:mt-0 lg:mb-0 lg:mt-0">
-              <a href="./index.html">Home</a>
-            </li>
-            <li class="mr-5 mb-3 mt-5 sm:mb-0 sm:mt-0 md:mb-0 md:mt-0 lg:mb-0 lg:mt-0">
-              <a href="./docs.html">Documentation</a>
-            </li>
-            <li class="mr-5 mb-3 mt-5 sm:mb-0 sm:mt-0 md:mb-0 md:mt-0 lg:mb-0 lg:mt-0">
-              <a href="#contributors">Contribution</a>
-            </li>
-            <div>
-              <ul class="flex">
-                <li class="mr-5 flex dark:hidden">
-                  <p onclick="darkmode()">
-                    <img src="public/svgs/sun.svg" alt="sun Link" />
-                  </p>
-                </li>
-                <li class="mr-5 hidden dark:flex">
-                  <p onclick="lightmode()">
-                    <img src="public/svgs/sun-dark.svg" alt="sun Link" />
-                  </p>
-                </li>
-                <li class="mr-5 flex dark:hidden">
-                  <a href="/github"><img src="public/svgs/github.svg" alt="GitHub Link" /></a>
-                </li>
-                <li class="mr-5 hidden dark:flex">
-                  <a href="/github"><img src="public/svgs/github-dark.svg" alt="GitHub Link" /></a>
-                </li>
-              </ul>
-            </div>
-          </ul>
+  <body style="font-family: 'Poppins', sans-serif" class="bg-white text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-200">
+    <!-- Header -->
+    <header class="border-b border-slate-200 dark:border-slate-800 relative">
+      <div class="mx-auto flex max-w-4xl items-center justify-between px-5 py-4">
+        <a href="./index.html" class="font-semibold tracking-tight">Mfikria Docs</a>
+
+        <!-- Navigation -->
+        <nav id="header-nav" class="hidden absolute top-full left-0 w-full flex-col gap-4 border-b border-slate-200 bg-white p-5 shadow-lg sm:static sm:flex sm:w-auto sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none dark:border-slate-800 dark:bg-slate-900">
+          <a href="./index.html" class="hover:text-red-600">Home</a>
+          <a href="./docs.html" class="hover:text-red-600">Documentation</a>
+          <a href="#contributors" class="hover:text-red-600">Contribution</a>
+          
+          <div class="flex items-center gap-6 sm:gap-4 pt-2 sm:pt-0 border-t sm:border-0 border-slate-200 dark:border-slate-800">
+            <p onclick="darkmode()" class="flex cursor-pointer dark:hidden"><img src="public/svgs/sun.svg" alt="Mode gelap" class="h-5 w-5" /></p>
+            <p onclick="lightmode()" class="hidden cursor-pointer dark:flex"><img src="public/svgs/sun-dark.svg" alt="Mode terang" class="h-5 w-5" /></p>
+            <a href="/github" class="flex dark:hidden"><img src="public/svgs/github.svg" alt="GitHub" class="h-5 w-5" /></a>
+            <a href="/github" class="hidden dark:flex"><img src="public/svgs/github-dark.svg" alt="GitHub" class="h-5 w-5" /></a>
+          </div>
         </nav>
 
-        <div class="sm:hidden flex" onclick="OnclickOpenMenu()" id="open-menu">
+        <!-- Hamburger Button (Mobile Only) -->
+        <div class="flex sm:hidden cursor-pointer" onclick="OnclickOpenMenu()" id="open-menu">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z" clip-rule="evenodd" />
           </svg>
         </div>
-        <div class="hidden" onclick="OnclickCloseMenu()" id="close-menu">
+        
+        <!-- Close Button (Mobile Only) -->
+        <div class="hidden cursor-pointer" onclick="OnclickCloseMenu()" id="close-menu">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-      </header>
+      </div>
+    </header>
 
-      <div class="bg-gradient-to-r from-[#0F2027] to-[#2C5364] p-10">
-        <div class="w-full items-center flex justify-center flex-col">
-          <p class="text-3xl text-white">Documentation</p>
-          <p class="font-sans text-white text-center w-[300px] lg:w-[700px] md:w-[700px] sm:w-[600px] mt-4">Saya Membuat Sebuah Api Yang bisa di pakai untuk Sebuah Project Sendiri.</p>
+    <main class="mx-auto max-w-4xl px-5">
+      <!-- Hero -->
+      <section class="py-20 text-center">
+        <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Documentation</h1>
+        <p class="mx-auto mt-4 max-w-md text-slate-500 dark:text-slate-400">
+          API buatan sendiri yang bisa dipakai untuk project apa saja.
+        </p>
+        <a href="./docs.html" class="mt-8 inline-block rounded-md bg-red-600 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-red-700">
+          Memulai itu mudah
+        </a>
+      </section>
+
+      <!-- Fitur -->
+      <section class="grid gap-8 border-t border-slate-200 py-14 dark:border-slate-800 sm:grid-cols-3">
+        <div>
+          <h2 class="font-medium">Introduction</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Perkenalan singkat, mulai dari halaman home.</p>
         </div>
-      </div>
-
-      <div class="w-full flex justify-center p-6 flex-col items-center">
-        <p class="p-5 text-xl">Ayo Mulai</p>
-        <a href="./docs.html" class="text-white h-50 bg-red-600 p-2 w-44 rounded text-center"> Memulai itu mudah! </a>
-      </div>
-
-      <div class="w-full flex justify-center p-6 flex-col items-center">
-        <p class="p-5 text-xl">Test Api</p>
-        <button onclick="testApi()" id="hidden" class="text-white h-50 bg-red-600 p-2 w-44 rounded text-center">Test Api</button>
-        <div id="loading" style="display: none;">Loding</div>
-        <div id="res" class="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 px-4"></div>
-      </div>
-
-      <div class="w-full flex justify-center items-center mt-20 mb-20">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          <div class="max-w-sm rounded shadow bg-white bg-gradient-to-br from-[#302b63] to-[#2c3e50] block -inset-1 -skew-y-3 relative inline-block before:block before:absolute before:-inset-1 before:bg-[#F27121] before:h-2 before:rounded">
-            <div class="flex">
-              <div class="px-6 py-5">
-                <p tabindex="0" class="focus:outline-none text-base font-medium leading-none text-white flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                  </svg>
-                  Introduction
-                </p>
-                <p tabindex="0" class="focus:outline-none text-base leading-2 text-gray-300 dark:text-gray-400 pt-2">Saya perkenalkan saya mfikria bisa memulai api ini dari halaman home</p>
-              </div>
-            </div>
-          </div>
-          <div class="max-w-sm rounded shadow bg-white bg-gradient-to-br from-[#302b63] to-[#2c3e50] block -inset-1 -skew-y-3 relative inline-block before:block before:absolute before:-inset-1 before:bg-pink-500 before:h-2 before:rounded">
-            <div class="flex">
-              <div class="px-6 py-5">
-                <p tabindex="0" class="focus:outline-none text-base font-medium leading-none text-white flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path
-                      fill-rule="evenodd"
-                      d="M2 9.5A3.5 3.5 0 005.5 13H9v2.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 15.586V13h2.5a4.5 4.5 0 10-.616-8.958 4.002 4.002 0 10-7.753 1.977A3.5 3.5 0 002 9.5zm9 3.5H9V8a1 1 0 012 0v5z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  Installation
-                </p>
-                <p tabindex="0" class="focus:outline-none text-base leading-2 text-gray-300 dark:text-gray-400 pt-2">Ayo mulai dengan Installationnya</p>
-              </div>
-            </div>
-          </div>
-          <div class="max-w-sm rounded shadow bg-white bg-gradient-to-br from-[#302b63] to-[#2c3e50] block -inset-1 -skew-y-3 relative inline-block before:block before:absolute before:-inset-1 before:bg-[#F27121] before:h-2 before:rounded">
-            <div class="flex">
-              <div class="px-6 py-5">
-                <p tabindex="0" class="focus:outline-none text-base font-medium leading-none text-white flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path
-                      fill-rule="evenodd"
-                      d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  Integration
-                </p>
-                <p tabindex="0" class="focus:outline-none text-base leading-2 text-gray-300 dark:text-gray-400 pt-2">Saya Membuat ini untuk diri sendiri dan bisa di pakai untuk semua orang</p>
-              </div>
-            </div>
-          </div>
+        <div>
+          <h2 class="font-medium">Installation</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Ayo mulai dengan instalasinya.</p>
         </div>
-      </div>
-
-      <div class="w-full flex justify-center items-center  p-6 flex-col">
-        <h1 class="dark:text-white font-bold p-5 text-xl m-4">My Project setup</h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          <div class="max-w-sm rounded shadow bg-white bg-gradient-to-br from-[#302b63] to-[#2c3e50] block -inset-1 -skew-y-3 relative inline-block before:block before:absolute before:-inset-1 before:bg-[#F27121] before:h-2 before:rounded">
-            <div class="flex">
-              <div class="px-6 py-5">
-                <p tabindex="0" class="focus:outline-none text-base font-medium leading-none text-white flex items-center">
-                <i class='bx bxl-nodejs' style="font-size: 25px;"></i>
-                Node javascript
-                </p>
-                <p tabindex="0" class="focus:outline-none text-base leading-2 text-gray-300 dark:text-gray-400 pt-2">Node.js is a cross-platform, open-source JavaScript runtime environment that can run on Windows, Linux, Unix, macOS, and more. Node.js runs on the V8 JavaScript engine, and executes JavaScript code outside a web browser. Node.js lets developers use JavaScript to write command line tools and for server-side scripting</p>
-              </div>
-            </div>
-          </div>
-          <div class="max-w-sm rounded shadow bg-white bg-gradient-to-br from-[#302b63] to-[#2c3e50] block -inset-1 -skew-y-3 relative inline-block before:block before:absolute before:-inset-1 before:bg-pink-500 before:h-2 before:rounded">
-            <div class="flex">
-              <div class="px-6 py-5">
-                <p tabindex="0" class="focus:outline-none text-base font-medium leading-none text-white flex items-center">
-                <i class='bx bxl-tailwind-css' style="font-size: 25px;"></i>
-                Tailwind
-                </p>
-                <p tabindex="0" class="focus:outline-none text-base leading-2 text-gray-300 dark:text-gray-400 pt-2">Tailwind CSS is an open source CSS framework. The main feature of this library is that, unlike other CSS frameworks like Bootstrap, it does not provide a series of predefined classes for elements such as buttons or tables</p>
-              </div>
-            </div>
-          </div>
-          <div class="max-w-sm rounded shadow bg-white bg-gradient-to-br from-[#302b63] to-[#2c3e50] block -inset-1 -skew-y-3 relative inline-block before:block before:absolute before:-inset-1 before:bg-[#F27121] before:h-2 before:rounded">
-            <div class="flex">
-              <div class="px-6 py-5">
-                <p tabindex="0" class="focus:outline-none text-base font-medium leading-none text-white flex items-center">
-                  <i class='bx bx-server' style="font-size: 25px;"></i>
-                  Vercel
-                </p>
-                <p tabindex="0" class="focus:outline-none text-base leading-2 text-gray-300 dark:text-gray-400 pt-2">Vercel Inc., formerly ZEIT, is an American cloud platform as a service company. The company maintains the Next.js web development framework. Vercel's architecture is built around composable architecture, and deployments are handled through Git repositories. Vercel is a member of the MACH Alliance</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <section id="contributors">
-        <div class="container mx-auto m-5 bg-gradient-to-r from-[#009FFF] to-[#ec2F4B] rounded-md">
-          <div class="flex flex-col justify-center items-center py-12 mx-4 md:mx-6">
-            <div class="lg:w-1/2 flex flex-col justify-center items-center mb-10">
-              <h1 class="text-3xl lg:text-4xl xl:text-5xl font-bold text-center text-white">Meet our contributors</h1>
-            </div>
-            <div role="list" id="ress" aria-label="Team members" class="grid grid-flow-row md:grid-flow-col gap-10">
-            </div>
-          </div>
+        <div>
+          <h2 class="project-setup font-medium">Integration</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Dibuat untuk diri sendiri, bisa dipakai semua orang.</p>
         </div>
       </section>
-      <footer>
-        <div class="bg-white dark:bg-slate-900 h-38 py-1 px-1 mt-5">
-          <div tabindex="0" aria-label="footer" class="focus:outline-none mx-auto container flex flex-col items-center justify-center">
-            <div class="text-black flex flex-col md:items-center f-f-l pt-0">
-              <div class="my-6 text-base text-color f-f-l">
-                <ul class="md:flex items-center">
-                  <li class="md:mr-6 cursor-pointer pt-4 lg:py-0">
-                    <a href="./index.html" class="text-black dark:text-white focus:outline-none focus:underline hover:text-gray-200">Home </a>
-                  </li>
-                  <li class="md:mr-6 cursor-pointer pt-4 lg:py-0">
-                    <a href="./docs.html" class="text-black dark:text-white focus:outline-none focus:underline hover:text-gray-200">Documentation </a>
-                  </li>
-                  <li class="md:mr-6 cursor-pointer pt-4 lg:py-0">
-                    <a href="#contributors" class="text-black dark:text-white focus:outline-none focus:underline hover:text-gray-200">Contribution </a>
-                  </li>
-                </ul>
-              </div>
-              <div class="text-sm text-color mb-10 f-f-l">
-                <p tabindex="0" class="text-black dark:text-white focus:outline-none">
-                  Copyright &copy;
-                  <script>
-                    document.write(new Date().getFullYear());
-                  </script>
-                  Mfikria. All rights reserved
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+
+      <!-- Test API -->
+      <section class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Test API</h2>
+        <button onclick="testApi()" id="hidden" class="mt-5 rounded-md border border-slate-300 px-5 py-2 text-sm transition hover:border-red-600 hover:text-red-600 dark:border-slate-700">
+          Jalankan
+        </button>
+        <div id="loading" class="mt-4 text-sm text-slate-500" style="display: none">Memuat...</div>
+        <div id="res" class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4"></div>
+      </section>
+
+      <!-- Stack -->
+      <section class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Project setup</h2>
+        <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Node.js &middot; Tailwind CSS &middot; Vercel</p>
+      </section>
+
+      <!-- Kontributor -->
+      <section id="contributors" class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Contributors</h2>
+        <div role="list" id="ress" aria-label="Team members" class="mt-8 grid grid-flow-row justify-center gap-8 md:grid-flow-col"></div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+      Copyright &copy;
+      <script>
+        document.write(new Date().getFullYear());
+      </script>
+      Mfikria. All rights reserved.
+    </footer>
   </body>
 </html>

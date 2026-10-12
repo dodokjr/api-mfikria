@@ -1,9 +1,3 @@
-// Halaman player (HTML) untuk /share/:id dan /embed/:id.
-// Simpan di: utilitis/PlayerPage.js  (sejajar dengan Mfikriawebcore.js)
-//
-// Hanya berisi tampilan: tidak memanggil Drive/database. Controller cukup memanggil
-// renderPlayerHtml({ mode, title, views, streamPath, viewPath, share, watch }).
-
 const { escapeHtml } = require('./Mfikriawebcore');
 
 // Link "Video Library" di header halaman share
