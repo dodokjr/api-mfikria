@@ -146,60 +146,118 @@
      return String(meta.name || '').replace(/\.[^.]+$/, '');
    }
    
-   /* ========================= GUEST TOKEN (enkripsi + pengecekan akses) ========================= */
-   // Pembuatan token baru (sheet "GuestTokens") ada di videoController; di sini hanya bagian yang dipakai bersama.
+   /* ========================= GUEST TOKEN (enkripsi + pengecekan akses) =========================
+      Frontend menyimpan token di sessionStorage lalu mengirimnya ke backend.
+      Backend yang menentukan token masih bisa dipakai atau tidak:
+      - 1 token berlaku 24 jam sejak dibuat (dihitung dari waktu pembuatan, bukan aktivitas)
+      - lewat 24 jam -> 401 dengan code GUEST_TOKEN_EXPIRED dan renew:true, frontend wajib membuat token baru
+      Pembuatan token baru (sheet "GuestTokens") ada di videoController; di sini bagian yang dipakai bersama. */
+   
+   const GUEST_TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 1 token = 24 jam
    
    const GUEST_TOKEN_KEY = crypto
      .createHash('sha256')
      .update(process.env.GUEST_TOKEN_SECRET || `guest|${ADMIN_SECRET_TOKEN}|${USER_SECRET_TOKEN}`)
      .digest();
    
-   function createGuestToken(userId, tanggal, expiresAt) {
+   // payload: u = userId, d = tanggal (DDMMYY), i = waktu dibuat (ms), e = waktu kedaluwarsa (ms)
+   // Return: { token, issuedAt, expiresAt }
+   function createGuestToken(userId, tanggal, issuedAt = Date.now()) {
+     const expiresAt = issuedAt + GUEST_TOKEN_TTL_MS; // selalu 24 jam, tidak bisa diatur dari luar
      const iv = crypto.randomBytes(IV_LENGTH);
      const cipher = crypto.createCipheriv('aes-256-gcm', GUEST_TOKEN_KEY, iv);
-     const encrypted = Buffer.concat([cipher.update(JSON.stringify({ u: userId, d: tanggal, e: expiresAt }), 'utf8'), cipher.final()]);
-     return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString('base64url');
+     const encrypted = Buffer.concat([
+       cipher.update(JSON.stringify({ u: userId, d: tanggal, i: issuedAt, e: expiresAt }), 'utf8'),
+       cipher.final(),
+     ]);
+     const token = Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString('base64url');
+     return { token, issuedAt, expiresAt };
    }
    
-   function readGuestToken(token) {
+   // Hasil: { state: 'valid' | 'expired' | 'invalid', payload }
+   function inspectGuestToken(token) {
      try {
        const raw = Buffer.from(String(token), 'base64url');
-       if (raw.length < IV_LENGTH + 16 + 2) return null;
+       if (raw.length < IV_LENGTH + 16 + 2) return { state: 'invalid' };
        const iv = raw.subarray(0, IV_LENGTH);
        const tag = raw.subarray(IV_LENGTH, IV_LENGTH + 16);
        const encrypted = raw.subarray(IV_LENGTH + 16);
        const decipher = crypto.createDecipheriv('aes-256-gcm', GUEST_TOKEN_KEY, iv);
        decipher.setAuthTag(tag);
        const payload = JSON.parse(Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8'));
-       if (typeof payload.u !== 'string' || !payload.u) return null;
-       if (typeof payload.d !== 'string' || !payload.d) return null;
-       if (payload.e && Date.now() > payload.e) return null; // kedaluwarsa
-       return payload;
+   
+       if (typeof payload.u !== 'string' || !payload.u) return { state: 'invalid' };
+       if (typeof payload.d !== 'string' || !payload.d) return { state: 'invalid' };
+       // token lama tanpa i/e dianggap tidak valid -> frontend akan membuat token baru
+       if (!Number.isFinite(payload.i) || !Number.isFinite(payload.e)) return { state: 'invalid' };
+       if (payload.e - payload.i > GUEST_TOKEN_TTL_MS) return { state: 'invalid' }; // masa berlaku dimanipulasi
+   
+       const now = Date.now();
+       // lebih dari 24 jam sejak dibuat, atau sudah lewat e -> expired
+       if (now >= payload.e || now - payload.i >= GUEST_TOKEN_TTL_MS) return { state: 'expired', payload };
+   
+       return { state: 'valid', payload };
      } catch (error) {
-       return null;
+       return { state: 'invalid' };
      }
    }
    
-   // Guest token dikirim lewat query string (tag <video src> tidak bisa kirim header):
-   //   ?query=<Access_Token guest>&tgl=<tanggal guest, DDMMYY>
+   // Kompatibel dengan kode lama: payload kalau valid, null kalau tidak
+   function readGuestToken(token) {
+     const r = inspectGuestToken(token);
+     return r.state === 'valid' ? r.payload : null;
+   }
+   
+   // Token dari sessionStorage frontend. Prioritas header; fallback query string
+   // (tag <video src> / iframe tidak bisa mengirim header).
+   //   Header: x-guest-token, x-guest-date
+   //   Query : ?query=<token>&tgl=<DDMMYY>
    function getGuestParams(req) {
-     const q = typeof req.query.query === 'string' ? req.query.query : '';
-     const tgl = typeof req.query.tgl === 'string' ? req.query.tgl : '';
+     const h = (name) => (typeof req.headers[name] === 'string' ? req.headers[name] : '');
+     const q = h('x-guest-token') || (typeof req.query.query === 'string' ? req.query.query : '');
+     const tgl = h('x-guest-date') || (typeof req.query.tgl === 'string' ? req.query.tgl : '');
      return { q, tgl };
    }
    
-   // Token harus valid, belum kedaluwarsa, dan tgl harus sama dengan tanggal yang tercatat di token
-   // (= tanggal di sheet GuestTokens). Return true jika boleh lanjut.
-   function checkGuestAccess(req, res) {
+   // Kembalikan { ok, state, payload } tanpa menulis response (dipakai juga oleh endpoint status)
+   function evaluateGuestAccess(req) {
      const { q, tgl } = getGuestParams(req);
-     const payload = q ? readGuestToken(q) : null;
-     if (payload && safeEqual(padDate(tgl), padDate(payload.d))) return true;
+     if (!q) return { ok: false, state: 'missing' };
+     const r = inspectGuestToken(q);
+     if (r.state !== 'valid') return { ok: false, state: r.state };
+     if (!safeEqual(padDate(tgl), padDate(r.payload.d))) return { ok: false, state: 'invalid' };
+     return { ok: true, state: 'valid', payload: r.payload };
+   }
    
+   // Return true kalau boleh lanjut; kalau tidak, langsung balas 401
+   function checkGuestAccess(req, res) {
+     const r = evaluateGuestAccess(req);
+     if (r.ok) return true;
+   
+     res.setHeader('Cache-Control', 'no-store');
      res.status(401).json({
        status: 'error',
-       message: '401 Unauthorized: query (guest token) atau tgl tidak valid / kedaluwarsa.',
+       code: r.state === 'expired' ? 'GUEST_TOKEN_EXPIRED' : 'GUEST_TOKEN_INVALID', // frontend: buat token baru
+       renew: true,
+       message:
+         r.state === 'expired'
+           ? '401 Unauthorized: guest token sudah kedaluwarsa (24 jam), buat token baru.'
+           : '401 Unauthorized: guest token atau tanggal tidak valid.',
      });
      return false;
+   }
+   
+   // Untuk endpoint GET /guest-token/status (frontend cek sisa waktu token dari sessionStorage)
+   function guestTokenStatus(req) {
+     const r = evaluateGuestAccess(req);
+     if (!r.ok) return { valid: false, state: r.state, renew: true };
+     return {
+       valid: true,
+       state: 'valid',
+       renew: false,
+       expiresAt: r.payload.e,
+       remainingMs: Math.max(r.payload.e - Date.now(), 0),
+     };
    }
    
    /* ========================= VIEW COUNTER (Google Sheet tab "VideoViews") ========================= */
@@ -393,6 +451,7 @@
      API_BASE_PATH,
      VIDEO_REQUIRE_FETCH_DEST,
      VIEWS_SHEET,
+     GUEST_TOKEN_TTL_MS,
      escapeHtml,
      getClientIp,
      getBaseUrl,
@@ -405,8 +464,11 @@
      videoTitle,
      createGuestToken,
      readGuestToken,
+     inspectGuestToken,
      getGuestParams,
+     evaluateGuestAccess,
      checkGuestAccess,
+     guestTokenStatus,
      getViewsMap,
      addView,
      alreadyCounted,
