@@ -8,8 +8,27 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const fileUpload = require('express-fileupload');
-const authRoutes = require('./routes/mfikria/routes/authRoutes');
-const githubRoutes = require('./routes/mfikria/routes/Githubroutes'); // proxy GitHub baru (wajib Access_Token guest)
+
+// Muat router dengan aman: kalau satu modul gagal dimuat (nama file salah huruf, package kurang, env kosong),
+// hanya route itu yang membalas 500 JSON. Route lain (misal /v1/home) tetap hidup, dan header CORS tetap terkirim.
+// Penyebab asli tercatat di log dengan awalan "BOOT ERROR". APP_DEBUG=1 menampilkan pesannya di respons.
+function loadRouter(label, loader) {
+     try {
+          return loader();
+     } catch (error) {
+          console.error(`BOOT ERROR (${label}):`, error && error.stack ? error.stack : error);
+          const failed = express.Router();
+          failed.use((req, res) => {
+               const payload = { status: 'error', message: `500 Modul ${label} gagal dimuat, cek log server.` };
+               if (process.env.APP_DEBUG === '1') payload.reason = String(error && error.message ? error.message : error);
+               res.status(500).json(payload);
+          });
+          return failed;
+     }
+}
+
+const authRoutes = loadRouter('authRoutes', () => require('./routes/mfikria/routes/authRoutes'));
+const githubRoutes = loadRouter('githubRoutes', () => require('./routes/mfikria/routes/Githubroutes')); // proxy GitHub (wajib guest token)
 
 const app = express();
 const PORT = process.env.PORT || 5991;
@@ -57,7 +76,9 @@ const corsOptions = {
           return callback(null, false);
      },
      methods: ['GET', 'POST', 'OPTIONS'],
-     allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-Token', 'X-Requested-With'],
+     // x-guest-token / x-guest-date / Range ditambahkan untuk guest token 24 jam dan streaming video
+     allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-Token', 'X-Requested-With', 'x-guest-token', 'x-guest-date', 'Range'],
+     exposedHeaders: ['Content-Range', 'Accept-Ranges', 'Content-Length', 'Retry-After'],
      maxAge: 86400,
 };
 
