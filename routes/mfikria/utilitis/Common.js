@@ -7,7 +7,7 @@ const USER_SECRET_TOKEN = process.env.USER_SECRET_TOKEN;
 
 // Kalau salah satu kosong, "undefined === undefined" bisa meloloskan siapa saja
 if (!ADMIN_SECRET_TOKEN || !USER_SECRET_TOKEN) {
-  throw new Error('ADMIN_SECRET_TOKEN dan USER_SECRET_TOKEN wajib diset di environment/.env');
+  throw new Error('ADMIN_SECRET_TOKEN dan USER_SECRET_TOKEN wajib diset ...');
 }
 
 const crypto = require('crypto');

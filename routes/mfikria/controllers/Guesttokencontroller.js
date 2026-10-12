@@ -3,12 +3,12 @@
 //   POST /guest-token         -> buat token baru (berlaku 24 jam)
 //   GET  /guest-token/status  -> cek token dari frontend masih bisa dipakai atau tidak
 //
-// Pemasangan di router:
+// Pemasangan di router (routes/mfikria/routes/authRoutes.js):
 //   const guest = require('../controllers/guestTokenController');
 //   router.post('/guest-token', guest.rateLimit, guest.createToken);
 //   router.get('/guest-token/status', guest.status);
 //
-// Pastikan /guest-token/status dan /guest-token TIDAK dipasang di belakang middleware guestAuth.
+// Pastikan /guest-token dan /guest-token/status TIDAK dipasang di belakang middleware guestAuth.
 
 const crypto = require('crypto');
 const core = require('../utilitis/Mfikriawebcore'); // samakan huruf besar/kecil dengan nama file asli (Vercel = Linux)
@@ -16,7 +16,7 @@ const { spreadsheetId, sheets } = require('../config/spreadsheetConfig');
 const { nowStamp, withLock } = require('../utilitis/Common');
 
 // Tab Google Sheet. Kolom: A userId | B token | C tanggal (DDMMYY) | D pukul (HHMM) | E expired (ISO) | F IP
-const GUEST_SHEET = process.env.GUEST_SHEET_NAME || 'GuestTokens';
+const GUEST_SHEET = 'GuestTokens'; // nama tab tetap, tidak dibaca dari env
 
 function numEnv(name, fallback) {
   const raw = process.env[name];
@@ -51,6 +51,7 @@ exports.rateLimit = (req, res, next) => {
 
 /* ========================= Catat ke Google Sheet (best effort) ========================= */
 // Kegagalan menulis sheet TIDAK membuat endpoint 500: token tetap diberikan, error hanya dicatat di log.
+// Semua nilai baris harus berupa string / angka (objek ditolak Sheets: "Invalid values ... struct_value").
 
 async function logTokenToSheet(row) {
   try {
@@ -59,7 +60,7 @@ async function logTokenToSheet(row) {
         spreadsheetId,
         range: `${GUEST_SHEET}!A:F`,
         valueInputOption: 'RAW',
-        requestBody: { values: [row] },
+        requestBody: { values: [row.map((v) => (v === undefined || v === null ? '' : String(v)))] },
       });
     });
   } catch (error) {
@@ -97,8 +98,11 @@ exports.createToken = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('guest-token createToken:', error);
-    return res.status(500).json({ status: 'error', message: 'Gagal membuat guest token.' });
+    console.error('guest-token createToken:', error && error.stack ? error.stack : error);
+    const payload = { status: 'error', message: 'Gagal membuat guest token.' };
+    // APP_DEBUG=1 di environment -> penyebab asli ikut tampil di respons (matikan lagi setelah selesai)
+    if (process.env.APP_DEBUG === '1') payload.reason = String(error && error.message ? error.message : error);
+    return res.status(500).json(payload);
   }
 };
 
