@@ -6,7 +6,6 @@ const express = require('express');
 const auth = require('../controllers/authController');
 const video = require('../controllers/Videocontroller');
 const share = require('../controllers/Sharecontroller');
-const guest = require('../controllers/Guesttokencontroller');
 
 const router = express.Router();
 
@@ -20,14 +19,12 @@ router.get('/assets/photo/:photoId', auth.getProfilePhoto);        // dipakai fr
 router.get('/assets/session-photo/:photoId', auth.getPhotoAsset);  // validasi sesi: ?query={encryptedQueryToken}
 
 // guest token (berlaku 24 jam). Dua route ini TIDAK boleh di belakang pengecekan guest token.
-// Menggantikan video.issueGuestToken yang lama (itu penyebab error "Invalid values ... struct_value":
-// createGuestToken kini mengembalikan objek { token, issuedAt, expiresAt }, bukan string).
-router.post('/guest-token', guest.rateLimit, guest.createToken);
-router.get('/guest-token/status', guest.status);
+router.post('/guest-token', video.issueGuestToken);
+router.get('/guest-token/status', video.guestTokenStatus); // frontend cek token dari sessionStorage masih berlaku atau tidak
 
 // video (akses lewat guest token)
 router.get('/guest-view', video.getGuestView);
-router.get('/videos', video.getFolderVideos);
+router.get('/videos', video.getFolderVideos);              // urutan diacak; &shuffle=0 untuk urutan asli
 router.get('/video/:token', video.getVideo);
 router.get('/video-info/:token', video.getVideoInfo);
 router.post('/video-view/:token', video.registerVideoView);
