@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const fileUpload = require('express-fileupload');
 const authRoutes = require('./routes/mfikria/routes/authRoutes');
+const githubRoutes = require('./routes/mfikria/routes/Githubroutes'); // proxy GitHub baru (wajib Access_Token guest)
 
 const app = express();
 const PORT = process.env.PORT || 5991;
@@ -96,7 +97,7 @@ app.use(express.static(__dirname + '/__public/'));
 app.use('/link', limiter, require('./routes/v2/link-media/api'));
 app.use('/v3/youtube', limiter, require('./routes/v3/youtube/api'));
 app.use('/v2/anime', limiter, require('./routes/v2/anime/api'));
-app.use('/v2/github', limiter, require('./routes/v2/github/api'));
+app.use('/v2/github', limiter, githubRoutes); // ganti router lama ./routes/v2/github/api (sudah dihapus)
 app.use('/status', limiter, require('./routes/status'));
 app.use('/lk21', limiter, require('./routes/v3/lk21/api'));
 app.use('/u', limiter, require('./routes/v2/link-media/link'));
