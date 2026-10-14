@@ -13,6 +13,10 @@ try {
   throw new Error('GOOGLE_CREDENTIALS bukan JSON yang valid: ' + err.message);
 }
 
+const STREAM_MODE = process.env.VIDEO_STREAM_MODE || 'redirect'; // 'redirect' | 'proxy'
+
+/* ========================= TOKEN ========================= */
+
 let cached = { token: null, exp: 0 };
 
 // Token read-only Drive, di-cache sampai mendekati kedaluwarsa (~1 jam)
@@ -28,22 +32,66 @@ async function getDriveToken() {
   return cached;
 }
 
-const STREAM_MODE = process.env.VIDEO_STREAM_MODE || 'redirect'; // 'redirect' | 'proxy'
-
-// Redirect 302 ke file Drive (video / foto). File tidak lewat Vercel.
-async function redirectToDrive(res, fileId) {
-  const { token, exp } = await getDriveToken();
-  const url = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media&supportsAllDrives=true&access_token=${encodeURIComponent(token)}`;
-  // Browser boleh pakai ulang redirect, jadi request Range berikutnya tidak memanggil function lagi
-  const maxAge = Math.max(Math.min(Math.floor((exp - Date.now()) / 1000) - 600, 1800), 0);
-  res.setHeader('Cache-Control', maxAge ? `private, max-age=${maxAge}` : 'no-store');
-  return res.redirect(302, url);
+function mediaUrl(fileId) {
+  return `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?alt=media&supportsAllDrives=true`;
 }
 
-// Video: redirect (hemat) atau proxy lama (fallback)
+/* ========================= PROBE (tes 1 byte ke Drive) ========================= */
+// Memastikan Drive benar-benar mengizinkan unduhan SEBELUM browser di-redirect.
+// Hasil di-cache: OK 10 menit, gagal 1 menit. Biayanya 1 byte, bukan isi video.
+
+const probeCache = new Map(); // fileId -> { ok, until }
+
+async function probe(fileId, token) {
+  const hit = probeCache.get(fileId);
+  if (hit && Date.now() < hit.until) return hit.ok;
+
+  let ok = false;
+  try {
+    const r = await fetch(mediaUrl(fileId), {
+      headers: { Authorization: `Bearer ${token}`, Range: 'bytes=0-0' },
+    });
+    ok = r.status === 200 || r.status === 206;
+    if (ok) {
+      if (r.body && r.body.cancel) await r.body.cancel();
+    } else {
+      const body = (await r.text()).slice(0, 400);
+      console.error(`DriveDirect probe gagal [${r.status}] file ${fileId}:`, body);
+    }
+  } catch (error) {
+    console.error('DriveDirect probe error:', error.message);
+  }
+
+  if (probeCache.size > 500) probeCache.clear();
+  probeCache.set(fileId, { ok, until: Date.now() + (ok ? 10 * 60 * 1000 : 60 * 1000) });
+  return ok;
+}
+
+/* ========================= REDIRECT ========================= */
+
+// Redirect 302 ke file Drive (video / foto). File tidak lewat Vercel.
+// Mengembalikan true kalau redirect dikirim, false kalau tidak (pemanggil harus memakai proxy lama).
+async function redirectToDrive(res, fileId) {
+  try {
+    const { token, exp } = await getDriveToken();
+    if (!(await probe(fileId, token))) return false;
+
+    const url = `${mediaUrl(fileId)}&access_token=${encodeURIComponent(token)}`;
+    // Browser boleh pakai ulang redirect, jadi request Range berikutnya tidak memanggil function lagi
+    const maxAge = Math.max(Math.min(Math.floor((exp - Date.now()) / 1000) - 600, 1800), 0);
+    res.setHeader('Cache-Control', maxAge ? `private, max-age=${maxAge}` : 'no-store');
+    res.redirect(302, url);
+    return true;
+  } catch (error) {
+    console.error('DriveDirect redirect gagal:', error.message);
+    return false;
+  }
+}
+
+// Video: redirect (hemat); kalau gagal / mode proxy -> streamVideo lama
 async function sendVideo(req, res, videoId, meta, streamVideo) {
-  if (STREAM_MODE !== 'redirect') return streamVideo(req, res, videoId, meta);
-  return redirectToDrive(res, videoId);
+  if (STREAM_MODE === 'redirect' && (await redirectToDrive(res, videoId))) return;
+  return streamVideo(req, res, videoId, meta);
 }
 
 module.exports = { sendVideo, redirectToDrive };
