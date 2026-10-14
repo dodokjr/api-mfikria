@@ -27,7 +27,7 @@ const {
   streamVideo,
 } = require('../utilitis/Mfikriawebcore');
 // BARU: kirim video lewat redirect ke Drive (hemat Fast Origin Transfer)
-const { sendVideo } = require('../utilitis/Drivedirect');
+const { sendVideo, fetchThumbnail } = require('../utilitis/Drivedirect');
 
 /* ========================= HELPER ========================= */
 
@@ -427,5 +427,41 @@ exports.registerVideoView = async (req, res) => {
       message: 'Terjadi kesalahan pada server saat mencatat view.',
       ...(hint ? { hint } : {}),
     });
+  }
+};
+
+// GET /thumb/:token  -> gambar cuplikan video (tanpa guest token, supaya URL-nya stabil dan bisa di-cache CDN).
+// Aman karena token pendek 10 karakter tidak bisa ditebak. Gambar kecil (puluhan KB), bukan video.
+exports.getThumb = async (req, res) => {
+  const notFound = () => {
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(404).json({ status: 'error', message: '404 Not Found' });
+  };
+
+  try {
+    const videoId = await resolveVideoId(req.params.token);
+    if (!videoId) return notFound();
+
+    let meta;
+    try {
+      meta = await getVideoMeta(videoId);
+    } catch (err) {
+      return notFound();
+    }
+    if (!isAllowedVideo(meta)) return notFound();
+
+    const thumb = await fetchThumbnail(videoId);
+    if (!thumb) return notFound();
+
+    res.setHeader('Content-Type', thumb.type);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    // frontend & API beda domain: izinkan <img> lintas origin (kalau memakai helmet)
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    // Browser 1 hari, CDN Vercel 7 hari -> function hanya jalan sekali per gambar
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
+    return res.status(200).send(thumb.buf);
+  } catch (error) {
+    console.error('getThumb:', error.message);
+    return notFound();
   }
 };

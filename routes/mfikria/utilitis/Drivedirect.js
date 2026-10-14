@@ -94,4 +94,38 @@ async function sendVideo(req, res, videoId, meta, streamVideo) {
   return streamVideo(req, res, videoId, meta);
 }
 
-module.exports = { sendVideo, redirectToDrive };
+/* ========================= THUMBNAIL ========================= */
+// Ambil gambar cuplikan video dari Drive (thumbnailLink, biasanya 10-40 KB).
+// thumbnailLink untuk file privat harus diambil dengan token (credentialed request).
+const thumbCache = new Map(); // fileId -> { buf, type, at }
+const THUMB_TTL_MS = 6 * 60 * 60 * 1000;
+
+async function fetchThumbnail(fileId) {
+  const hit = thumbCache.get(fileId);
+  if (hit && Date.now() - hit.at < THUMB_TTL_MS) return hit;
+
+  const { token } = await getDriveToken();
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const metaRes = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(fileId)}?fields=thumbnailLink&supportsAllDrives=true`,
+    { headers }
+  );
+  if (!metaRes.ok) throw new Error(`thumbnail meta ${metaRes.status}`);
+  const { thumbnailLink } = await metaRes.json();
+  if (!thumbnailLink) return null; // Drive belum membuat thumbnail (video baru diupload)
+
+  const imgRes = await fetch(thumbnailLink.replace(/=s\d+$/, '=s480'), { headers });
+  if (!imgRes.ok) throw new Error(`thumbnail image ${imgRes.status}`);
+
+  const entry = {
+    buf: Buffer.from(await imgRes.arrayBuffer()),
+    type: imgRes.headers.get('content-type') || 'image/jpeg',
+    at: Date.now(),
+  };
+  if (thumbCache.size > 200) thumbCache.clear();
+  thumbCache.set(fileId, entry);
+  return entry;
+}
+
+module.exports = { sendVideo, redirectToDrive, fetchThumbnail };
