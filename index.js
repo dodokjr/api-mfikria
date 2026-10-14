@@ -29,9 +29,10 @@ function loadRouter(label, loader) {
 
 const authRoutes = loadRouter('authRoutes', () => require('./routes/mfikria/routes/authRoutes'));
 const githubRoutes = loadRouter('githubRoutes', () => require('./routes/mfikria/routes/Githubroutes')); // proxy GitHub (wajib guest token)
+const feedbackRoutes = loadRouter('feedbackRoutes', () => require('./routes/mfikria/routes/Feedbackroutes')); // saran & kritik (Google Sheet)
 
 const app = express();
-const PORT = process.env.PORT || 5991;
+const PORT = process.env.PORT || 5990;
 
 // ---------- helpers (defined first so middleware can use them) ----------
 function randomString(len, charSet) {
@@ -100,13 +101,21 @@ const limiter = rateLimit({
      }
 });
 
+// Route yang responsnya di-cache CDN Vercel lewat Cache-Control s-maxage (hemat Fast Origin Transfer):
+//   thumb (gambar cuplikan), guest-view (jumlah pengunjung), feedback (daftar saran & kritik), embed (halaman player).
+// Response yang membawa Set-Cookie tidak disimpan CDN, dan header "age" palsu mengurangi masa segar cache,
+// jadi keduanya TIDAK dipasang untuk route ini.
+const CDN_CACHEABLE = /^\/mfikria\/v1\/(thumb\/|guest-view$|feedback$|embed\/)/;
+
 app.use(cookieParser());
 app.use(function (req, res, next) {
+     const cacheable = req.method === 'GET' && CDN_CACHEABLE.test(req.path);
+
      // NOTE: do not set Access-Control-* headers here, the cors() middleware owns them
-     res.setHeader('age', '20');
+     if (!cacheable) res.setHeader('age', '20');
      res.setHeader('Content-Language', 'id-ID');
      res.setHeader('Date', new Date().toUTCString());
-     res.cookie('mfikria', randomValue, { maxAge: 20000, httpOnly: true, sameSite: 'lax', secure: true });
+     if (!cacheable) res.cookie('mfikria', randomValue, { maxAge: 20000, httpOnly: true, sameSite: 'lax', secure: true });
      if (req.method === 'OPTIONS') return res.sendStatus(200);
      next();
 });
@@ -140,6 +149,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // API routes
 app.use('/mfikria/v1', authRoutes);
+app.use('/mfikria/v1', feedbackRoutes);
 app.get('/mfikria/v1', (req, res) => {
      res.status(200).send({
           succes: true,
