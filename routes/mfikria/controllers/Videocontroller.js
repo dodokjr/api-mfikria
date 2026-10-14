@@ -26,6 +26,8 @@ const {
   forgetView,
   streamVideo,
 } = require('../utilitis/Mfikriawebcore');
+// BARU: kirim video lewat redirect ke Drive (hemat Fast Origin Transfer)
+const { sendVideo } = require('../utilitis/Drivedirect');
 
 /* ========================= HELPER ========================= */
 
@@ -271,6 +273,11 @@ exports.getFolderVideos = async (req, res) => {
 
     res.setHeader('Cache-Control', 'no-store'); // urutan acak, jangan di-cache browser/CDN
 
+    // ?compact=1 -> JSON ramping (tanpa share/videoUrl/mimeType/uploadedAt) supaya hemat transfer.
+    // Frontend membangun URL video sendiri: `${API}/video/${videoToken}?query=..&tgl=..`
+    // dan memanggil /share-info/:token hanya saat tombol Share ditekan.
+    const compact = req.query.compact === '1';
+
     return res.status(200).json({
       status: 'success',
       message: 'Berhasil mengambil daftar video.',
@@ -278,18 +285,22 @@ exports.getFolderVideos = async (req, res) => {
       data: ordered.map((file) => {
         const token = makeShortId(file.id); // 10 karakter, stabil
         const title = file.name.replace(/\.[^.]+$/, ''); // tanpa ekstensi
-        return {
+        const item = {
           title,
-          mimeType: file.mimeType,
           size: Number(file.size) || null,
           videoToken: token,
           views: viewsMap.get(file.id) || 0,
-          uploadedAt: file.createdTime || null, // tanggal upload ke Drive (ISO UTC)
           uploadedAtLocal: formatUploadDate(file.createdTime), // { tanggal, pukul } WIB
-          videoUrl: `${API_BASE_PATH}/video/${token}${guestSuffix}`, // videoId asli tidak terlihat
-          share: buildShare(base, token, title), // { shareUrl, embedUrl, embedCode, social }
-          expiresAt: null, // token pendek tidak kedaluwarsa; akses tetap dijaga guest token
         };
+        if (!compact) {
+          // format lengkap (lama), untuk frontend yang belum diubah
+          item.mimeType = file.mimeType;
+          item.uploadedAt = file.createdTime || null; // ISO UTC
+          item.videoUrl = `${API_BASE_PATH}/video/${token}${guestSuffix}`;
+          item.share = buildShare(base, token, title);
+          item.expiresAt = null;
+        }
+        return item;
       }),
     });
   } catch (error) {
@@ -298,7 +309,7 @@ exports.getFolderVideos = async (req, res) => {
   }
 };
 
-// GET /video/:token?query=&tgl=  -> stream video
+// GET /video/:token?query=&tgl=  -> redirect 302 ke Drive (video tidak lewat server Vercel)
 exports.getVideo = async (req, res) => {
   const notFound = () => res.status(404).json({ status: 'error', message: '404 Not Found' });
 
@@ -321,7 +332,8 @@ exports.getVideo = async (req, res) => {
 
     if (!isAllowedVideo(meta) || meta.size === undefined) return notFound();
 
-    return await streamVideo(req, res, videoId, meta);
+    // BERUBAH: sebelumnya `return await streamVideo(req, res, videoId, meta);`
+    return await sendVideo(req, res, videoId, meta, streamVideo);
   } catch (error) {
     console.error('getVideo:', error);
     const code = error.code || (error.response && error.response.status);
@@ -354,6 +366,7 @@ exports.getVideoInfo = async (req, res) => {
     const viewsMap = await getViewsMap();
     const title = videoTitle(file);
 
+    res.setHeader('Cache-Control', 'private, max-age=60'); // hemat transfer: browser boleh simpan 1 menit
     return res.status(200).json({
       status: 'success',
       data: {

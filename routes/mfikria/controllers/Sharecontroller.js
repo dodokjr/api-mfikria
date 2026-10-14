@@ -18,6 +18,8 @@ const {
   streamVideo,
 } = require('../utilitis/Mfikriawebcore');
 const { renderPlayerHtml } = require('../utilitis/Playerpage');
+// BARU: kirim video lewat redirect ke Drive (hemat Fast Origin Transfer)
+const { sendVideo } = require('../utilitis/Drivedirect');
 
 /* ========================= HELPER ========================= */
 
@@ -37,6 +39,10 @@ const SHARE_REDIRECT = process.env.SHARE_REDIRECT !== '0';
 const CRAWLER_RE =
   /facebookexternalhit|facebot|whatsapp|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|skypeuripreview|pinterest|embedly|vkshare|redditbot|googlebot|bingbot/i;
 const SHARE_ID_RE = /^[\w.~-]{1,200}$/;
+
+// Cache halaman share/embed di CDN Vercel (detik). Halaman sama untuk semua orang, jadi aman di-cache.
+// Efek samping: angka views di halaman bisa tertinggal sampai selama itu. Set 0 untuk mematikan.
+const SHARE_PAGE_CDN_S = Number(process.env.SHARE_PAGE_CDN_S ?? 300);
 
 // ID di link share (shareId) dipakai sebagai ?id= di front end (videoToken)
 function watchUrl(shortId) {
@@ -109,12 +115,21 @@ async function renderSharePage(req, res, mode) {
 
     // Boleh disematkan di iframe (atur EMBED_ALLOWED_ORIGINS untuk membatasi).
     // cdn.tailwindcss.com diizinkan untuk script karena styling memakai Tailwind CDN.
+    // media-src menyertakan www.googleapis.com karena stream sekarang di-redirect ke Drive
+    // (CSP juga berlaku untuk hasil redirect).
     res.removeHeader('X-Frame-Options');
     res.setHeader(
       'Content-Security-Policy',
-      `default-src 'none'; media-src 'self'; script-src 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'unsafe-inline'; connect-src 'self'; frame-ancestors ${EMBED_ALLOWED_ORIGINS}`
+      `default-src 'none'; media-src 'self' https://www.googleapis.com; script-src 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'unsafe-inline'; connect-src 'self'; frame-ancestors ${EMBED_ALLOWED_ORIGINS}`
     );
-    res.setHeader('Cache-Control', 'no-cache');
+    // Cache di CDN Vercel: hanya kunjungan pertama tiap SHARE_PAGE_CDN_S detik yang memanggil function.
+    // Browser tetap selalu cek ulang (max-age=0).
+    res.setHeader(
+      'Cache-Control',
+      SHARE_PAGE_CDN_S > 0
+        ? `public, max-age=0, s-maxage=${SHARE_PAGE_CDN_S}, stale-while-revalidate=${SHARE_PAGE_CDN_S * 2}`
+        : 'no-cache'
+    );
     return res.status(200).type('html').send(html);
   } catch (error) {
     console.error('renderSharePage:', error.message);
@@ -133,7 +148,7 @@ exports.sharePage = (req, res) => renderSharePage(req, res, 'share');
 // GET /embed/:id  -> halaman player polos, untuk <iframe src="...">
 exports.embedPage = (req, res) => renderSharePage(req, res, 'embed');
 
-// GET /s/:id/stream?e=&s=  -> stream video untuk halaman share/embed (URL bertanda tangan)
+// GET /s/:id/stream?e=&s=  -> redirect 302 ke Drive untuk halaman share/embed (URL bertanda tangan)
 exports.getSharedVideo = async (req, res) => {
   const notFound = () => res.status(404).json({ status: 'error', message: '404 Not Found' });
 
@@ -155,7 +170,8 @@ exports.getSharedVideo = async (req, res) => {
     }
     if (!isAllowedVideo(meta) || meta.size === undefined) return notFound();
 
-    return await streamVideo(req, res, videoId, meta);
+    // BERUBAH: sebelumnya `return await streamVideo(req, res, videoId, meta);`
+    return await sendVideo(req, res, videoId, meta, streamVideo);
   } catch (error) {
     console.error('getSharedVideo:', error);
     const code = error.code || (error.response && error.response.status);
@@ -221,6 +237,7 @@ exports.getShareInfo = async (req, res) => {
     }
     if (!isAllowedVideo(meta)) return notFound();
 
+    res.setHeader('Cache-Control', 'private, max-age=300'); // hemat transfer: browser boleh simpan 5 menit
     return res.status(200).json({
       status: 'success',
       data: buildShare(getBaseUrl(req), shortId, videoTitle(meta)),
