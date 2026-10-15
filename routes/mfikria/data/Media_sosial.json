@@ -1,0 +1,9 @@
+{
+    "github": "https://api-mfikria.vercel.app/m?q=github",
+    "instagram": "https://api-mfikria.vercel.app/m?q=instagram",
+    "youtube": "https://api-mfikria.vercel.app/m?q=youtube",
+    "linkedin": "https://api-mfikria.vercel.app/m?q=linkedin",
+    "discord": "https://api-mfikria.vercel.app/m?q=discord",
+    "steam": "https://api-mfikria.vercel.app/m?q=steam",
+    "twitter": "https://api-mfikria.vercel.app/m?q=twitter"
+  }

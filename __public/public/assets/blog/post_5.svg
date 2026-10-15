@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Grafik pasar keuangan dan jaringan data">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#18284a"/>
+    </linearGradient>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2dd4bf" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- grid -->
+  <g stroke="#ffffff" stroke-opacity="0.06" stroke-width="1">
+    <path d="M0 105H1200M0 210H1200M0 315H1200M0 420H1200M0 525H1200"/>
+    <path d="M150 0V630M300 0V630M450 0V630M600 0V630M750 0V630M900 0V630M1050 0V630"/>
+  </g>
+
+  <!-- area + line chart -->
+  <path d="M0 520 L110 480 L220 500 L330 430 L440 450 L550 370 L660 395 L770 310 L880 330 L990 240 L1100 205 L1200 170 L1200 630 L0 630 Z" fill="url(#area)"/>
+  <path d="M0 520 L110 480 L220 500 L330 430 L440 450 L550 370 L660 395 L770 310 L880 330 L990 240 L1100 205 L1200 170" fill="none" stroke="#2dd4bf" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- candlesticks -->
+  <g stroke-width="3" stroke-linecap="round">
+    <g stroke="#2dd4bf" fill="#2dd4bf">
+      <line x1="330" y1="395" x2="330" y2="470"/><rect x="318" y="415" width="24" height="40" rx="3"/>
+      <line x1="550" y1="330" x2="550" y2="410"/><rect x="538" y="345" width="24" height="45" rx="3"/>
+      <line x1="770" y1="270" x2="770" y2="345"/><rect x="758" y="285" width="24" height="42" rx="3"/>
+      <line x1="990" y1="200" x2="990" y2="275"/><rect x="978" y="215" width="24" height="40" rx="3"/>
+    </g>
+    <g stroke="#f87171" fill="#f87171">
+      <line x1="220" y1="460" x2="220" y2="535"/><rect x="208" y="478" width="24" height="38" rx="3"/>
+      <line x1="440" y1="410" x2="440" y2="485"/><rect x="428" y="425" width="24" height="40" rx="3"/>
+      <line x1="660" y1="355" x2="660" y2="430"/><rect x="648" y="372" width="24" height="38" rx="3"/>
+      <line x1="880" y1="290" x2="880" y2="365"/><rect x="868" y="306" width="24" height="40" rx="3"/>
+    </g>
+  </g>
+
+  <!-- network / circuit nodes -->
+  <g stroke="#60a5fa" stroke-opacity="0.7" stroke-width="2" fill="none">
+    <path d="M820 90 L900 60 L980 100 L1060 70 L1130 120"/>
+    <path d="M900 60 L930 150 L980 100"/>
+    <path d="M1060 70 L1040 160 L930 150"/>
+    <path d="M1130 120 L1040 160"/>
+  </g>
+  <g fill="#0b1220" stroke="#60a5fa" stroke-width="3">
+    <circle cx="820" cy="90" r="9"/><circle cx="900" cy="60" r="9"/><circle cx="980" cy="100" r="9"/>
+    <circle cx="1060" cy="70" r="9"/><circle cx="1130" cy="120" r="9"/>
+    <circle cx="930" cy="150" r="9"/><circle cx="1040" cy="160" r="9"/>
+  </g>
+
+  <!-- label -->
+  <g font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" fill="#e5edff">
+    <text x="64" y="120" font-size="30" font-weight="600" letter-spacing="6" fill="#2dd4bf">TEKNOLOGI INFORMASI</text>
+    <text x="64" y="185" font-size="58" font-weight="700">× Pasar Keuangan</text>
+  </g>
+</svg>

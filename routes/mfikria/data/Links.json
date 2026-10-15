@@ -1,0 +1,47 @@
+{
+    "name": "Muhammad Fikri Ardiyansah",
+    "img_src": "https://mfikria.vercel.app/assets/pp_merah_new-DRIg1PY2.jpg",
+    "quetes": "Saya Muhammad Fikri Ardiyansah, pernah menjadi seorang freelancer di suatu aplikasi bernama linkedin.com dan freepik.com selama 1 tahun, dan saya seorang web developer di bagian front end developer.",
+    "link_one": [
+      {
+        "id": 1,
+        "title": "Github",
+        "href": "https://github.com/dodokjr"
+      },
+      {
+        "id": 2,
+        "title": "Linkedin",
+        "href": "https://www.linkedin.com/in/muhammad-fikri-ardiyansah/"
+      },
+      {
+        "id": 3,
+        "title": "Instagram",
+        "href": "https://instagram.com/fkri__17"
+      },
+      {
+        "id": 4,
+        "title": "Twitter or X",
+        "href": "https://x.com/bintangFikri3"
+      },
+      {
+        "id": 5,
+        "title": "Sociabuzz or Cofy",
+        "href": "https://sociabuzz.com/muhammadfikriardiyansah"
+      },
+      {
+        "id": 6,
+        "title": "My Personal Website",
+        "href": "https://mfikria.vercel.app/"
+      },
+      {
+        "id": 7,
+        "title": "Spotify",
+        "href": "https://open.spotify.com/user/31n75unhqxw7q747ihdkwwznupua"
+      },
+      {
+        "id": 8,
+        "title": "Youtube",
+        "href": "https://www.youtube.com/@fkri__17?sub_confirmation=1"
+      }
+    ]
+  }

@@ -1,0 +1,87 @@
+[
+    {
+      "id": "1",
+      "slug": "dodok-store",
+      "title": "Dodok Store",
+      "img_url": "https://api-mfikria.vercel.app/public/assets/project/DodokStore.webp",
+      "descriptions": "Store Project with Html Css Javascript",
+      "url_github": "https://github.com/dodokjr/dodok-store",
+      "url_demo": "https://dodokvapestore.netlify.app/",
+      "code": {
+        "name_html": "html",
+        "skillHtml": 20,
+        "name_css": "css",
+        "skillCss": 20,
+        "name_js": "Javascript",
+        "skillJs": 10
+      }
+    },
+    {
+      "id": "2",
+      "slug": "token-and-password-random",
+      "title": "Token And Password Random",
+      "img_url": "https://api-mfikria.vercel.app/public/assets/project/gabut.webp",
+      "descriptions": "Project with Html Css Javascript",
+      "url_github": "https://github.com/dodokjr/gabut-1",
+      "url_demo": "https://gabut-1.vercel.app/",
+      "code": {
+        "name_html": "html",
+        "skillHtml": 20,
+        "name_css": "css",
+        "skillCss": 20,
+        "name_js": "Javascript",
+        "skillJs": 10
+      }
+    },
+    {
+      "id": "3",
+      "slug": "anime-list",
+      "title": "Anime List",
+      "img_url": "https://api-mfikria.vercel.app/public/assets/project/mfanimelist.webp",
+      "descriptions": "Project with frontend Reactjs and backend Expressjs api with jikan anime",
+      "url_github": "https://github.com/dodokjr/animeList",
+      "url_demo": "https://mfanimelist.vercel.app/",
+      "code": {
+        "name_html": "html",
+        "skillHtml": 20,
+        "name_css": "css",
+        "skillCss": 20,
+        "name_js": "Javascript",
+        "skillJs": 10
+      }
+    },
+    {
+      "id": "4",
+      "slug": "api-mfikria",
+      "title": "official Api By me",
+      "img_url": "https://api-mfikria.vercel.app/public/assets/project/api.webp",
+      "descriptions": "Project with Backend Express js",
+      "url_github": "https://github.com/dodokjr/api-mfikria",
+      "url_demo": "https://api-mfikria.vercel.app/",
+      "code": {
+        "name_html": "html",
+        "skillHtml": 20,
+        "name_css": "css",
+        "skillCss": 20,
+        "name_js": "Javascript",
+        "skillJs": 10
+      }
+    },
+    {
+      "id": "5",
+      "slug": "S3Com",
+      "title": "Company Profile S3",
+      "img_url": "https://api-mfikria.vercel.app/public/assets/project/S3com.png",
+      "descriptions": "Project Company Profile FrontEnd and Backend With Vite ReactTS For FrontEnd and Backend ExpressJs",
+      "url_github": "https://github.com/dodokjr/S3-Frontend",
+      "url_demo": "https://s3com.vercel.app/",
+      "code": {
+        "name_html": "html",
+        "skillHtml": 40,
+        "name_css": "css",
+        "skillCss": 40,
+        "name_js": "Javascript",
+        "skillJs": 45
+      }
+    }
+  ]
