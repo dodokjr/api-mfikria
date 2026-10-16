@@ -131,6 +131,7 @@
             <button type="button" data-tab="node" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Node.js</button>
             <button type="button" data-tab="python" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Python</button>
             <button type="button" data-tab="go" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Go</button>
+            <button type="button" data-tab="java" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Java</button>
           </div>
 
           <div data-panel="js">
@@ -248,7 +249,7 @@ func main() {
 	var tok struct {
 		Data struct {
 			AccessToken string `json:"Access_Token"`
-			Tanggal	 string `json:"tanggal"`
+			Tanggal     string `json:"tanggal"`
 		} `json:"data"`
 	}
 	if err := json.NewDecoder(res.Body).Decode(&amp;tok); err != nil {
@@ -276,6 +277,54 @@ func main() {
 	for _, r := range repos {
 		fmt.Println(r.Name)
 	}
+}</code></pre>
+          </div>
+
+          <div data-panel="java" class="hidden">
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Java 11 atau lebih baru (<code>java.net.http</code> bawaan, tanpa library tambahan)</p>
+            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Main {
+    static final String API = "https://api-mfikria.vercel.app";
+
+    // Ambil nilai string dari JSON sederhana (tanpa library JSON)
+    static String find(String json, String key) {
+        Matcher m = Pattern.compile("\"" + key + "\"\\s*:\\s*\"([^\"]*)\"").matcher(json);
+        if (!m.find()) throw new IllegalStateException("Field tidak ditemukan: " + key);
+        return m.group(1);
+    }
+
+    public static void main(String[] args) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        // 1. ambil guest token
+        HttpRequest tokenReq = HttpRequest.newBuilder()
+                .uri(URI.create(API + "/mfikria/v1/guest-token"))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+        String tokenBody = client.send(tokenReq, HttpResponse.BodyHandlers.ofString()).body();
+        String token = find(tokenBody, "Access_Token");
+        String tanggal = find(tokenBody, "tanggal");
+
+        // 2. pakai token di endpoint GitHub
+        String url = API + "/v2/github/dodokjr/repos?per_page=5"
+                + "&amp;query=" + URLEncoder.encode(token, StandardCharsets.UTF_8)
+                + "&amp;tgl=" + URLEncoder.encode(tanggal, StandardCharsets.UTF_8);
+
+        HttpRequest reposReq = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+        HttpResponse&lt;String&gt; res = client.send(reposReq, HttpResponse.BodyHandlers.ofString());
+        if (res.statusCode() != 200) {
+            throw new RuntimeException("HTTP " + res.statusCode());
+        }
+        System.out.println(res.body());
+    }
 }</code></pre>
           </div>
         </section>
@@ -439,5 +488,88 @@ func main() {
       </script>
       Mfikria. All rights reserved.
     </footer>
+
+    <!-- Tab "Contoh Kode": dipasang di akhir body supaya tombolnya sudah ada saat script jalan -->
+    <script>
+      document.querySelectorAll('[data-tab]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var name = btn.getAttribute('data-tab');
+
+          document.querySelectorAll('[data-tab]').forEach(function (b) {
+            var on = b === btn;
+            b.classList.toggle('border-red-600', on);
+            b.classList.toggle('text-red-600', on);
+            b.classList.toggle('border-transparent', !on);
+            b.classList.toggle('text-slate-500', !on);
+          });
+
+          document.querySelectorAll('[data-panel]').forEach(function (p) {
+            p.classList.toggle('hidden', p.getAttribute('data-panel') !== name);
+          });
+        });
+      });
+    </script>
+
+    <!-- Tombol "Salin" otomatis di setiap blok kode -->
+    <script>
+      (function () {
+        function copyText(text) {
+          if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+          }
+          // Cadangan untuk browser lama / halaman non-HTTPS
+          return new Promise(function (resolve, reject) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              document.execCommand('copy') ? resolve() : reject();
+            } catch (e) {
+              reject(e);
+            }
+            document.body.removeChild(ta);
+          });
+        }
+
+        document.querySelectorAll('main pre').forEach(function (pre) {
+          var code = pre.querySelector('code') || pre;
+
+          // Bungkus supaya tombol tetap diam saat kode di-scroll ke samping
+          var wrap = document.createElement('div');
+          wrap.className = 'relative mt-2';
+          pre.classList.remove('mt-2');
+          pre.parentNode.insertBefore(wrap, pre);
+          wrap.appendChild(pre);
+
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = 'Salin';
+          btn.setAttribute('aria-label', 'Salin kode');
+          btn.className =
+            'absolute right-2 top-2 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-600 shadow-sm hover:text-red-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:text-red-400';
+          wrap.appendChild(btn);
+
+          var timer;
+          btn.addEventListener('click', function () {
+            copyText(code.textContent).then(
+              function () {
+                btn.textContent = 'Tersalin \u2713';
+              },
+              function () {
+                btn.textContent = 'Gagal';
+              }
+            );
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+              btn.textContent = 'Salin';
+            }, 1800);
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
