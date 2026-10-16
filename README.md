@@ -142,6 +142,6 @@ Pull request dan saran sangat diterima. Silakan buka *issue* untuk diskusi perub
 
 Terima kasih banyak! 🙏
 
-[![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://api-mfikria.vercel.app/instagram)
+[![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://api-mfikria.vercel.app/instagram/fkri.ardn)
 
 </div>
