@@ -1,4 +1,4 @@
-/node_modules/
+node_modules
 .env
 credentials.json
 client_secret.json
@@ -8,3 +8,4 @@ client_secret.json
 
 
 nop.txt
+.env*
