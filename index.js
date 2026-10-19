@@ -149,9 +149,7 @@ app.use('/v2/anime/otaku', limiter,
     must('requireAccessToken', access.requireAccessToken),
     must('otakudesuRoute', require('./routes/newV2/routes/otakudesuRoute')));
 
-app.use('/v2/donghua/anichi', limiter,
-    must('requireAccessToken', access.requireAccessToken),
-    must('anichinRoute', require('./routes/newV2/routes/anichinRoute')));
+app.use('/v2/donghua/anichi', limiter, must('anichinRoute', require('./routes/newV2/routes/anichinRoute')));
 
 // Portfolio
 app.use(express.urlencoded({ extended: true }));

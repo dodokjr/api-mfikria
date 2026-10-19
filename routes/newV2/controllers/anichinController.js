@@ -6,6 +6,12 @@ const BASE_URL = (process.env.ANICHIN_BASE_URL || 'https://anichin.moe').replace
 // Path endpoint watch milik API ini (dipakai untuk link prev/next)
 const WATCH_PATH = process.env.ANICHIN_WATCH_PATH || '/v2/donghua/anichi/watch';
 
+// Total waktu maksimal untuk satu fetchHtml (semua retry digabung).
+// Harus LEBIH KECIL dari maxDuration fungsi Vercel Anda.
+// Default: 9 dtk tanpa scraper, 25 dtk dengan scraper. Override lewat FETCH_BUDGET_MS.
+const FETCH_BUDGET_MS =
+    parseInt(process.env.FETCH_BUDGET_MS, 10) || (process.env.SCRAPER_URL_TEMPLATE ? 25000 : 9000);
+
 // "https://anichin.moe/slug/" -> "/slug/"
 const pathOf = (u) => {
     try {
@@ -19,6 +25,8 @@ const pathOf = (u) => {
 // Link ke endpoint watch milik API ini
 const toWatch = (u) => `${WATCH_PATH}?url=${encodeURIComponent(pathOf(u))}`;
 
+// Catatan: Accept-Encoding sengaja TIDAK diset manual. Axios mengaturnya sendiri
+// dan men-decode respons dengan benar (header "br" manual bisa merusak HTML di axios lama).
 const client = axios.create({
     timeout: 15000,
     maxRedirects: 5,
@@ -26,7 +34,6 @@ const client = axios.create({
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
         'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Accept-Encoding': 'gzip, deflate, br',
         'Referer': `${BASE_URL}/`,
         'Upgrade-Insecure-Requests': '1',
         'Sec-Fetch-Dest': 'document',
@@ -47,37 +54,62 @@ const isChallenge = (html) =>
 
 const blocked = (status) => {
     const err = new Error(
-        `Situs target memblokir request${status ? ` (HTTP ${status})` : ''}, kemungkinan proteksi Cloudflare/anti-bot atau IP server diblokir.`
+        `Situs target memblokir request${status ? ` (HTTP ${status})` : ''}, kemungkinan proteksi Cloudflare/anti-bot atau IP server diblokir. Di Vercel, set SCRAPER_URL_TEMPLATE untuk memakai layanan scraping.`
     );
     err.status = 502;
+    err.upstreamStatus = status || null;
     return err;
 };
 
-// Ambil HTML dengan retry. Opsional lewat layanan scraping: SCRAPER_URL_TEMPLATE=https://api.scraperapi.com/?api_key=KUNCI&url={url}
+// Ambil HTML dengan retry dan batas waktu total.
+// Opsional lewat layanan scraping: SCRAPER_URL_TEMPLATE=https://api.scraperapi.com/?api_key=KUNCI&url={url}
 async function fetchHtml(url, retries = 2) {
+    const deadline = Date.now() + FETCH_BUDGET_MS;
+    const template = (process.env.SCRAPER_URL_TEMPLATE || '').trim().replace(/^["']|["']$/g, '');
+    if (template && !template.includes('{url}')) {
+        const err = new Error('SCRAPER_URL_TEMPLATE tidak mengandung placeholder {url}.');
+        err.status = 500;
+        throw err;
+    }
     let lastError;
+
     for (let attempt = 0; attempt <= retries; attempt++) {
+        const remaining = deadline - Date.now();
+        if (remaining < 1500) break; // sisa waktu terlalu sedikit untuk percobaan lagi
+
         try {
-            const template = process.env.SCRAPER_URL_TEMPLATE;
             const { data } = template
-                ? await axios.get(template.replace('{url}', encodeURIComponent(url)), { timeout: 60000 })
-                : await client.get(url);
+                ? await axios.get(template.replace('{url}', encodeURIComponent(url)), {
+                      timeout: Math.min(remaining, 60000)
+                  })
+                : await client.get(url, { timeout: Math.min(remaining, 15000) });
             if (isChallenge(data)) throw blocked(200);
             return data;
         } catch (error) {
             lastError = error;
             const status = error.response && error.response.status;
             if (status === 404 || error.status === 502) break;
-            if (attempt < retries) await sleep(800 * (attempt + 1));
+            if (attempt < retries && deadline - Date.now() > 2500) await sleep(800 * (attempt + 1));
         }
     }
+
+    if (!lastError) {
+        const err = new Error('Waktu habis sebelum situs sumber sempat merespons. Naikkan FETCH_BUDGET_MS dan maxDuration di Vercel.');
+        err.status = 504;
+        throw err;
+    }
+
     const status = lastError.response && lastError.response.status;
     if (lastError.status === 502) throw lastError;
     if (status === 403 || status === 503) throw blocked(status);
+    if (lastError.code === 'ECONNABORTED' || lastError.code === 'ETIMEDOUT') {
+        const err = new Error('Koneksi ke situs sumber timeout. Kemungkinan IP server diblokir atau scraper terlalu lambat.');
+        err.status = 504;
+        throw err;
+    }
     throw lastError;
 }
 
-// Gambar sering lazy-load: URL asli ada di data-src, bukan src
 // Ubah URL relatif ("/slug/") jadi lengkap ("https://anichin.moe/slug/"); URL yang sudah lengkap dibiarkan
 const abs = (u) => {
     if (!u) return '';
@@ -98,6 +130,7 @@ const resolveUrl = (u) => {
     }
 };
 
+// Gambar sering lazy-load: URL asli ada di data-src, bukan src
 const imgSrc = ($el) => {
     const img = $el.find('img').first();
     return abs(
@@ -116,8 +149,11 @@ const meta = ($, html) => ({
     hint: 'Hasil kosong. Kalau pageTitle berisi "Just a moment" berarti kena Cloudflare; kalau halaman normal, selector perlu disesuaikan (Inspect Element).'
 });
 
-const fail = (res, error) =>
-    res.status(error.status || 500).json({ status: false, message: error.message });
+const fail = (res, error) => {
+    const body = { status: false, message: error.message };
+    if (error.upstreamStatus) body.upstreamStatus = error.upstreamStatus;
+    res.status(error.status || 500).json(body);
+};
 
 // Parser kartu donghua (dipakai di halaman utama dan pencarian)
 function parseCards($, scope) {
