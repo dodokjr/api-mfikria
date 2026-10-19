@@ -1,4 +1,108 @@
 const API_ORIGIN = 'https://api-mfikria.vercel.app';
+
+/* ========================= Guest token (dari API_ORIGIN) ========================= */
+// POST {API_ORIGIN}/mfikria/v1/guest-token                    -> buat token baru (berlaku 24 jam)
+// GET  {API_ORIGIN}/mfikria/v1/guest-token/status?query=&tgl= -> cek token masih berlaku (data.valid)
+// GET  {API_ORIGIN}/mfikria/v1/guest-view                     -> akses video lewat guest token
+// Token disimpan di sessionStorage, dicek dulu sebelum dipakai, dan dibuat ulang kalau tidak valid.
+// Dipakai lewat guestFetch('/guest-view') (path relatif ke GUEST_BASE): header x-guest-token dan x-guest-date dipasang otomatis.
+
+const GUEST_BASE = `${API_ORIGIN}/mfikria/v1`;
+const GUEST_STORAGE_KEY = 'guest_token';
+const GUEST_EXPIRY_MARGIN_MS = 60 * 1000; // anggap kedaluwarsa 1 menit lebih awal
+let guestPromise = null;
+
+function readGuest() {
+  try {
+    const raw = sessionStorage.getItem(GUEST_STORAGE_KEY);
+    if (!raw) return null;
+    const g = JSON.parse(raw);
+    return g && g.token && g.tgl ? g : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveGuest(g) {
+  try {
+    sessionStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(g));
+  } catch (e) {
+    /* sessionStorage tidak tersedia: token tetap dipakai untuk sesi halaman ini */
+  }
+}
+
+function clearGuest() {
+  try {
+    sessionStorage.removeItem(GUEST_STORAGE_KEY);
+  } catch (e) {
+    /* abaikan */
+  }
+}
+
+async function createGuestToken() {
+  const res = await fetch(`${GUEST_BASE}/guest-token`, { method: 'POST', cache: 'no-store' });
+  if (!res.ok) throw new Error(`guest-token: HTTP ${res.status}`);
+
+  const json = await res.json();
+  const d = json && json.data;
+  if (!d || !d.token || !d.tgl) throw new Error('guest-token: respons tidak valid');
+
+  const g = { token: d.token, tgl: d.tgl, expiresAt: d.expiresAt };
+  saveGuest(g);
+  return g;
+}
+
+async function isGuestValid(g) {
+  if (!g) return false;
+  if (g.expiresAt && Date.now() >= g.expiresAt - GUEST_EXPIRY_MARGIN_MS) return false;
+
+  try {
+    const url = `${GUEST_BASE}/guest-token/status?query=${encodeURIComponent(g.token)}&tgl=${encodeURIComponent(g.tgl)}`;
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return false;
+    const json = await res.json();
+    return !!(json && json.data && json.data.valid);
+  } catch (e) {
+    return false;
+  }
+}
+
+// Mengembalikan { token, tgl, expiresAt }. Panggilan bersamaan berbagi satu proses.
+function getGuestToken(force = false) {
+  if (!guestPromise) {
+    guestPromise = (async () => {
+      const saved = force ? null : readGuest();
+      if (await isGuestValid(saved)) return saved;
+      return createGuestToken();
+    })().finally(() => {
+      guestPromise = null;
+    });
+  }
+  return guestPromise;
+}
+
+// fetch ke API_ORIGIN dengan guest token. Contoh: const res = await guestFetch('/guest-view');
+// Jika server membalas 401, token dibuat ulang lalu request diulang satu kali.
+async function guestFetch(path, options = {}) {
+  const url = /^https?:\/\//i.test(path) ? path : `${GUEST_BASE}${path}`;
+  const send = (g) =>
+    fetch(url, {
+      ...options,
+      headers: { ...(options.headers || {}), 'x-guest-token': g.token, 'x-guest-date': g.tgl },
+    });
+
+  let g = await getGuestToken();
+  let res = await send(g);
+  if (res.status === 401) {
+    clearGuest();
+    g = await getGuestToken(true);
+    res = await send(g);
+  }
+  return res;
+}
+
+/* ========================= Util tampilan ========================= */
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -115,8 +219,14 @@ async function Contributors() {
   }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', Contributors);
-} else {
+function init() {
   Contributors();
+  // siapkan guest token lebih awal; kegagalan tidak mengganggu halaman
+  getGuestToken().catch((error) => console.error('guest-token:', error.message));
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
 }

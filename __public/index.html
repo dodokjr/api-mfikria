@@ -36,6 +36,10 @@
         <nav id="header-nav" class="hidden absolute top-full left-0 w-full flex-col gap-4 border-b border-slate-200 bg-white p-5 shadow-lg sm:static sm:flex sm:w-auto sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none dark:border-slate-800 dark:bg-slate-900">
           <a href="./index.html" class="hover:text-red-600">Home</a>
           <a href="./docs.html" class="hover:text-red-600">Documentation</a>
+          <a href="./InputToken.html" class="hover:text-red-600">Access Token</a>
+          <a href="./api_tester.html" class="hover:text-red-600">Api Test Tools</a>
+          <a href="#contributors" class="hover:text-red-600">Contribution</a>
+          <a href="#users" class="hover:text-red-600">Pengguna</a>
           <a href="#contributors" class="hover:text-red-600">Contribution</a>
           
           <div class="flex items-center gap-6 sm:gap-4 pt-2 sm:pt-0 border-t sm:border-0 border-slate-200 dark:border-slate-800">
@@ -100,10 +104,41 @@
         <div id="res" class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4"></div>
       </section>
 
+      <!-- Api Test Tools -->
+      <section class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Api Test Tools</h2>
+        <p class="mx-auto mt-4 max-w-md text-sm text-slate-500 dark:text-slate-400">
+          Uji API dari localhost atau host publik. Kirim GET, POST, PUT, PATCH, dan DELETE dengan header dan body, lalu lihat kode status serta respons lengkap.
+        </p>
+        <a href="./api_tester.html" class="mt-5 inline-block rounded-md border border-slate-300 px-5 py-2 text-sm transition hover:border-red-600 hover:text-red-600 dark:border-slate-700">
+          Buka Api Test Tools
+        </a>
+      </section>
+
       <!-- Stack -->
       <section class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
         <h2 class="text-lg font-medium">Project setup</h2>
         <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Node.js &middot; Tailwind CSS &middot; Vercel</p>
+      </section>
+
+      <!-- Pengguna API -->
+      <section id="users" class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Pengguna API</h2>
+        <p class="mx-auto mt-4 max-w-md text-sm text-slate-500 dark:text-slate-400">Platform yang sudah memakai API ini.</p>
+
+        <div role="list" aria-label="Platform pengguna API" class="mt-8 grid justify-center gap-4 sm:grid-cols-2">
+          <a
+            role="listitem"
+            href="https://mfikria.vercel.app/app"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="block rounded-lg border border-slate-200 p-5 text-left transition hover:border-red-600 dark:border-slate-800 dark:hover:border-red-600"
+          >
+            <h3 class="font-medium">Mfikria App</h3>
+            <p class="mt-1 break-all text-sm text-slate-500 dark:text-slate-400">mfikria.vercel.app/app</p>
+            <span class="mt-3 inline-block text-xs font-medium text-red-600">Kunjungi &rarr;</span>
+          </a>
+        </div>
       </section>
 
       <!-- Kontributor -->

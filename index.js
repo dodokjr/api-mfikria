@@ -1,5 +1,6 @@
 require('dotenv').config(); // load .env FIRST so process.env.FRONTEND_ORIGIN is available below
 
+const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const cors = require('cors');
@@ -35,19 +36,46 @@ const app = express();
 const PORT = process.env.PORT || 5990;
 
 // ---------- helpers (defined first so middleware can use them) ----------
+// Acak aman (crypto.randomInt), bukan Math.random yang bisa ditebak.
 function randomString(len, charSet) {
      charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
      let result = '';
      for (let i = 0; i < len; i++) {
-          const randomPoz = Math.floor(Math.random() * charSet.length);
-          result += charSet.substring(randomPoz, randomPoz + 1);
+          result += charSet.charAt(crypto.randomInt(charSet.length));
      }
      return result;
 }
 
-let randomNumber = Math.random().toString();
-randomNumber = randomNumber.substring(1);
+const randomNumber = '.' + crypto.randomBytes(8).readBigUInt64BE().toString();
 const randomValue = randomString(5);
+
+// ---------- cookie aman ----------
+// - httpOnly : tidak bisa dibaca JavaScript (melindungi dari XSS)
+// - secure   : hanya dikirim lewat HTTPS (otomatis aktif di Vercel / production)
+// - sameSite : 'lax' = tidak ikut terkirim pada request lintas-situs (melindungi dari CSRF)
+// - signed   : ditandatangani HMAC dengan COOKIE_SECRET, nilai yang diubah klien ditolak
+// - __Host-  : prefix yang memaksa Secure, Path=/, dan tanpa Domain (tidak bisa ditimpa subdomain)
+// - nilai    : acak per pengunjung (crypto.randomBytes), bukan satu nilai yang sama untuk semua orang
+const IS_PROD = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+
+const COOKIE_SECRET =
+     process.env.COOKIE_SECRET ||
+     (() => {
+          if (IS_PROD) console.warn('COOKIE_SECRET belum di-set di environment. Pakai secret sementara (berubah tiap instance/restart).');
+          return crypto.randomBytes(32).toString('hex');
+     })();
+
+const COOKIE_NAME = process.env.COOKIE_NAME || (IS_PROD ? '__Host-mfikria' : 'mfikria');
+const COOKIE_MAX_AGE_MS = Number(process.env.COOKIE_MAX_AGE_MS) > 0 ? Number(process.env.COOKIE_MAX_AGE_MS) : 20000;
+
+const COOKIE_OPTIONS = {
+     httpOnly: true,
+     secure: IS_PROD,
+     sameSite: 'lax',
+     path: '/',
+     maxAge: COOKIE_MAX_AGE_MS,
+     signed: true,
+};
 
 // ---------- CORS ----------
 // Origin = scheme + host (+ port) only. NO trailing slash, NO path.
@@ -107,7 +135,7 @@ const limiter = rateLimit({
 // jadi keduanya TIDAK dipasang untuk route ini.
 const CDN_CACHEABLE = /^\/mfikria\/v1\/(thumb\/|guest-view$|feedback$|embed\/)/;
 
-app.use(cookieParser());
+app.use(cookieParser(COOKIE_SECRET)); // secret dipakai untuk memverifikasi cookie bertanda tangan (req.signedCookies)
 app.use(function (req, res, next) {
      const cacheable = req.method === 'GET' && CDN_CACHEABLE.test(req.path);
 
@@ -115,7 +143,12 @@ app.use(function (req, res, next) {
      if (!cacheable) res.setHeader('age', '20');
      res.setHeader('Content-Language', 'id-ID');
      res.setHeader('Date', new Date().toUTCString());
-     if (!cacheable) res.cookie('mfikria', randomValue, { maxAge: 20000, httpOnly: true, sameSite: 'lax', secure: true });
+     if (!cacheable) {
+          // pakai ulang id pengunjung kalau cookie bertanda tangan masih sah, kalau tidak buat id acak baru
+          const existing = req.signedCookies && req.signedCookies[COOKIE_NAME];
+          const visitorId = typeof existing === 'string' && existing ? existing : crypto.randomBytes(16).toString('hex');
+          res.cookie(COOKIE_NAME, visitorId, COOKIE_OPTIONS);
+     }
      if (req.method === 'OPTIONS') return res.sendStatus(200);
      next();
 });
@@ -207,7 +240,6 @@ app.get('/id', function (req, res) {
      });
 });
 
-// ---------- 404 (must stay last) ----------
 // ---------- 404 (must stay last) ----------
 app.use((req, res) => {
      const now = new Date();
