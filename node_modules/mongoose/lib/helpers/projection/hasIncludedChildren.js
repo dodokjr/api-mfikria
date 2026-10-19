@@ -12,7 +12,7 @@
  *     res['a.b.c']; // 1
  *     res['a.c']; // undefined
  *
- * @param {Object} fields
+ * @param {object} fields
  * @api private
  */
 
@@ -21,6 +21,7 @@ module.exports = function hasIncludedChildren(fields) {
   const keys = Object.keys(fields);
 
   for (const key of keys) {
+
     if (key.indexOf('.') === -1) {
       hasIncludedChildren[key] = 1;
       continue;

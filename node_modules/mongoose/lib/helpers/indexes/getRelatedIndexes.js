@@ -1,5 +1,7 @@
 'use strict';
 
+const hasDollarKeys = require('../query/hasDollarKeys');
+
 function getRelatedSchemaIndexes(model, schemaIndexes) {
   return getRelatedIndexes({
     baseModelName: model.baseModelName,
@@ -29,8 +31,8 @@ function getRelatedIndexes({
   indexes,
   indexesType
 }) {
-  const discriminatorKey = discriminatorMapping && discriminatorMapping.key;
-  const discriminatorValue = discriminatorMapping && discriminatorMapping.value;
+  const discriminatorKey = discriminatorMapping?.key;
+  const discriminatorValue = discriminatorMapping?.value;
 
   if (!discriminatorKey) {
     return indexes;
@@ -46,14 +48,16 @@ function getRelatedIndexes({
 
   return indexes.filter(index => {
     const partialFilterExpression = getPartialFilterExpression(index, indexesType);
-    return !partialFilterExpression || !partialFilterExpression[discriminatorKey];
+    return !partialFilterExpression
+      || !partialFilterExpression[discriminatorKey]
+      || (hasDollarKeys(partialFilterExpression[discriminatorKey]) && !('$eq' in partialFilterExpression[discriminatorKey]));
   });
 }
 
 function getPartialFilterExpression(index, indexesType) {
   if (indexesType === 'schema') {
     const options = index[1];
-    return options && options.partialFilterExpression;
+    return options?.partialFilterExpression;
   }
   return index.partialFilterExpression;
 }

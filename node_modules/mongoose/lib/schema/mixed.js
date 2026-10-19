@@ -4,7 +4,7 @@
 
 'use strict';
 
-const SchemaType = require('../schematype');
+const SchemaType = require('../schemaType');
 const symbols = require('./symbols');
 const isObject = require('../helpers/isObject');
 const utils = require('../utils');
@@ -12,19 +12,21 @@ const utils = require('../utils');
 /**
  * Mixed SchemaType constructor.
  *
- * @param {String} path
- * @param {Object} options
+ * @param {string} path
+ * @param {object} options
+ * @param {object} _schemaOptions
+ * @param {Schema} parentSchema
  * @inherits SchemaType
  * @api public
  */
 
-function Mixed(path, options) {
-  if (options && options.default) {
+function SchemaMixed(path, options, _schemaOptions, parentSchema) {
+  if (options?.default) {
     const def = options.default;
     if (Array.isArray(def) && def.length === 0) {
       // make sure empty array defaults are handled
       options.default = Array;
-    } else if (!options.shared && isObject(def) && Object.keys(def).length === 0) {
+    } else if (!options.shared && isObject(def) && utils.hasOwnKeys(def) === false) {
       // prevent odd "shared" objects between documents
       options.default = function() {
         return {};
@@ -32,7 +34,7 @@ function Mixed(path, options) {
     }
   }
 
-  SchemaType.call(this, path, options, 'Mixed');
+  SchemaType.call(this, path, options, 'Mixed', parentSchema);
 
   this[symbols.schemaMixedSymbol] = true;
 }
@@ -43,15 +45,15 @@ function Mixed(path, options) {
  *
  * @api public
  */
-Mixed.schemaName = 'Mixed';
+SchemaMixed.schemaName = 'Mixed';
 
-Mixed.defaultOptions = {};
+SchemaMixed.defaultOptions = {};
 
 /*!
  * Inherits from SchemaType.
  */
-Mixed.prototype = Object.create(SchemaType.prototype);
-Mixed.prototype.constructor = Mixed;
+SchemaMixed.prototype = Object.create(SchemaType.prototype);
+SchemaMixed.prototype.constructor = SchemaMixed;
 
 /**
  * Attaches a getter for all Mixed paths.
@@ -59,7 +61,7 @@ Mixed.prototype.constructor = Mixed;
  * #### Example:
  *
  *     // Hide the 'hidden' path
- *     mongoose.Schema.Mixed.get(v => Object.assign({}, v, { hidden: null }));
+ *     mongoose.Schema.Types.Mixed.get(v => Object.assign({}, v, { hidden: null }));
  *
  *     const Model = mongoose.model('Test', new Schema({ test: {} }));
  *     new Model({ test: { hidden: 'Secret!' } }).test.hidden; // null
@@ -71,7 +73,7 @@ Mixed.prototype.constructor = Mixed;
  * @api public
  */
 
-Mixed.get = SchemaType.get;
+SchemaMixed.get = SchemaType.get;
 
 /**
  * Sets a default option for all Mixed instances.
@@ -79,31 +81,33 @@ Mixed.get = SchemaType.get;
  * #### Example:
  *
  *     // Make all mixed instances have `required` of true by default.
- *     mongoose.Schema.Mixed.set('required', true);
+ *     mongoose.Schema.Types.Mixed.set('required', true);
  *
  *     const User = mongoose.model('User', new Schema({ test: mongoose.Mixed }));
  *     new User({ }).validateSync().errors.test.message; // Path `test` is required.
  *
- * @param {String} option The option you'd like to set the value for
- * @param {Any} value value for option
+ * @param {string} option The option you'd like to set the value for
+ * @param {any} value value for option
  * @return {undefined}
  * @function set
  * @static
  * @api public
  */
 
-Mixed.set = SchemaType.set;
+SchemaMixed.set = SchemaType.set;
+
+SchemaMixed.setters = [];
 
 /**
  * Casts `val` for Mixed.
  *
  * _this is a no-op_
  *
- * @param {Object} value to cast
+ * @param {object} value to cast
  * @api private
  */
 
-Mixed.prototype.cast = function(val) {
+SchemaMixed.prototype.cast = function(val) {
   if (val instanceof Error) {
     return utils.errorToPOJO(val);
   }
@@ -113,17 +117,30 @@ Mixed.prototype.cast = function(val) {
 /**
  * Casts contents for queries.
  *
- * @param {String} $cond
+ * @param {string} $cond
  * @param {any} [val]
  * @api private
  */
 
-Mixed.prototype.castForQuery = function($cond, val) {
+SchemaMixed.prototype.castForQuery = function($cond, val) {
   return val;
+};
+
+/**
+ * Returns this schema type's representation in a JSON schema.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.useBsonType=false] If true, return a representation with `bsonType` for use with MongoDB's `$jsonSchema`.
+ * @returns {object} JSON schema properties
+ */
+
+// eslint-disable-next-line no-unused-vars
+SchemaMixed.prototype.toJSONSchema = function toJSONSchema(_options) {
+  return {};
 };
 
 /*!
  * Module exports.
  */
 
-module.exports = Mixed;
+module.exports = SchemaMixed;

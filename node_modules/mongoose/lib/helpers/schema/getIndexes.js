@@ -39,6 +39,11 @@ module.exports = function getIndexes(schema) {
         continue;
       }
 
+      if (path._duplicateKeyErrorMessage != null) {
+        schema._duplicateKeyErrorMessagesByPath = schema._duplicateKeyErrorMessagesByPath || {};
+        schema._duplicateKeyErrorMessagesByPath[key] = path._duplicateKeyErrorMessage;
+      }
+
       if (path.$isMongooseDocumentArray || path.$isSingleNested) {
         if (get(path, 'options.excludeIndexes') !== true &&
             get(path, 'schemaOptions.excludeIndexes') !== true &&
@@ -62,12 +67,12 @@ module.exports = function getIndexes(schema) {
         }
       }
 
-      const index = path._index || (path.caster && path.caster._index);
+      const index = path._index || (path.embeddedSchemaType && path.embeddedSchemaType._index);
 
-      if (index !== false && index !== null && index !== undefined) {
+      if (index !== false && index != null) {
         const field = {};
         const isObject = helperIsObject(index);
-        const options = isObject ? index : {};
+        const options = isObject ? { ...index } : {};
         const type = typeof index === 'string' ? index :
           isObject ? index.type :
             false;
@@ -78,19 +83,24 @@ module.exports = function getIndexes(schema) {
           field[prefix + key] = 'text';
           delete options.text;
         } else {
-          const isDescendingIndex = Number(index) === -1;
+          let isDescendingIndex = false;
+          if (index === 'descending' || index === 'desc') {
+            isDescendingIndex = true;
+          } else if (index === 'ascending' || index === 'asc') {
+            isDescendingIndex = false;
+          } else {
+            isDescendingIndex = Number(index) === -1;
+          }
+
           field[prefix + key] = isDescendingIndex ? -1 : 1;
         }
 
         delete options.type;
-        if (!('background' in options)) {
-          options.background = true;
-        }
         if (schema.options.autoIndex != null) {
           options._autoIndex = schema.options.autoIndex;
         }
 
-        const indexName = options && options.name;
+        const indexName = options?.name;
 
         if (typeof indexName === 'string') {
           if (indexByName.has(indexName)) {
@@ -113,9 +123,6 @@ module.exports = function getIndexes(schema) {
     } else {
       schema._indexes.forEach(function(index) {
         const options = index[1];
-        if (!('background' in options)) {
-          options.background = true;
-        }
         decorateDiscriminatorIndexOptions(schema, options);
       });
       indexes = indexes.concat(schema._indexes);
@@ -128,7 +135,7 @@ module.exports = function getIndexes(schema) {
    *
    * schema._indexes = [ [indexObj, options], [indexObj, options] ..]
    * @param {Schema} schema
-   * @param {String} prefix
+   * @param {string} prefix
    * @api private
    */
 
@@ -149,7 +156,7 @@ module.exports = function getIndexes(schema) {
       }
 
       const newIndexOptions = Object.assign({}, indexOptions);
-      if (indexOptions != null && indexOptions.partialFilterExpression != null) {
+      if (indexOptions?.partialFilterExpression != null) {
         newIndexOptions.partialFilterExpression = {};
         const partialFilterExpression = indexOptions.partialFilterExpression;
         for (const key of Object.keys(partialFilterExpression)) {

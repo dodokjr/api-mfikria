@@ -4,11 +4,26 @@ declare module 'mongoose' {
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
 
+  interface ValidateOptions {
+    /** List of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
+    pathsToSkip?: pathsToSkip;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
+  }
+
+  interface ValidateSyncOptions extends Omit<ValidateOptions, 'middleware'> {
+    /** `validateSync()` does not run middleware. Use `validate()` if you need middleware. */
+    middleware?: never;
+    [k: string]: any;
+  }
+
   interface DocumentSetOptions {
     merge?: boolean;
 
     [key: string]: any;
   }
+
+  class ModifiedPathsSnapshot {}
 
   /**
    * Generic types for Document:
@@ -16,20 +31,26 @@ declare module 'mongoose' {
    * *  TQueryHelpers - Object with any helpers that should be mixed into the Query type
    * *  DocType - the type of the actual Document created
    */
-  class Document<T = any, TQueryHelpers = any, DocType = any> {
+  class Document<T = Types.ObjectId, TQueryHelpers = any, DocType = any, TVirtuals = Record<string, any>, TSchemaOptions = {}> {
     constructor(doc?: any);
 
     /** This documents _id. */
-    _id?: T;
-
-    /** This documents __v. */
-    __v?: any;
+    _id: T;
 
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
-    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
+    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>;
+
+    /** Clear the document's modified paths. */
+    $clearModifiedPaths(): this;
 
     /** Returns a deep clone of this document */
     $clone(): this;
+
+    /**
+     * Creates a snapshot of this document's internal change tracking state. You can later
+     * reset this document's change tracking state using `$restoreModifiedPathsSnapshot()`.
+     */
+    $createModifiedPathsSnapshot(): ModifiedPathsSnapshot;
 
     /* Get all subdocs (by bfs) */
     $getAllSubdocs(): Document[];
@@ -37,8 +58,8 @@ declare module 'mongoose' {
     /** Don't run validation on this path or persist changes to this path. */
     $ignore(path: string): void;
 
-    /** Checks if a path is set to its default. */
-    $isDefault(path: string): boolean;
+    /** Checks if a path is set to its default. If no path set, checks if any path is set to its default. */
+    $isDefault(path?: string): boolean;
 
     /** Getter/setter, determines whether the document was removed or not. */
     $isDeleted(val?: boolean): boolean;
@@ -74,13 +95,21 @@ declare module 'mongoose' {
     $markValid(path: string): void;
 
     /** Returns the model with the given name on this document's associated connection. */
-    $model<ModelType = Model<unknown>>(name: string): ModelType;
+    $model<ModelType extends Model<unknown>>(name: string): ModelType;
+    $model<ModelType extends Model<DocType, any, any, any>>(): ModelType;
 
     /**
      * A string containing the current operation that Mongoose is executing
      * on this document. Can be `null`, `'save'`, `'validate'`, or `'remove'`.
      */
     $op: 'save' | 'validate' | 'remove' | null;
+
+    /**
+     * Restore this document's change tracking state to the given snapshot.
+     * Note that `$restoreModifiedPathsSnapshot()` does **not** modify the document's
+     * properties, just resets the change tracking state.
+     */
+    $restoreModifiedPathsSnapshot(snapshot: ModifiedPathsSnapshot): this;
 
     /**
      * Getter/setter around the session associated with this document. Used to
@@ -90,9 +119,9 @@ declare module 'mongoose' {
     $session(session?: ClientSession | null): ClientSession | null;
 
     /** Alias for `set()`, used internally to avoid conflicts */
-    $set(path: string, val: any, type: any, options?: DocumentSetOptions): this;
-    $set(path: string, val: any, options?: DocumentSetOptions): this;
-    $set(value: any): this;
+    $set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
+    $set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
+    $set(value: string | Record<string, any>): this;
 
     /** Set this property to add additional query filters when Mongoose saves this document and `isNew` is false. */
     $where: Record<string, unknown>;
@@ -107,13 +136,21 @@ declare module 'mongoose' {
     db: Connection;
 
     /** Removes this document from the db. */
-    deleteOne(options?: QueryOptions): QueryWithHelpers<any, this, TQueryHelpers>;
+    deleteOne(options?: QueryOptions): QueryWithHelpers<
+      mongodb.DeleteResult,
+      this,
+      TQueryHelpers,
+      DocType,
+      'deleteOne',
+      Record<string, never>,
+      Default__v<Require_id<DocType>>
+    >;
 
     /**
      * Takes a populated field and returns it to its unpopulated state. If called with
      * no arguments, then all populated fields are returned to their unpopulated state.
      */
-    depopulate(path?: string | string[]): this;
+    depopulate<Paths = {}>(path?: string | string[]): MergeType<this, Paths>;
 
     /**
      * Returns the list of paths that have been directly modified. A direct
@@ -135,16 +172,21 @@ declare module 'mongoose' {
     errors?: Error.ValidationError;
 
     /** Returns the value of a path. */
+    get<T extends keyof DocType>(path: T, type?: any, options?: any): DocType[T];
     get(path: string, type?: any, options?: any): any;
 
     /**
      * Returns the changes that happened to the document
      * in the format that will be sent to MongoDB.
      */
-    getChanges(): UpdateQuery<this>;
+    $getChanges(): UpdateQuery<this>;
 
-    /** The string version of this documents _id. */
-    id?: any;
+    /**
+     * Returns the changes that happened to the document
+     * in the format that will be sent to MongoDB.
+     * @deprecated Use `$getChanges()` instead.
+     */
+    getChanges(): UpdateQuery<this>;
 
     /** Signal that we desire an increment of this documents version. */
     increment(): this;
@@ -157,31 +199,42 @@ declare module 'mongoose' {
     init(obj: AnyObject, opts?: AnyObject): this;
 
     /** Marks a path as invalid, causing validation to fail. */
+    invalidate<T extends keyof DocType>(path: T, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
     invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
 
     /** Returns true if `path` was directly set and modified, else false. */
+    isDirectModified<T extends keyof DocType>(path: T | Array<T>): boolean;
     isDirectModified(path: string | Array<string>): boolean;
 
     /** Checks if `path` was explicitly selected. If no projection, always returns true. */
+    isDirectSelected<T extends keyof DocType>(path: T): boolean;
     isDirectSelected(path: string): boolean;
 
     /** Checks if `path` is in the `init` state, that is, it was set by `Document#init()` and not modified since. */
+    isInit<T extends keyof DocType>(path: T): boolean;
     isInit(path: string): boolean;
 
     /**
      * Returns true if any of the given paths are modified, else false. If no arguments, returns `true` if any path
      * in this document is modified.
      */
-    isModified(path?: string | Array<string>): boolean;
+    isModified<T extends keyof DocType>(path?: T | Array<T>, options?: { ignoreAtomics?: boolean } | null): boolean;
+    isModified(path?: string | Array<string>, options?: { ignoreAtomics?: boolean } | null): boolean;
 
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;
 
     /** Checks if `path` was selected in the source query which initialized this document. */
+    isSelected<T extends keyof DocType>(path: T): boolean;
     isSelected(path: string): boolean;
 
     /** Marks the path as having pending changes to write to the db. */
+    markModified<T extends keyof DocType>(path: T, scope?: any): void;
     markModified(path: string, scope?: any): void;
+
+    /** Returns the model with the given name on this document's associated connection. */
+    model<ModelType extends Model<unknown>>(name: string): ModelType;
+    model<ModelType extends Model<DocType, any, any, any>>(): ModelType;
 
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
@@ -200,8 +253,8 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<MergeType<this, Paths>>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<MergeType<this, Paths>>;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any, any, any, any>, match?: AnyObject, options?: PopulateOptions): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -216,29 +269,79 @@ declare module 'mongoose' {
     schema: Schema;
 
     /** Sets the value of a path, or many paths. */
-    set(path: string, val: any, type: any, options?: any): this;
-    set(path: string, val: any, options?: any): this;
-    set(value: any): this;
+    set<T extends keyof DocType>(path: T, val: DocType[T], type: any, options?: DocumentSetOptions): this;
+    set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
+    set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
+    set(value: string | Record<string, any>): this;
+
+    toBSON(): Require_id<DocType>;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON<T = Require_id<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
-    toJSON<T = Require_id<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
+    toJSON<PopulatedRawDocType, DepopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: { depopulate: true }
+    ): Default__v<Require_id<DepopulatedRawDocType>, TSchemaOptions>;
+    toJSON<PopulatedRawDocType, DepopulatedRawDocType, O extends ToObjectOptions & { depopulate: true }>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: O
+    ): ToObjectReturnType<DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toJSON<PopulatedRawDocType, O extends ToObjectOptions>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>,
+      options: O
+    ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toJSON<PopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>
+    ): DefaultToObjectReturnType<PopulatedRawDocType, TVirtuals, TSchemaOptions, 'toJSON'>;
+    toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
+    toJSON(options?: ToObjectOptions): DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, 'toJSON'>;
+    toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject<T = Require_id<DocType>>(options?: ToObjectOptions): Require_id<T>;
+    toObject<PopulatedRawDocType, DepopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: { depopulate: true }
+    ): Default__v<Require_id<DepopulatedRawDocType>, TSchemaOptions>;
+    toObject<PopulatedRawDocType, DepopulatedRawDocType, O extends ToObjectOptions & { depopulate: true }>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: O
+    ): ToObjectReturnType<DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toObject<PopulatedRawDocType, O extends ToObjectOptions>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>,
+      options: O
+    ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toObject<PopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>
+    ): DefaultToObjectReturnType<PopulatedRawDocType, TVirtuals, TSchemaOptions, 'toObject'>;
+    toObject<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
+    toObject(options?: ToObjectOptions): DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, 'toObject'>;
+    toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Clears the modified state on the specified path. */
+    unmarkModified<T extends keyof DocType>(path: T): void;
     unmarkModified(path: string): void;
 
     /** Sends an updateOne command with this document `_id` as the query selector. */
     updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
-    validate(pathsToValidate?: pathsToValidate, options?: AnyObject): Promise<void>;
-    validate(options: { pathsToSkip?: pathsToSkip }): Promise<void>;
+    validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
+    validate(pathsToValidate?: pathsToValidate, options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
+    validate(options: ValidateOptions): Promise<void>;
 
-    /** Executes registered validation rules (skipping asynchronous validators) for this document. */
-    validateSync(options: { pathsToSkip?: pathsToSkip, [k: string]: any }): Error.ValidationError | null;
-    validateSync(pathsToValidate?: pathsToValidate, options?: AnyObject): Error.ValidationError | null;
+    /**
+     * Executes registered validation rules (skipping asynchronous validators) for this document.
+     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
+     */
+    validateSync(options: ValidateSyncOptions): Error.ValidationError | null;
+    /**
+     * Executes registered validation rules (skipping asynchronous validators) for this document.
+     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
+     */
+    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateSyncOptions, 'pathsToSkip'>): Error.ValidationError | null;
+    /**
+     * Executes registered validation rules (skipping asynchronous validators) for this document.
+     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
+     */
+    validateSync(pathsToValidate?: pathsToValidate, options?: Omit<ValidateSyncOptions, 'pathsToSkip'>): Error.ValidationError | null;
   }
 }

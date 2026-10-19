@@ -1,7 +1,6 @@
 'use strict';
 
-const symbols = require('../../schema/symbols');
-const promiseOrCallback = require('../promiseOrCallback');
+const { buildMiddlewareFilter, middlewareFiltersFromLastArg } = require('../buildMiddlewareFilter');
 
 /*!
  * ignore
@@ -15,10 +14,10 @@ module.exports = applyHooks;
 
 applyHooks.middlewareFunctions = [
   'deleteOne',
-  'save',
-  'validate',
   'remove',
+  'save',
   'updateOne',
+  'validate',
   'init'
 ];
 
@@ -33,7 +32,7 @@ const alreadyHookedFunctions = new Set(applyHooks.middlewareFunctions.flatMap(fn
  *
  * @param {Model} model
  * @param {Schema} schema
- * @param {Object} options
+ * @param {object} options
  * @api private
  */
 
@@ -47,15 +46,15 @@ function applyHooks(model, schema, options) {
     contextParameter: true
   };
   const objToDecorate = options.decorateDoc ? model : model.prototype;
-
   model.$appliedHooks = true;
   for (const key of Object.keys(schema.paths)) {
-    const type = schema.paths[key];
+    let type = schema.paths[key];
     let childModel = null;
-    if (type.$isSingleNested) {
-      childModel = type.caster;
-    } else if (type.$isMongooseDocumentArray) {
-      childModel = type.Constructor;
+
+    const result = findChildModel(type);
+    if (result) {
+      childModel = result.childModel;
+      type = result.type;
     } else {
       continue;
     }
@@ -64,7 +63,11 @@ function applyHooks(model, schema, options) {
       continue;
     }
 
-    applyHooks(childModel, type.schema, options);
+    applyHooks(childModel, type.schema, {
+      ...options,
+      decorateDoc: false,
+      isChildSchema: true
+    });
     if (childModel.discriminators != null) {
       const keys = Object.keys(childModel.discriminators);
       for (const key of keys) {
@@ -78,40 +81,30 @@ function applyHooks(model, schema, options) {
   // promises and make it so that `doc.save.toString()` provides meaningful
   // information.
 
-  const middleware = schema.s.hooks.
-    filter(hook => {
-      if (hook.name === 'updateOne' || hook.name === 'deleteOne') {
-        return !!hook['document'];
-      }
-      if (hook.name === 'remove' || hook.name === 'init') {
-        return hook['document'] == null || !!hook['document'];
-      }
-      if (hook.query != null || hook.document != null) {
-        return hook.document !== false;
-      }
-      return true;
-    }).
-    filter(hook => {
-      // If user has overwritten the method, don't apply built-in middleware
-      if (schema.methods[hook.name]) {
-        return !hook.fn[symbols.builtInMiddleware];
-      }
-
-      return true;
-    });
+  const middleware = schema._getDocumentMiddleware(model.prototype.$isSubdocument);
 
   model._middleware = middleware;
 
-  objToDecorate.$__originalValidate = objToDecorate.$__originalValidate || objToDecorate.$__validate;
-
-  for (const method of ['save', 'validate', 'remove', 'deleteOne']) {
-    const toWrap = method === 'validate' ? '$__originalValidate' : `$__${method}`;
-    const wrapped = middleware.
-      createWrapper(method, objToDecorate[toWrap], null, kareemOptions);
-    objToDecorate[`$__${method}`] = wrapped;
+  // Most subdocuments have no init hooks. Avoid wrapping every hydration in
+  // Kareem when there is no middleware to run.
+  const $__init = objToDecorate.$__init;
+  if (middleware.hasHooks('init')) {
+    objToDecorate.$__init = middleware.
+      createWrapperSync('init', $__init, null, {
+        ...kareemOptions,
+        getOptions: (args) => {
+          const opts = args[1];
+          return {
+            pre: { filter: buildMiddlewareFilter(opts, 'pre') },
+            post: { filter: buildMiddlewareFilter(opts, 'post') }
+          };
+        }
+      });
+  } else {
+    // Still define an own `$__init` so top-level discriminators, whose prototype is later set to
+    // the base model's prototype, don't inherit the base model's wrapped `$__init`.
+    objToDecorate.$__init = $__init;
   }
-  objToDecorate.$__init = middleware.
-    createWrapperSync('init', objToDecorate.$__init, null, kareemOptions);
 
   // Support hooks for custom methods
   const customMethods = Object.keys(schema.methods);
@@ -133,17 +126,42 @@ function applyHooks(model, schema, options) {
       continue;
     }
     const originalMethod = objToDecorate[method];
-    objToDecorate[method] = function() {
-      const args = Array.prototype.slice.call(arguments);
-      const cb = args.slice(-1).pop();
-      const argsWithoutCallback = typeof cb === 'function' ?
-        args.slice(0, args.length - 1) : args;
-      return promiseOrCallback(cb, callback => {
-        return this[`$__${method}`].apply(this,
-          argsWithoutCallback.concat([callback]));
-      }, model.events);
-    };
-    objToDecorate[`$__${method}`] = middleware.
-      createWrapper(method, originalMethod, null, customMethodOptions);
+    objToDecorate[`$__${method}`] = objToDecorate[method];
+    // Only read the `middleware` option from the method's last argument if
+    // the method opts in via `supportsMiddlewareOption`. Custom methods have
+    // arbitrary signatures, so the last argument may be an object with an
+    // unrelated `middleware` property.
+    const methodOptions = originalMethod.supportsMiddlewareOption === true ?
+      { ...customMethodOptions, getOptions: middlewareFiltersFromLastArg } :
+      customMethodOptions;
+    objToDecorate[method] = middleware.
+      createWrapper(method, originalMethod, null, methodOptions);
   }
+}
+
+/**
+ * Check if there is an embedded schematype in the given schematype. Handles drilling down into primitive
+ * arrays and maps in case of array of array of subdocs or map of subdocs.
+ *
+ * @param {SchemaType} curType
+ * @returns {{ childModel: Model | typeof Subdocument, curType: SchemaType } | null}
+ */
+
+function findChildModel(curType) {
+  if (curType.$isSingleNested || curType.$isMongooseDocumentArray) {
+    return { childModel: curType.Constructor, type: curType };
+  }
+  if (curType.instance === 'Array') {
+    const embedded = curType.getEmbeddedSchemaType();
+    if (embedded) {
+      return findChildModel(embedded);
+    }
+  }
+  if (curType.instance === 'Map') {
+    const mapType = curType.getEmbeddedSchemaType();
+    if (mapType) {
+      return findChildModel(mapType);
+    }
+  }
+  return null;
 }

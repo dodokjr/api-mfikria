@@ -10,8 +10,8 @@ const util = require('util');
 /**
  * Casting Error constructor.
  *
- * @param {String} type
- * @param {String} value
+ * @param {string} type
+ * @param {string} value
  * @inherits MongooseError
  * @api private
  */
@@ -20,10 +20,9 @@ class CastError extends MongooseError {
   constructor(type, value, path, reason, schemaType) {
     // If no args, assume we'll `init()` later.
     if (arguments.length > 0) {
-      const stringValue = getStringValue(value);
       const valueType = getValueType(value);
       const messageFormat = getMessageFormat(schemaType);
-      const msg = formatMessage(null, type, stringValue, path, messageFormat, valueType, reason);
+      const msg = formatMessage(null, type, value, path, messageFormat, valueType, reason);
       super(msg);
       this.init(type, value, path, reason, schemaType);
     } else {
@@ -43,6 +42,7 @@ class CastError extends MongooseError {
       message: this.message
     };
   }
+
   /*!
    * ignore
    */
@@ -76,9 +76,8 @@ class CastError extends MongooseError {
    * ignore
    */
   setModel(model) {
-    this.model = model;
-    this.message = formatMessage(model, this.kind, this.stringValue, this.path,
-      this.messageFormat, this.valueType);
+    this.message = formatMessage(model, this.kind, this.value, this.path,
+      this.messageFormat, this.valueType, this.reason);
   }
 }
 
@@ -111,10 +110,8 @@ function getValueType(value) {
 }
 
 function getMessageFormat(schemaType) {
-  const messageFormat = schemaType &&
-  schemaType.options &&
-  schemaType.options.cast || null;
-  if (typeof messageFormat === 'string') {
+  const messageFormat = schemaType?._castErrorMessage || null;
+  if (typeof messageFormat === 'string' || typeof messageFormat === 'function') {
     return messageFormat;
   }
 }
@@ -123,30 +120,42 @@ function getMessageFormat(schemaType) {
  * ignore
  */
 
-function formatMessage(model, kind, stringValue, path, messageFormat, valueType, reason) {
-  if (messageFormat != null) {
-    let ret = messageFormat.
-      replace('{KIND}', kind).
-      replace('{VALUE}', stringValue).
-      replace('{PATH}', path);
+function formatMessage(model, kind, value, path, messageFormat, valueType, reason) {
+  if (typeof messageFormat === 'string') {
+    const stringValue = getStringValue(value);
+    let ret = messageFormat
+      .replace('{KIND}', kind)
+      .replace('{VALUE}', stringValue)
+      .replace('{PATH}', path);
+
     if (model != null) {
       ret = ret.replace('{MODEL}', model.modelName);
     }
 
     return ret;
+  } else if (typeof messageFormat === 'function') {
+    return messageFormat(value, path, model, kind);
   } else {
+    const stringValue = getStringValue(value);
     const valueTypeMsg = valueType ? ' (type ' + valueType + ')' : '';
+
     let ret = 'Cast to ' + kind + ' failed for value ' +
       stringValue + valueTypeMsg + ' at path "' + path + '"';
+
     if (model != null) {
       ret += ' for model "' + model.modelName + '"';
     }
-    if (reason != null &&
-        typeof reason.constructor === 'function' &&
-        reason.constructor.name !== 'AssertionError' &&
-        reason.constructor.name !== 'Error') {
+
+    if (
+      reason != null &&
+      typeof reason.constructor === 'function' &&
+      reason.constructor.name !== 'AssertionError' &&
+      reason.constructor.name !== 'Error' &&
+      reason.constructor.name !== 'BSONError'
+    ) {
       ret += ' because of "' + reason.constructor.name + '"';
     }
+
     return ret;
   }
 }

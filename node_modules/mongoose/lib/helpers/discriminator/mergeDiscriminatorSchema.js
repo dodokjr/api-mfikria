@@ -3,13 +3,14 @@ const schemaMerge = require('../schema/merge');
 const specialProperties = require('../../helpers/specialProperties');
 const isBsonType = require('../../helpers/isBsonType');
 const ObjectId = require('../../types/objectid');
+const SchemaType = require('../../schemaType');
 const isObject = require('../../helpers/isObject');
 /**
  * Merges `from` into `to` without overwriting existing properties.
  *
- * @param {Object} to
- * @param {Object} from
- * @param {String} [path]
+ * @param {object} to
+ * @param {object} from
+ * @param {string} [path]
  * @api private
  */
 
@@ -34,14 +35,20 @@ module.exports = function mergeDiscriminatorSchema(to, from, path, seen) {
         key === 'base' ||
         key === '_applyDiscriminators' ||
         key === '_userProvidedOptions' ||
-        key === 'options') {
+        key === 'options' ||
+        key === 'tree') {
         continue;
       }
     }
-    if (path === 'tree' && from != null && from.instanceOfSchema) {
+    if (path === 'tree' && from?.instanceOfSchema) {
       continue;
     }
     if (specialProperties.has(key)) {
+      continue;
+    }
+    if (key === 'parentSchema') {
+      // Skip parentSchema to avoid merging parent schema multiple times
+      // through child paths' back-references (gh-15966)
       continue;
     }
     if (to[key] == null) {
@@ -55,7 +62,8 @@ module.exports = function mergeDiscriminatorSchema(to, from, path, seen) {
         // base schema has a given path as a single nested but discriminator schema
         // has the path as a document array, or vice versa (gh-9534)
         if ((from[key].$isSingleNested && to[key].$isMongooseDocumentArray) ||
-              (from[key].$isMongooseDocumentArray && to[key].$isSingleNested)) {
+              (from[key].$isMongooseDocumentArray && to[key].$isSingleNested) ||
+              (from[key].$isMongooseDocumentArrayElement && to[key].$isMongooseDocumentArrayElement)) {
           continue;
         } else if (from[key].instanceOfSchema) {
           if (to[key].instanceOfSchema) {
@@ -67,9 +75,22 @@ module.exports = function mergeDiscriminatorSchema(to, from, path, seen) {
         } else if (isBsonType(from[key], 'ObjectId')) {
           to[key] = new ObjectId(from[key]);
           continue;
+        } else if (from[key] instanceof SchemaType) {
+          if (to[key] == null) {
+            to[key] = from[key].clone();
+          }
+          // For container types with nested schemas, we need to continue to the
+          // recursive merge below to properly merge the nested schemas
+          if (!from[key].$isMongooseDocumentArray && !from[key].$isSingleNested) {
+            continue;
+          }
         }
       }
       mergeDiscriminatorSchema(to[key], from[key], path ? path + '.' + key : key, seen);
     }
+  }
+
+  if (from?.instanceOfSchema) {
+    to.tree = Object.assign({}, from.tree, to.tree);
   }
 };

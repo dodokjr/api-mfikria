@@ -7,7 +7,7 @@ const utils = require('../../utils');
 
 module.exports = assignRawDocsToIdStructure;
 
-const kHasArray = Symbol('assignRawDocsToIdStructure.hasArray');
+const kHasArray = Symbol('mongoose#assignRawDocsToIdStructure#hasArray');
 
 /**
  * Assign `vals` returned by mongo query to the `rawIds`
@@ -26,15 +26,19 @@ const kHasArray = Symbol('assignRawDocsToIdStructure.hasArray');
  * @param {Array} rawIds
  * @param {Array} resultDocs
  * @param {Array} resultOrder
- * @param {Object} options
- * @param {Boolean} recursed
+ * @param {object} options
+ * @param {boolean} recursed
  * @api private
  */
 
 function assignRawDocsToIdStructure(rawIds, resultDocs, resultOrder, options, recursed) {
-  // honor user specified sort order
+  // honor user specified sort order, unless we're populating a single
+  // virtual underneath an array (e.g. populating `employees.mostRecentShift` where
+  // `mostRecentShift` is a virtual with `justOne`)
   const newOrder = [];
-  const sorting = options.sort && rawIds.length > 1;
+  const sorting = options.isVirtual && options.justOne && rawIds.length > 1
+    ? false :
+    options.sort && rawIds.length > 1;
   const nullIfNotFound = options.$nullIfNotFound;
   let doc;
   let sid;
@@ -100,7 +104,7 @@ function assignRawDocsToIdStructure(rawIds, resultDocs, resultOrder, options, re
         } else {
           newOrder.push(doc);
         }
-      } else if (id != null && id[modelSymbol] != null) {
+      } else if (id?.[modelSymbol] != null) {
         newOrder.push(id);
       } else {
         newOrder.push(options.retainNullValues || nullIfNotFound ? null : id);

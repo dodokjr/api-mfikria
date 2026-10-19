@@ -5,8 +5,8 @@
 'use strict';
 
 const MongooseBuffer = require('../types/buffer');
-const SchemaBufferOptions = require('../options/SchemaBufferOptions');
-const SchemaType = require('../schematype');
+const SchemaBufferOptions = require('../options/schemaBufferOptions');
+const SchemaType = require('../schemaType');
 const handleBitwiseOperator = require('./operators/bitwise');
 const utils = require('../utils');
 
@@ -16,14 +16,16 @@ const CastError = SchemaType.CastError;
 /**
  * Buffer SchemaType constructor
  *
- * @param {String} key
- * @param {Object} options
+ * @param {string} key
+ * @param {object} options
+ * @param {object} schemaOptions
+ * @param {Schema} parentSchema
  * @inherits SchemaType
  * @api public
  */
 
-function SchemaBuffer(key, options) {
-  SchemaType.call(this, key, options, 'Buffer');
+function SchemaBuffer(key, options, _schemaOptions, parentSchema) {
+  SchemaType.call(this, key, options, 'Buffer', parentSchema);
 }
 
 /**
@@ -47,7 +49,7 @@ SchemaBuffer.prototype.OptionsConstructor = SchemaBufferOptions;
  * ignore
  */
 
-SchemaBuffer._checkRequired = v => !!(v && v.length);
+SchemaBuffer._checkRequired = v => !!v?.length;
 
 /**
  * Sets a default option for all Buffer instances.
@@ -55,13 +57,13 @@ SchemaBuffer._checkRequired = v => !!(v && v.length);
  * #### Example:
  *
  *     // Make all buffers have `required` of true by default.
- *     mongoose.Schema.Buffer.set('required', true);
+ *     mongoose.Schema.Types.Buffer.set('required', true);
  *
  *     const User = mongoose.model('User', new Schema({ test: Buffer }));
  *     new User({ }).validateSync().errors.test.message; // Path `test` is required.
  *
- * @param {String} option The option you'd like to set the value for
- * @param {Any} value value for option
+ * @param {string} option The option you'd like to set the value for
+ * @param {any} value value for option
  * @return {undefined}
  * @function set
  * @static
@@ -69,6 +71,28 @@ SchemaBuffer._checkRequired = v => !!(v && v.length);
  */
 
 SchemaBuffer.set = SchemaType.set;
+
+SchemaBuffer.setters = [];
+
+/**
+ * Attaches a getter for all Buffer instances
+ *
+ * #### Example:
+ *
+ *     // Always convert to string when getting an ObjectId
+ *     mongoose.Schema.Types.Buffer.get(v => v.toString('hex'));
+ *
+ *     const Model = mongoose.model('Test', new Schema({ buf: Buffer } }));
+ *     typeof (new Model({ buf: Buffer.fromString('hello') }).buf); // 'string'
+ *
+ * @param {Function} getter
+ * @return {this}
+ * @function get
+ * @static
+ * @api public
+ */
+
+SchemaBuffer.get = SchemaType.get;
 
 /**
  * Override the function the required validator uses to check whether a string
@@ -96,9 +120,9 @@ SchemaBuffer.checkRequired = SchemaType.checkRequired;
  * required validator, a buffer must not be null or undefined and have
  * non-zero length.
  *
- * @param {Any} value
+ * @param {any} value
  * @param {Document} doc
- * @return {Boolean}
+ * @return {boolean}
  * @api public
  */
 
@@ -112,21 +136,21 @@ SchemaBuffer.prototype.checkRequired = function(value, doc) {
 /**
  * Casts contents
  *
- * @param {Object} value
+ * @param {object} value
  * @param {Document} doc document that triggers the casting
- * @param {Boolean} init
+ * @param {boolean} init
  * @api private
  */
 
-SchemaBuffer.prototype.cast = function(value, doc, init) {
+SchemaBuffer.prototype.cast = function(value, doc, init, prev, options) {
   let ret;
   if (SchemaType._isRef(this, value, doc, init)) {
-    if (value && value.isMongooseBuffer) {
+    if (value?.isMongooseBuffer) {
       return value;
     }
 
     if (Buffer.isBuffer(value)) {
-      if (!value || !value.isMongooseBuffer) {
+      if (!value?.isMongooseBuffer) {
         value = new MongooseBuffer(value, [this.path, doc]);
         if (this.options.subtype != null) {
           value._subtype = this.options.subtype;
@@ -145,21 +169,21 @@ SchemaBuffer.prototype.cast = function(value, doc, init) {
     }
 
     if (value == null || utils.isNonBuiltinObject(value)) {
-      return this._castRef(value, doc, init);
+      return this._castRef(value, doc, init, options);
     }
   }
 
   // documents
-  if (value && value._id) {
+  if (value?._id) {
     value = value._id;
   }
 
-  if (value && value.isMongooseBuffer) {
+  if (value?.isMongooseBuffer) {
     return value;
   }
 
   if (Buffer.isBuffer(value)) {
-    if (!value || !value.isMongooseBuffer) {
+    if (!value?.isMongooseBuffer) {
       value = new MongooseBuffer(value, [this.path, doc]);
       if (this.options.subtype != null) {
         value._subtype = this.options.subtype;
@@ -197,12 +221,20 @@ SchemaBuffer.prototype.cast = function(value, doc, init) {
     return ret;
   }
 
+  if (utils.isPOJO(value) && (value.$binary instanceof Binary || typeof value.$binary === 'string')) {
+    const buf = this.cast(Buffer.from(value.$binary, 'base64'));
+    if (value.$type != null) {
+      buf._subtype = value.$type;
+      return buf;
+    }
+  }
+
   throw new CastError('Buffer', value, this.path, null, this);
 };
 
 /**
  * Sets the default [subtype](https://studio3t.com/whats-new/best-practices-uuid-mongodb/)
- * for this buffer. You can find a [list of allowed subtypes here](https://api.mongodb.com/python/current/api/bson/binary.html).
+ * for this buffer. You can find a [list of allowed subtypes here](https://www.mongodb.com/docs/manual/reference/bson-types/#binary-data).
  *
  * #### Example:
  *
@@ -211,7 +243,7 @@ SchemaBuffer.prototype.cast = function(value, doc, init) {
  *     const m = new M({ uuid: 'test string' });
  *     m.uuid._subtype; // 4
  *
- * @param {Number} subtype the default subtype
+ * @param {number} subtype the default subtype
  * @return {SchemaType} this
  * @api public
  */
@@ -228,22 +260,38 @@ function handleSingle(val, context) {
   return this.castForQuery(null, val, context);
 }
 
-SchemaBuffer.prototype.$conditionalHandlers =
-    utils.options(SchemaType.prototype.$conditionalHandlers, {
-      $bitsAllClear: handleBitwiseOperator,
-      $bitsAnyClear: handleBitwiseOperator,
-      $bitsAllSet: handleBitwiseOperator,
-      $bitsAnySet: handleBitwiseOperator,
-      $gt: handleSingle,
-      $gte: handleSingle,
-      $lt: handleSingle,
-      $lte: handleSingle
-    });
+const $conditionalHandlers = {
+  ...SchemaType.prototype.$conditionalHandlers,
+  $bitsAllClear: handleBitwiseOperator,
+  $bitsAnyClear: handleBitwiseOperator,
+  $bitsAllSet: handleBitwiseOperator,
+  $bitsAnySet: handleBitwiseOperator,
+  $gt: handleSingle,
+  $gte: handleSingle,
+  $lt: handleSingle,
+  $lte: handleSingle
+};
+
+/**
+ * Contains the handlers for different query operators for this schema type.
+ * For example, `$conditionalHandlers.$exists` is the function Mongoose calls to cast `$exists` filter operators.
+ *
+ * @property $conditionalHandlers
+ * @memberOf SchemaBuffer
+ * @instance
+ * @api public
+ */
+
+Object.defineProperty(SchemaBuffer.prototype, '$conditionalHandlers', {
+  enumerable: false,
+  value: $conditionalHandlers
+});
+
 
 /**
  * Casts contents for queries.
  *
- * @param {String} $conditional
+ * @param {string} $conditional
  * @param {any} [value]
  * @api private
  */
@@ -257,8 +305,33 @@ SchemaBuffer.prototype.castForQuery = function($conditional, val, context) {
     }
     return handler.call(this, val);
   }
-  const casted = this.applySetters(val, context);
+
+  let casted;
+  try {
+    casted = this.applySetters(val, context);
+  } catch (err) {
+    if (err instanceof CastError && err.path === this.path && this.$fullPath != null) {
+      err.path = this.$fullPath;
+    }
+    throw err;
+  }
   return casted ? casted.toObject({ transform: false, virtuals: false }) : casted;
+};
+
+/**
+ * Returns this schema type's representation in a JSON schema.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.useBsonType=false] If true, return a representation with `bsonType` for use with MongoDB's `$jsonSchema`.
+ * @returns {object} JSON schema properties
+ */
+
+SchemaBuffer.prototype.toJSONSchema = function toJSONSchema(options) {
+  return this._createJSONSchemaTypeDefinition('string', 'binData', options);
+};
+
+SchemaBuffer.prototype.autoEncryptionType = function autoEncryptionType() {
+  return 'binData';
 };
 
 /*!

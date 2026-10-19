@@ -38,9 +38,11 @@ router.get("/Portofolio-Tamplate", function (res, req)
 });
 
 
-router.get("*", function (res, req)
-{
-    req.status(404).json({ status: 404 });
-})
-
+// 404 catch-all (Express 5: tanpa wildcard, harus tetap paling bawah)
+router.use((req, res) => {
+    res.status(404).send({
+        status: res.statusCode,
+        message: "error Page"
+    });
+});
 module.exports = router

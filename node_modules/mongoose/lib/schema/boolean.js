@@ -5,21 +5,22 @@
  */
 
 const CastError = require('../error/cast');
-const SchemaType = require('../schematype');
+const SchemaType = require('../schemaType');
 const castBoolean = require('../cast/boolean');
-const utils = require('../utils');
 
 /**
  * Boolean SchemaType constructor.
  *
- * @param {String} path
- * @param {Object} options
+ * @param {string} path
+ * @param {object} options
+ * @param {object} schemaOptions
+ * @param {Schema} parentSchema
  * @inherits SchemaType
  * @api public
  */
 
-function SchemaBoolean(path, options) {
-  SchemaType.call(this, path, options, 'Boolean');
+function SchemaBoolean(path, options, _schemaOptions, parentSchema) {
+  SchemaType.call(this, path, options, 'Boolean', parentSchema);
 }
 
 /**
@@ -50,13 +51,13 @@ SchemaBoolean._cast = castBoolean;
  * #### Example:
  *
  *     // Make all booleans have `default` of false.
- *     mongoose.Schema.Boolean.set('default', false);
+ *     mongoose.Schema.Types.Boolean.set('default', false);
  *
  *     const Order = mongoose.model('Order', new Schema({ isPaid: Boolean }));
  *     new Order({ }).isPaid; // false
  *
- * @param {String} option The option you'd like to set the value for
- * @param {Any} value value for option
+ * @param {string} option The option you'd like to set the value for
+ * @param {any} value value for option
  * @return {undefined}
  * @function set
  * @static
@@ -65,14 +66,35 @@ SchemaBoolean._cast = castBoolean;
 
 SchemaBoolean.set = SchemaType.set;
 
+SchemaBoolean.setters = [];
+
+/**
+ * Attaches a getter for all Boolean instances
+ *
+ * #### Example:
+ *
+ *     mongoose.Schema.Types.Boolean.get(v => v === true ? 'yes' : 'no');
+ *
+ *     const Order = mongoose.model('Order', new Schema({ isPaid: Boolean }));
+ *     new Order({ isPaid: false }).isPaid; // 'no'
+ *
+ * @param {Function} getter
+ * @return {this}
+ * @function get
+ * @static
+ * @api public
+ */
+
+SchemaBoolean.get = SchemaType.get;
+
 /**
  * Get/set the function used to cast arbitrary values to booleans.
  *
  * #### Example:
  *
  *     // Make Mongoose cast empty string '' to false.
- *     const original = mongoose.Schema.Boolean.cast();
- *     mongoose.Schema.Boolean.cast(v => {
+ *     const original = mongoose.Schema.Types.Boolean.cast();
+ *     mongoose.Schema.Types.Boolean.cast(v => {
  *       if (v === '') {
  *         return false;
  *       }
@@ -80,11 +102,11 @@ SchemaBoolean.set = SchemaType.set;
  *     });
  *
  *     // Or disable casting entirely
- *     mongoose.Schema.Boolean.cast(false);
+ *     mongoose.Schema.Types.Boolean.cast(false);
  *
  * @param {Function} caster
  * @return {Function}
- * @function get
+ * @function cast
  * @static
  * @api public
  */
@@ -136,8 +158,8 @@ SchemaBoolean.checkRequired = SchemaType.checkRequired;
  * to satisfy a required validator, it must be strictly equal to true or to
  * false.
  *
- * @param {Any} value
- * @return {Boolean}
+ * @param {any} value
+ * @return {boolean}
  * @api public
  */
 
@@ -152,10 +174,12 @@ SchemaBoolean.prototype.checkRequired = function(value) {
  *
  *     const M = mongoose.model('Test', new Schema({ b: Boolean }));
  *     new M({ b: 'affirmative' }).b; // undefined
- *     mongoose.Schema.Boolean.convertToTrue.add('affirmative');
+ *     mongoose.Schema.Types.Boolean.convertToTrue.add('affirmative');
  *     new M({ b: 'affirmative' }).b; // true
  *
  * @property convertToTrue
+ * @static
+ * @memberOf SchemaBoolean
  * @type {Set}
  * @api public
  */
@@ -176,6 +200,8 @@ Object.defineProperty(SchemaBoolean, 'convertToTrue', {
  *     new M({ b: 'nay' }).b; // false
  *
  * @property convertToFalse
+ * @static
+ * @memberOf SchemaBoolean
  * @type {Set}
  * @api public
  */
@@ -188,8 +214,8 @@ Object.defineProperty(SchemaBoolean, 'convertToFalse', {
 /**
  * Casts to boolean
  *
- * @param {Object} value
- * @param {Object} model this value is optional
+ * @param {object} value
+ * @param {object} model this value is optional
  * @api private
  */
 
@@ -210,13 +236,27 @@ SchemaBoolean.prototype.cast = function(value) {
   }
 };
 
-SchemaBoolean.$conditionalHandlers =
-    utils.options(SchemaType.prototype.$conditionalHandlers, {});
+const $conditionalHandlers = { ...SchemaType.prototype.$conditionalHandlers };
+
+/**
+ * Contains the handlers for different query operators for this schema type.
+ * For example, `$conditionalHandlers.$in` is the function Mongoose calls to cast `$in` filter operators.
+ *
+ * @property $conditionalHandlers
+ * @memberOf SchemaBoolean
+ * @instance
+ * @api public
+ */
+
+Object.defineProperty(SchemaBoolean.prototype, '$conditionalHandlers', {
+  enumerable: false,
+  value: $conditionalHandlers
+});
 
 /**
  * Casts contents for queries.
  *
- * @param {String} $conditional
+ * @param {string} $conditional
  * @param {any} val
  * @api private
  */
@@ -224,16 +264,23 @@ SchemaBoolean.$conditionalHandlers =
 SchemaBoolean.prototype.castForQuery = function($conditional, val, context) {
   let handler;
   if ($conditional != null) {
-    handler = SchemaBoolean.$conditionalHandlers[$conditional];
+    handler = this.$conditionalHandlers[$conditional];
 
     if (handler) {
       return handler.call(this, val);
     }
 
-    return this.applySetters(null, val, context);
+    return this.applySetters(val, context);
   }
 
-  return this.applySetters(val, context);
+  try {
+    return this.applySetters(val, context);
+  } catch (err) {
+    if (err instanceof CastError && err.path === this.path && this.$fullPath != null) {
+      err.path = this.$fullPath;
+    }
+    throw err;
+  }
 };
 
 /**
@@ -258,6 +305,22 @@ SchemaBoolean.prototype._castNullish = function _castNullish(v) {
     return true;
   }
   return v;
+};
+
+/**
+ * Returns this schema type's representation in a JSON schema.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.useBsonType=false] If true, return a representation with `bsonType` for use with MongoDB's `$jsonSchema`.
+ * @returns {object} JSON schema properties
+ */
+
+SchemaBoolean.prototype.toJSONSchema = function toJSONSchema(options) {
+  return this._createJSONSchemaTypeDefinition('boolean', 'bool', options);
+};
+
+SchemaBoolean.prototype.autoEncryptionType = function autoEncryptionType() {
+  return 'bool';
 };
 
 /*!

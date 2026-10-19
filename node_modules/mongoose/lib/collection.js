@@ -5,7 +5,6 @@
  */
 
 const EventEmitter = require('events').EventEmitter;
-const STATES = require('./connectionstate');
 const immediate = require('./helpers/immediate');
 
 /**
@@ -13,9 +12,9 @@ const immediate = require('./helpers/immediate');
  *
  * This is the base class that drivers inherit from and implement.
  *
- * @param {String} name name of the collection
+ * @param {string} name name of the collection
  * @param {Connection} conn A MongooseConnection instance
- * @param {Object} [opts] optional collection options
+ * @param {object} [opts] optional collection options
  * @api public
  */
 
@@ -29,10 +28,10 @@ function Collection(name, conn, opts) {
   this.collectionName = name;
   this.conn = conn;
   this.queue = [];
-  this.buffer = true;
+  this.buffer = !conn?._hasOpened;
   this.emitter = new EventEmitter();
 
-  if (STATES.connected === this.conn.readyState) {
+  if (conn?._hasOpened) {
     this.onOpen();
   }
 }
@@ -87,7 +86,7 @@ Collection.prototype.onClose = function() {};
  * Queues a method for later execution when its
  * database connection opens.
  *
- * @param {String} name name of the method to queue
+ * @param {string} name name of the method to queue
  * @param {Array} args arguments to pass to the method when executed
  * @api private
  */
@@ -100,7 +99,7 @@ Collection.prototype.addQueue = function(name, args) {
 /**
  * Removes a queued method
  *
- * @param {String} name name of the method to queue
+ * @param {string} name name of the method to queue
  * @param {Array} args arguments to pass to the method when executed
  * @api private
  */
@@ -290,7 +289,7 @@ Collection.prototype._shouldBufferCommands = function _shouldBufferCommands() {
   if (opts.bufferCommands != null) {
     return opts.bufferCommands;
   }
-  if (opts && opts.schemaUserProvidedOptions != null && opts.schemaUserProvidedOptions.bufferCommands != null) {
+  if (opts?.schemaUserProvidedOptions?.bufferCommands != null) {
     return opts.schemaUserProvidedOptions.bufferCommands;
   }
 
@@ -308,16 +307,10 @@ Collection.prototype._getBufferTimeoutMS = function _getBufferTimeoutMS() {
   if (opts.bufferTimeoutMS != null) {
     return opts.bufferTimeoutMS;
   }
-  if (opts && opts.schemaUserProvidedOptions != null && opts.schemaUserProvidedOptions.bufferTimeoutMS != null) {
+  if (opts?.schemaUserProvidedOptions?.bufferTimeoutMS != null) {
     return opts.schemaUserProvidedOptions.bufferTimeoutMS;
   }
-  if (conn.config.bufferTimeoutMS != null) {
-    return conn.config.bufferTimeoutMS;
-  }
-  if (conn.base != null && conn.base.get('bufferTimeoutMS') != null) {
-    return conn.base.get('bufferTimeoutMS');
-  }
-  return 10000;
+  return conn._getBufferTimeoutMS();
 };
 
 /*!

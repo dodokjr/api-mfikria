@@ -3,32 +3,35 @@
 const cleanPositionalOperators = require('../schema/cleanPositionalOperators');
 const get = require('../get');
 const getDiscriminatorByValue = require('../discriminator/getDiscriminatorByValue');
+const getDiscriminatorValueFromFilter = require('../discriminator/getDiscriminatorValueFromFilter');
 const updatedPathsByArrayFilter = require('../update/updatedPathsByArrayFilter');
 
 /**
  * Like `schema.path()`, except with a document, because impossible to
  * determine path type without knowing the embedded discriminator key.
  * @param {Schema} schema
- * @param {Object} [update]
- * @param {Object} [filter]
- * @param {String} path
- * @param {Object} [options]
+ * @param {object} [update]
+ * @param {object} [filter]
+ * @param {string} path
+ * @param {object} [options]
  * @api private
  */
 
 module.exports = function getEmbeddedDiscriminatorPath(schema, update, filter, path, options) {
-  const parts = path.split('.');
+  const parts = path.indexOf('.') === -1 ? [path] : path.split('.');
   let schematype = null;
   let type = 'adhocOrUndefined';
 
   filter = filter || {};
   update = update || {};
-  const arrayFilters = options != null && Array.isArray(options.arrayFilters) ?
+  const arrayFilters = Array.isArray(options?.arrayFilters) ?
     options.arrayFilters : [];
   const updatedPathsByFilter = updatedPathsByArrayFilter(update);
+  let startIndex = 0;
 
   for (let i = 0; i < parts.length; ++i) {
-    const subpath = cleanPositionalOperators(parts.slice(0, i + 1).join('.'));
+    const originalSubpath = parts.slice(startIndex, i + 1).join('.');
+    const subpath = cleanPositionalOperators(originalSubpath);
     schematype = schema.path(subpath);
     if (schematype == null) {
       continue;
@@ -44,16 +47,21 @@ module.exports = function getEmbeddedDiscriminatorPath(schema, update, filter, p
       let discriminatorKey = null;
 
       if (discriminatorValuePath in filter) {
-        discriminatorKey = filter[discriminatorValuePath];
+        discriminatorKey = getDiscriminatorValueFromFilter(filter[discriminatorValuePath]);
       }
       if (discriminatorFilterPath in filter) {
-        discriminatorKey = filter[discriminatorFilterPath];
+        discriminatorKey = getDiscriminatorValueFromFilter(filter[discriminatorFilterPath]);
       }
 
       const wrapperPath = subpath.replace(/\.\d+$/, '');
       if (schematype.$isMongooseDocumentArrayElement &&
           get(filter[wrapperPath], '$elemMatch.' + key) != null) {
-        discriminatorKey = filter[wrapperPath].$elemMatch[key];
+        discriminatorKey = getDiscriminatorValueFromFilter(filter[wrapperPath].$elemMatch[key]);
+      }
+
+      const discriminatorKeyUpdatePath = originalSubpath + '.' + key;
+      if (discriminatorKeyUpdatePath in update) {
+        discriminatorKey = update[discriminatorKeyUpdatePath];
       }
 
       if (discriminatorValuePath in update) {
@@ -64,7 +72,7 @@ module.exports = function getEmbeddedDiscriminatorPath(schema, update, filter, p
         const schemaKey = updatedPathsByFilter[filterKey] + '.' + key;
         const arrayFilterKey = filterKey + '.' + key;
         if (schemaKey === discriminatorFilterPath) {
-          const filter = arrayFilters.find(filter => filter.hasOwnProperty(arrayFilterKey));
+          const filter = arrayFilters.find(filter => Object.hasOwn(filter, arrayFilterKey));
           if (filter != null) {
             discriminatorKey = filter[arrayFilterKey];
           }
@@ -75,10 +83,16 @@ module.exports = function getEmbeddedDiscriminatorPath(schema, update, filter, p
         continue;
       }
 
-      const discriminatorSchema = getDiscriminatorByValue(schematype.caster.discriminators, discriminatorKey).schema;
+      const discriminator = getDiscriminatorByValue(schematype.Constructor.discriminators, discriminatorKey);
+      const discriminatorSchema = discriminator?.schema;
+      if (discriminatorSchema == null) {
+        continue;
+      }
 
       const rest = parts.slice(i + 1).join('.');
-      schematype = discriminatorSchema.path(rest);
+      schematype = discriminatorSchema._getSchema(rest);
+      schema = discriminatorSchema;
+      startIndex = i + 1;
       if (schematype != null) {
         type = discriminatorSchema._getPathType(rest);
         break;

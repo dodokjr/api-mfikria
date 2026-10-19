@@ -4,7 +4,7 @@
 
 'use strict';
 
-const MongooseError = require('./');
+const MongooseError = require('./mongooseError');
 
 
 /**
@@ -17,7 +17,7 @@ const MongooseError = require('./');
 
 class EachAsyncMultiError extends MongooseError {
   /**
-   * @param {String} connectionString
+   * @param {string} connectionString
    */
   constructor(errors) {
     let preview = errors.map(e => e.message).join(', ');

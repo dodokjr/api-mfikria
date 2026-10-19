@@ -2,13 +2,16 @@
 
 const get = require('../get');
 const utils = require('../../utils');
+
+const simpleCollation = Object.freeze({ locale: 'simple' });
+
 /**
  * Given a Mongoose index definition (key + options objects) and a MongoDB server
  * index definition, determine if the two indexes are equal.
  *
- * @param {Object} schemaIndexKeysObject the Mongoose index spec
- * @param {Object} options the Mongoose index definition's options
- * @param {Object} dbIndex the index in MongoDB as returned by `listIndexes()`
+ * @param {object} schemaIndexKeysObject the Mongoose index spec
+ * @param {object} options the Mongoose index definition's options
+ * @param {object} dbIndex the index in MongoDB as returned by `listIndexes()`
  * @api private
  */
 
@@ -20,7 +23,6 @@ module.exports = function isIndexEqual(schemaIndexKeysObject, options, dbIndex) 
   //   key: { _fts: 'text', _ftsx: 1 },
   //   name: 'name_text',
   //   ns: 'test.tests',
-  //   background: true,
   //   weights: { name: 1 },
   //   default_language: 'english',
   //   language_override: 'language',
@@ -62,14 +64,13 @@ module.exports = function isIndexEqual(schemaIndexKeysObject, options, dbIndex) 
       continue;
     }
     if (key === 'collation') {
-      if (options[key] == null || dbIndex[key] == null) {
-        return options[key] == null && dbIndex[key] == null;
-      }
-      const definedKeys = Object.keys(options.collation);
-      const schemaCollation = options.collation;
-      const dbCollation = dbIndex.collation;
-      for (const opt of definedKeys) {
-        if (get(schemaCollation, opt) !== get(dbCollation, opt)) {
+      // No collation is equivalent to { locale: 'simple' }. MongoDB server 9
+      // reports { locale: 'simple' } for indexes created with no collation,
+      // older versions omit it.
+      const schemaCollation = options.collation ?? simpleCollation;
+      const dbCollation = dbIndex.collation ?? simpleCollation;
+      for (const opt of Object.keys(schemaCollation)) {
+        if (schemaCollation[opt] !== dbCollation[opt]) {
           return false;
         }
       }

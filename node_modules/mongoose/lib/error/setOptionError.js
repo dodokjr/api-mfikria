@@ -8,13 +8,15 @@ const MongooseError = require('./mongooseError');
 const util = require('util');
 const combinePathErrors = require('../helpers/error/combinePathErrors');
 
+/**
+ * Mongoose.set Error
+ *
+ * @api private
+ * @inherits MongooseError
+ */
+
 class SetOptionError extends MongooseError {
-  /**
-   * Mongoose.set Error
-   *
-   * @api private
-   * @inherits MongooseError
-   */
+
   constructor() {
     super('');
 
@@ -38,8 +40,8 @@ class SetOptionError extends MongooseError {
 
   /**
   * add message
-  * @param {String} key
-  * @param {String|Error} error
+  * @param {string} key
+  * @param {string|Error} error
   * @api private
   */
   addError(key, error) {
@@ -85,7 +87,7 @@ Object.defineProperty(SetOptionError.prototype, 'name', {
 class SetOptionInnerError extends MongooseError {
   /**
    * Error for the "errors" array in "SetOptionError" with consistent message
-   * @param {String} key
+   * @param {string} key
    */
   constructor(key) {
     super(`"${key}" is not a valid option to set`);

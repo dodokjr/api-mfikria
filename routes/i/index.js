@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const blogHome = require("../../json/blog/home.json")
-router.get("/ig", function (res, req)
-{
-    req.json({
+
+router.get("/ig", function (req, res) {
+    res.json({
         owner: {
             "name": "fkri.ardn",
             "name_prop": "MFikriA",
@@ -67,12 +66,11 @@ router.get("/ig", function (res, req)
             },
         ]
     });
-})
+});
 
-router.get("/blog", (res, req) =>
-{
-    req.status(200).send({
-        status: req.statusCode,
+router.get("/blog", (req, res) => {
+    res.status(200).send({
+        status: res.statusCode,
         "data": [
             {
                 "id": 1,
@@ -98,7 +96,7 @@ router.get("/blog", (res, req) =>
                     "time": "on April 12, 2024"
                 }
             },
-             {
+            {
                 "id": 3,
                 "title": "My World Blog",
                 "subtitle": "Blog Life My Personal",
@@ -123,13 +121,12 @@ router.get("/blog", (res, req) =>
                 }
             },
         ]
-    })
-})
+    });
+});
 
-router.get("/blog/post_1", (res, req) =>
-{
-    req.status(200).send({
-        status: req.statusCode,
+router.get("/blog/post_1", (req, res) => {
+    res.status(200).send({
+        status: res.statusCode,
         data: {
             postBy: {
                 creator: "Admin",
@@ -162,13 +159,12 @@ router.get("/blog/post_1", (res, req) =>
                 iframe_yt: "https://www.youtube.com/embed/sV5mqMEnC0I?si=hKD4HdSLAv8Rp-vl"
             }
         }
-    })
-})
+    });
+});
 
-router.get("/blog/post_2", (res, req) =>
-{
-    req.status(200).send({
-        status: req.statusCode,
+router.get("/blog/post_2", (req, res) => {
+    res.status(200).send({
+        status: res.statusCode,
         data: {
             postBy: {
                 creator: "Admin",
@@ -191,13 +187,12 @@ router.get("/blog/post_2", (res, req) =>
                 iframe_yt: "https://www.youtube.com/embed/A-nV1o_IBmk?si=Fg-cb_YBwwF3k3Yv"
             }
         }
-    })
-})
+    });
+});
 
-router.get("/blog/post_3", (res, req) =>
-{
-    req.status(200).send({
-        status: req.statusCode,
+router.get("/blog/post_3", (req, res) => {
+    res.status(200).send({
+        status: res.statusCode,
         data: {
             postBy: {
                 creator: "Admin",
@@ -219,13 +214,12 @@ router.get("/blog/post_3", (res, req) =>
                 iframe_yt: "https://www.youtube.com/embed/E1SBwfT2Jsw?si=TFekOHJdhP6iwbuz"
             }
         }
-    })
-})
+    });
+});
 
-router.get("/blog/post_4", (res, req) =>
-{
-    req.status(200).send({
-        status: req.statusCode,
+router.get("/blog/post_4", (req, res) => {
+    res.status(200).send({
+        status: res.statusCode,
         data: {
             postBy: {
                 creator: "Admin",
@@ -239,7 +233,7 @@ router.get("/blog/post_4", (res, req) =>
             content:
             {
                 descriptions: [
-                    "Meski baru akan meluncur 1 Oktober nanti, FIFA 22 sudah bisa dipesan oleh para penggemar dari sekarang.", 
+                    "Meski baru akan meluncur 1 Oktober nanti, FIFA 22 sudah bisa dipesan oleh para penggemar dari sekarang.",
                     "Ada dua edisi yang ditawarkan EA, yaitu FIFA 22 - Standard Edition dan FIFA 22 - Ultimate Edition. Di Indonesia, pengguna sudah bisa memesan game tersebut di situs web resmi EA, atau di perangkat dan konsolnya masing-masing, dengan harga sebagai berikut. FIFA 22 - Standard Edition Baca juga: Alasan Belanda Hobi Tanam Pohon Asam Jawa di Pinggir Jalan - PS4: Rp 849.000 - PS5: Rp 1.009.000 - PC: Rp 659.000 FIFA 22 - Ultimate Edition - PS4 & PS5: Rp 1.409.000 - PC: Rp 999.000 Pengguna yang memesan FIFA 22 - Ultimate Edition tentunya bakal mendapatkan sejumlah benefit ekstra, salah satunya adalah. Artinya, apabila membeli edisi `Ultimate Edition`, pengguna bakal mendapatkan FIFA 22 untuk dua versi konsol game sekaligus secara cuma-cuma (free upgrade), yaitu untuk PS4 dan PS5 atau Xbox One dan Xbox Series X/S. Baca juga: Sony Diskon Harga Game hingga 80 Persen di PlayStation Store, Ini Rekomendasinya Lalu, mereka juga bakal mendapatkan sejumlah hadiah edisi terbatas, seperti in-game items berupa FUT Heroes Player, 4.600 FIFA Points, Team of the Week 1 Player, dan masih banyak lagi. Selain itu, mereka yang memesan FIFA 22 - Ultimate Edition juga bakal bisa memainkan game tersebut lebih awal pada 27 September 2021,",
                     "sebagaimana dirangkum KompasTekno dari EA.com, Selasa (13/7/2021)."
                 ],
@@ -247,14 +241,15 @@ router.get("/blog/post_4", (res, req) =>
                 iframe_yt: "https://www.youtube.com/embed/vUJis1UBI5w?si=LZ-RVn5O2y42VDUL"
             }
         }
-    })
-})
+    });
+});
 
-router.get("/*", (res, req) =>
-{
-    req.status(404).send({
-        status: req.statusCode,
+// 404 catch-all (Express 5: tanpa wildcard, harus tetap paling bawah)
+router.use((req, res) => {
+    res.status(404).send({
+        status: res.statusCode,
         message: "error Page"
-    })
-})
-module.exports = router
+    });
+});
+
+module.exports = router;

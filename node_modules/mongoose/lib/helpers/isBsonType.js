@@ -1,14 +1,13 @@
 'use strict';
 
 /**
- * Get the bson type, if it exists
+ * Determines if `obj` has the given BSON type.
  * @api private
  */
 
 function isBsonType(obj, typename) {
   return (
-    typeof obj === 'object' &&
-    obj !== null &&
+    obj != null &&
     obj._bsontype === typename
   );
 }

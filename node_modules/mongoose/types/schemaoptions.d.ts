@@ -7,6 +7,13 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
+  type SchemaOptionsStaticsPropertyType<TStaticMethods, TModelType> = IfEquals<
+    TStaticMethods,
+    {},
+    Record<string, (...args: any[]) => unknown> & ThisType<TModelType>,
+    { [K in keyof TStaticMethods]: OmitThisParameter<TStaticMethods[K]> } & ThisType<TModelType>
+  >;
+
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
@@ -16,7 +23,8 @@ declare module 'mongoose' {
     QueryHelpers = {},
     TStaticMethods = {},
     TVirtuals = {},
-    THydratedDocumentType = HydratedDocument<DocType, TInstanceMethods, QueryHelpers>
+    THydratedDocumentType = HydratedDocument<DocType, TVirtuals & TInstanceMethods, QueryHelpers>,
+    TModelType = Model<DocType, QueryHelpers, TInstanceMethods, TVirtuals, THydratedDocumentType>
   > {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
@@ -24,6 +32,11 @@ declare module 'mongoose' {
      * automatic index builds, you can set autoIndex to false.
      */
     autoIndex?: boolean;
+    /**
+     * Similar to autoIndex, except for automatically creates any Atlas search indexes defined in your
+     * schema. Unlike autoIndex, this option defaults to false.
+     */
+    autoSearchIndex?: boolean;
     /**
      * If set to `true`, Mongoose will call Model.createCollection() to create the underlying collection
      * in MongoDB if autoCreate is set to true. Calling createCollection() sets the collection's default
@@ -48,6 +61,12 @@ declare module 'mongoose' {
     capped?: boolean | number | { size?: number; max?: number; autoIndexId?: boolean; };
     /** Sets a default collation for every query and aggregation. */
     collation?: mongodb.CollationOptions;
+
+    /** Arbitrary options passed to `createCollection()` */
+    collectionOptions?: mongodb.CreateCollectionOptions;
+
+    /** Default lean options for queries */
+    lean?: boolean | LeanOptions;
 
     /** The timeseries option to use when creating the model's collection. */
     timeseries?: mongodb.TimeSeriesCollectionOptions;
@@ -99,9 +118,12 @@ declare module 'mongoose' {
     /**
      * Optimistic concurrency is a strategy to ensure the document you're updating didn't change between when you
      * loaded it using find() or findOne(), and when you update it using save(). Set to `true` to enable
-     * optimistic concurrency.
+     * optimistic concurrency for all fields. Set to a string array to enable optimistic concurrency only for
+     * the specified fields; note that this **replaces** the default array versioning behavior. Set to
+     * `{ exclude: string[] }` to enable optimistic concurrency for all fields except the specified ones;
+     * this also **replaces** the default array versioning.
      */
-    optimisticConcurrency?: boolean;
+    optimisticConcurrency?: boolean | string[] | { exclude: string[] };
     /**
      * If `plugin()` called with tags, Mongoose will only apply plugins to schemas that have
      * a matching tag in `pluginTags`
@@ -112,6 +134,10 @@ declare module 'mongoose' {
      * to all queries derived from a model.
      */
     read?: string;
+    /**
+     * Set a default readConcern for all queries at the schema level
+     */
+    readConcern?: { level: 'local' | 'available' | 'majority' | 'snapshot' | 'linearizable' }
     /** Allows setting write concern at the schema level. */
     writeConcern?: WriteConcern;
     /** defaults to true. */
@@ -132,15 +158,20 @@ declare module 'mongoose' {
      * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
      */
     strictQuery?: boolean | 'throw';
+    /**
+     * May be `false`, `true`, or `'throw'`. Sets the default
+     * [strictRead](https://mongoosejs.com/docs/guide.html#strictRead) mode for schemas.
+     */
+    strictRead?: boolean | 'throw';
     /** Exactly the same as the toObject option but only applies when the document's toJSON method is called. */
-    toJSON?: ToObjectOptions;
+    toJSON?: ToObjectOptions<DocType, THydratedDocumentType>;
     /**
      * Documents have a toObject method which converts the mongoose document into a plain JavaScript object.
      * This method accepts a few options. Instead of applying these options on a per-document basis, we may
      * declare the options at the schema level and have them applied to all of the schema's documents by
      * default.
      */
-    toObject?: ToObjectOptions;
+    toObject?: ToObjectOptions<DocType, THydratedDocumentType>;
     /**
      * By default, if you have an object with key 'type' in your schema, mongoose will interpret it as a
      * type declaration. However, for applications like geoJSON, the 'type' property is important. If you want to
@@ -155,13 +186,18 @@ declare module 'mongoose' {
      */
     validateBeforeSave?: boolean;
     /**
+     * By default, validation will run on modified and required paths before saving to the database.
+     * You can choose to have Mongoose only validate modified paths by setting validateModifiedOnly to true.
+     */
+    validateModifiedOnly?: boolean;
+    /**
      * The versionKey is a property set on each document when first created by Mongoose. This keys value
      * contains the internal revision of the document. The versionKey option is a string that represents
      * the path to use for versioning. The default is '__v'.
      *
      * @default '__v'
      */
-    versionKey?: string | boolean;
+    versionKey?: string | false;
     /**
      * By default, Mongoose will automatically select() any populated paths for you, unless you explicitly exclude them.
      *
@@ -198,12 +234,7 @@ declare module 'mongoose' {
     /**
      * Model Statics methods.
      */
-    statics?: IfEquals<
-    TStaticMethods,
-    {},
-    Record<any, (this: Model<DocType>, ...args: any) => unknown>,
-    TStaticMethods
-    >
+    statics?: SchemaOptionsStaticsPropertyType<TStaticMethods, TModelType>
 
     /**
      * Document instance methods.
@@ -212,7 +243,7 @@ declare module 'mongoose' {
     TInstanceMethods,
     {},
     Record<any, (this: THydratedDocumentType, ...args: any) => unknown>,
-    TInstanceMethods
+    AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject
     >
 
     /**
@@ -221,7 +252,7 @@ declare module 'mongoose' {
     query?: IfEquals<
     QueryHelpers,
     {},
-    Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType>>(this: T, ...args: any) => T>,
+    Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType, QueryHelpers, DocType>>(this: T, ...args: any) => T>,
     QueryHelpers
     >
 
@@ -234,19 +265,25 @@ declare module 'mongoose' {
     /**
      * Virtual paths.
      */
-    virtuals?: SchemaOptionsVirtualsPropertyType<DocType, TVirtuals, TInstanceMethods>,
+    virtuals?: SchemaOptionsVirtualsPropertyType<any, TVirtuals, THydratedDocumentType>,
 
     /**
      * Set to `true` to default to overwriting models with the same name when calling `mongoose.model()`, as opposed to throwing an `OverwriteModelError`.
      * @default false
      */
     overwriteModels?: boolean;
+
+    /**
+     *  Required when the schema is encrypted.
+     */
+    encryptionType?: 'csfle' | 'queryableEncryption';
   }
 
   interface DefaultSchemaOptions {
     typeKey: 'type';
     id: true;
     _id: true;
+    discriminatorKey: '__t';
     timestamps: false;
     versionKey: '__v'
   }

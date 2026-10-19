@@ -4,71 +4,25 @@
 
 'use strict';
 
-const MongooseBuffer = require('../types/buffer');
-const SchemaType = require('../schematype');
+const SchemaType = require('../schemaType');
 const CastError = SchemaType.CastError;
+const castUUID = require('../cast/uuid');
 const utils = require('../utils');
-const isBsonType = require('../helpers/isBsonType');
 const handleBitwiseOperator = require('./operators/bitwise');
 
-const UUID_FORMAT = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
-const Binary = MongooseBuffer.Binary;
-
-/**
- * Helper function to convert the input hex-string to a buffer
- * @param {String} hex The hex string to convert
- * @returns {Buffer} The hex as buffer
- * @api private
- */
-
-function hex2buffer(hex) {
-  // use buffer built-in function to convert from hex-string to buffer
-  const buff = hex != null && Buffer.from(hex, 'hex');
-  return buff;
-}
-
-/**
- * Helper function to convert the buffer input to a string
- * @param {Buffer} buf The buffer to convert to a hex-string
- * @returns {String} The buffer as a hex-string
- * @api private
- */
-
-function binary2hex(buf) {
-  // use buffer built-in function to convert from buffer to hex-string
-  const hex = buf != null && buf.toString('hex');
-  return hex;
-}
-
-/**
- * Convert a String to Binary
- * @param {String} uuidStr The value to process
- * @returns {MongooseBuffer} The binary to store
- * @api private
- */
-
-function stringToBinary(uuidStr) {
-  // Protect against undefined & throwing err
-  if (typeof uuidStr !== 'string') uuidStr = '';
-  const hex = uuidStr.replace(/[{}-]/g, ''); // remove extra characters
-  const bytes = hex2buffer(hex);
-  const buff = new MongooseBuffer(bytes);
-  buff._subtype = 4;
-
-  return buff;
-}
+const UUID_FORMAT = castUUID.UUID_FORMAT;
 
 /**
  * Convert binary to a uuid string
- * @param {Buffer|Binary|String} uuidBin The value to process
- * @returns {String} The completed uuid-string
+ * @param {Buffer|Binary|string} uuidBin The value to process
+ * @returns {string} The completed uuid-string
  * @api private
  */
 function binaryToString(uuidBin) {
   // i(hasezoey) dont quite know why, but "uuidBin" may sometimes also be the already processed string
   let hex;
   if (typeof uuidBin !== 'string' && uuidBin != null) {
-    hex = binary2hex(uuidBin);
+    hex = uuidBin.toString('hex');
     const uuidStr = hex.substring(0, 8) + '-' + hex.substring(8, 8 + 4) + '-' + hex.substring(12, 12 + 4) + '-' + hex.substring(16, 16 + 4) + '-' + hex.substring(20, 20 + 12);
     return uuidStr;
   }
@@ -78,15 +32,16 @@ function binaryToString(uuidBin) {
 /**
  * UUIDv1 SchemaType constructor.
  *
- * @param {String} key
- * @param {Object} options
+ * @param {string} key
+ * @param {object} options
+ * @param {object} _schemaOptions
+ * @param {Schema} parentSchema
  * @inherits SchemaType
  * @api public
  */
 
-function SchemaUUID(key, options) {
-  SchemaType.call(this, key, options, 'UUID');
-  this.getters.push(binaryToString);
+function SchemaUUID(key, options, _schemaOptions, parentSchema) {
+  SchemaType.call(this, key, options, 'UUID', parentSchema);
 }
 
 /**
@@ -109,44 +64,27 @@ SchemaUUID.prototype.constructor = SchemaUUID;
  * ignore
  */
 
-SchemaUUID._cast = function(value) {
-  if (value === null) {
-    return value;
-  }
+SchemaUUID._cast = castUUID;
 
-  function newBuffer(initbuff) {
-    const buff = new MongooseBuffer(initbuff);
-    buff._subtype = 4;
-    return buff;
-  }
+/**
+ * Attaches a getter for all UUID instances.
+ *
+ * #### Example:
+ *
+ *     // Note that `v` is a string by default
+ *     mongoose.Schema.UUID.get(v => v.toUpperCase());
+ *
+ *     const Model = mongoose.model('Test', new Schema({ test: 'UUID' }));
+ *     new Model({ test: uuid.v4() }).test; // UUID with all uppercase
+ *
+ * @param {Function} getter
+ * @return {this}
+ * @function get
+ * @static
+ * @api public
+ */
 
-  if (typeof value === 'string') {
-    if (UUID_FORMAT.test(value)) {
-      return stringToBinary(value);
-    } else {
-      throw new CastError(SchemaUUID.schemaName, value, this.path);
-    }
-  }
-
-  if (Buffer.isBuffer(value)) {
-    return newBuffer(value);
-  }
-
-  if (value instanceof Binary) {
-    return newBuffer(value.value(true));
-  }
-
-  // Re: gh-647 and gh-3030, we're ok with casting using `toString()`
-  // **unless** its the default Object.toString, because "[object Object]"
-  // doesn't really qualify as useful data
-  if (value.toString && value.toString !== Object.prototype.toString) {
-    if (UUID_FORMAT.test(value.toString())) {
-      return stringToBinary(value.toString());
-    }
-  }
-
-  throw new CastError(SchemaUUID.schemaName, value, this.path);
-};
+SchemaUUID.get = SchemaType.get;
 
 /**
  * Sets a default option for all UUID instances.
@@ -159,8 +97,8 @@ SchemaUUID._cast = function(value) {
  *     const User = mongoose.model('User', new Schema({ test: mongoose.UUID }));
  *     new User({ }).validateSync().errors.test.message; // Path `test` is required.
  *
- * @param {String} option The option you'd like to set the value for
- * @param {Any} value value for option
+ * @param {string} option The option you'd like to set the value for
+ * @param {any} value value for option
  * @return {undefined}
  * @function set
  * @static
@@ -168,6 +106,8 @@ SchemaUUID._cast = function(value) {
  */
 
 SchemaUUID.set = SchemaType.set;
+
+SchemaUUID.setters = [];
 
 /**
  * Get/set the function used to cast arbitrary values to UUIDs.
@@ -225,8 +165,8 @@ SchemaUUID.checkRequired = SchemaType.checkRequired;
 /**
  * Check if the given value satisfies a required validator.
  *
- * @param {Any} value
- * @return {Boolean}
+ * @param {any} value
+ * @return {boolean}
  * @api public
  */
 
@@ -240,19 +180,16 @@ SchemaUUID.prototype.checkRequired = function checkRequired(value) {
 /**
  * Casts to UUID
  *
- * @param {Object} value
- * @param {Object} doc
- * @param {Boolean} init whether this is an initialization cast
+ * @param {object} value
+ * @param {object} doc
+ * @param {boolean} init whether this is an initialization cast
  * @api private
  */
 
-SchemaUUID.prototype.cast = function(value, doc, init) {
-  if (SchemaType._isRef(this, value, doc, init)) {
-    if (isBsonType(value, 'UUID')) {
-      return value;
-    }
-
-    return this._castRef(value, doc, init);
+SchemaUUID.prototype.cast = function(value, doc, init, prev, options) {
+  if (utils.isNonBuiltinObject(value) &&
+      SchemaType._isRef(this, value, doc, init)) {
+    return this._castRef(value, doc, init, options);
   }
 
   let castFn;
@@ -289,26 +226,37 @@ function handleArray(val) {
   });
 }
 
-SchemaUUID.prototype.$conditionalHandlers =
-utils.options(SchemaType.prototype.$conditionalHandlers, {
+const $conditionalHandlers = {
+  ...SchemaType.prototype.$conditionalHandlers,
   $bitsAllClear: handleBitwiseOperator,
   $bitsAnyClear: handleBitwiseOperator,
   $bitsAllSet: handleBitwiseOperator,
   $bitsAnySet: handleBitwiseOperator,
   $all: handleArray,
-  $gt: handleSingle,
-  $gte: handleSingle,
   $in: handleArray,
-  $lt: handleSingle,
-  $lte: handleSingle,
   $ne: handleSingle,
   $nin: handleArray
+};
+
+/**
+ * Contains the handlers for different query operators for this schema type.
+ * For example, `$conditionalHandlers.$exists` is the function Mongoose calls to cast `$exists` filter operators.
+ *
+ * @property $conditionalHandlers
+ * @memberOf SchemaUUID
+ * @instance
+ * @api public
+ */
+
+Object.defineProperty(SchemaUUID.prototype, '$conditionalHandlers', {
+  enumerable: false,
+  value: $conditionalHandlers
 });
 
 /**
  * Casts contents for queries.
  *
- * @param {String} $conditional
+ * @param {string} $conditional
  * @param {any} val
  * @api private
  */
@@ -320,9 +268,32 @@ SchemaUUID.prototype.castForQuery = function($conditional, val, context) {
     if (!handler)
       throw new Error('Can\'t use ' + $conditional + ' with UUID.');
     return handler.call(this, val, context);
-  } else {
-    return this.cast(val);
   }
+
+  try {
+    return this.applySetters(val, context);
+  } catch (err) {
+    if (err instanceof CastError && err.path === this.path && this.$fullPath != null) {
+      err.path = this.$fullPath;
+    }
+    throw err;
+  }
+};
+
+/**
+ * Returns this schema type's representation in a JSON schema.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.useBsonType=false] If true, return a representation with `bsonType` for use with MongoDB's `$jsonSchema`.
+ * @returns {object} JSON schema properties
+ */
+
+SchemaUUID.prototype.toJSONSchema = function toJSONSchema(options) {
+  return this._createJSONSchemaTypeDefinition('string', 'binData', options);
+};
+
+SchemaUUID.prototype.autoEncryptionType = function autoEncryptionType() {
+  return 'binData';
 };
 
 /*!

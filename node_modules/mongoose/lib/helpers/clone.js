@@ -11,18 +11,22 @@ const isObject = require('./isObject');
 const isPOJO = require('./isPOJO');
 const symbols = require('./symbols');
 const trustedSymbol = require('./query/trusted').trustedSymbol;
+const BSON = require('mongodb/lib/bson');
+const UUID = BSON.UUID;
+
+const Binary = BSON.Binary;
 
 /**
  * Object clone with Mongoose natives support.
  *
  * If options.minimize is true, creates a minimal data object. Empty objects and undefined values will not be cloned. This makes the data payload sent to MongoDB as small as possible.
  *
- * Functions are never cloned.
+ * Functions and primitives are never cloned.
  *
- * @param {Object} obj the object to clone
- * @param {Object} options
- * @param {Boolean} isArrayChild true if cloning immediately underneath an array. Special case for minimize.
- * @return {Object} the cloned object
+ * @param {object} obj the object to clone
+ * @param {object} options
+ * @param {boolean} isArrayChild true if cloning immediately underneath an array. Special case for minimize.
+ * @return {object} the cloned object
  * @api private
  */
 
@@ -31,31 +35,58 @@ function clone(obj, options, isArrayChild) {
     return obj;
   }
 
+  if (isBsonType(obj, 'Double')) {
+    return new BSON.Double(obj.value);
+  }
+  if (typeof obj === 'number' || typeof obj === 'string' || typeof obj === 'boolean' || typeof obj === 'bigint') {
+    return obj;
+  }
+
   if (Array.isArray(obj)) {
-    return cloneArray(isMongooseArray(obj) ? obj.__array : obj, options);
+    return cloneArray(obj, options);
   }
 
   if (isMongooseObject(obj)) {
-    // Single nested subdocs should apply getters later in `applyGetters()`
-    // when calling `toObject()`. See gh-7442, gh-8295
-    if (options && options._skipSingleNestedGetters && obj.$isSingleNested) {
-      options = Object.assign({}, options, { getters: false });
+    if (options) {
+      if (options.flattenUUIDs) {
+        if (obj instanceof Binary && obj._subtype === Binary.SUBTYPE_UUID) {
+          return obj.toString();
+        }
+        if (obj?.isMongooseBuffer && obj._subtype === Binary.SUBTYPE_UUID) {
+          return obj.toUUID().toString();
+        }
+      }
+      if (options.retainDocuments && obj.$__ != null) {
+        const clonedDoc = obj.$clone();
+        if (obj.__index != null) {
+          clonedDoc.__index = obj.__index;
+        }
+        if (obj.__parentArray != null) {
+          clonedDoc.__parentArray = options.parentArray ?? obj.__parentArray;
+        }
+        clonedDoc.$__setParent(options.parentDoc ?? obj.$__parent);
+        return clonedDoc;
+      }
+      if (options.retainDocuments && obj.$isMongooseMap) {
+        const clonedParent = options.parentDoc ?? obj.$__parent;
+        const MongooseMap = obj.constructor;
+        const ret = new MongooseMap({}, obj.$__path, clonedParent, obj.$__schemaType);
+        for (const [key, value] of obj) {
+          ret.$__set(key, clone(value, { ...options, parentDoc: clonedParent }));
+        }
+        return ret;
+      }
     }
-    const isSingleNested = obj.$isSingleNested;
 
     if (isPOJO(obj) && obj.$__ != null && obj._doc != null) {
       return obj._doc;
     }
 
     let ret;
-    if (options && options.json && typeof obj.toJSON === 'function') {
+    if (options?.json && typeof obj.toJSON === 'function') {
       ret = obj.toJSON(options);
     } else {
       ret = obj.toObject(options);
-    }
-
-    if (options && options.minimize && isSingleNested && Object.keys(ret).length === 0) {
-      return undefined;
     }
 
     return ret;
@@ -78,14 +109,24 @@ function clone(obj, options, isArrayChild) {
   }
 
   if (isBsonType(obj, 'ObjectId')) {
+    if (options?.flattenObjectIds) {
+      return obj.toJSON();
+    }
     return new ObjectId(obj.id);
   }
 
   if (isBsonType(obj, 'Decimal128')) {
-    if (options && options.flattenDecimals) {
+    if (options?.flattenDecimals) {
       return obj.toJSON();
     }
     return Decimal.fromString(obj.toString());
+  }
+
+  if (obj instanceof UUID) {
+    if (options?.flattenUUIDs) {
+      return obj.toJSON();
+    }
+    return new UUID(obj.buffer);
   }
 
   // object created with Object.create(null)
@@ -100,7 +141,7 @@ function clone(obj, options, isArrayChild) {
   // If we're cloning this object to go into a MongoDB command,
   // and there's a `toBSON()` function, assume this object will be
   // stored as a primitive in MongoDB and doesn't need to be cloned.
-  if (options && options.bson && typeof obj.toBSON === 'function') {
+  if (options?.bson && typeof obj.toBSON === 'function') {
     return obj;
   }
 
@@ -117,9 +158,9 @@ module.exports = clone;
  */
 
 function cloneObject(obj, options, isArrayChild) {
-  const minimize = options && options.minimize;
-  const omitUndefined = options && options.omitUndefined;
-  const seen = options && options._seen;
+  const minimize = options?.minimize;
+  const omitUndefined = options?.omitUndefined;
+  const seen = options?._seen;
   const ret = {};
   let hasKeys;
 
@@ -128,17 +169,16 @@ function cloneObject(obj, options, isArrayChild) {
   } else if (seen) {
     seen.set(obj, ret);
   }
-  if (trustedSymbol in obj) {
+  if (trustedSymbol in obj && options?.copyTrustedSymbol !== false) {
     ret[trustedSymbol] = obj[trustedSymbol];
   }
 
-  let i = 0;
-  let key = '';
   const keys = Object.keys(obj);
   const len = keys.length;
 
-  for (i = 0; i < len; ++i) {
-    if (specialProperties.has(key = keys[i])) {
+  for (let i = 0; i < len; ++i) {
+    const key = keys[i];
+    if (specialProperties.has(key)) {
       continue;
     }
 
@@ -157,11 +197,56 @@ function cloneObject(obj, options, isArrayChild) {
 }
 
 function cloneArray(arr, options) {
+  const seen = options?._seen;
+  if (seen && seen.has(arr)) {
+    return seen.get(arr);
+  }
+
   let i = 0;
   const len = arr.length;
-  const ret = new Array(len);
-  for (i = 0; i < len; ++i) {
-    ret[i] = clone(arr[i], options, true);
+
+  let ret = null;
+  if (options?.retainDocuments) {
+    // Use the cloned parent doc (options.parentDoc) when available so the new
+    // array is wired up to the clone, not the source. Falling back to the
+    // source's parent preserves the previous behavior for callers that don't
+    // pass parentDoc.
+    const newParent = options.parentDoc ?? (arr.isMongooseArray ? arr.$parent() : undefined);
+    if (arr.isMongooseDocumentArray) {
+      ret = new (arr.$schemaType().schema.base.Types.DocumentArray)([], arr.$path(), newParent, arr.$schemaType());
+    } else if (arr.isMongooseArray) {
+      ret = new (arr.$parent().schema.base.Types.Array)([], arr.$path(), newParent, arr.$schemaType());
+    } else {
+      ret = new Array(len);
+    }
+  } else {
+    ret = new Array(len);
+  }
+
+  if (seen) {
+    seen.set(arr, ret);
+  }
+
+  arr = isMongooseArray(arr) ? arr.__array : arr;
+  if (ret.isMongooseDocumentArray) {
+    // Create new options object to avoid mutating the shared options.
+    // Subdocs need parentArray to point to their own cloned array.
+    options = { ...options, parentArray: ret };
+    // Skip change-tracking while populating the freshly cloned array: every
+    // index assignment would otherwise call markModified on the cloned parent
+    // doc and (before this guard) on the source parent doc.
+    for (i = 0; i < len; ++i) {
+      const doc = clone(arr[i], options, true);
+      // Document arrays can contain null entries, so only restamp actual subdocs.
+      if (typeof doc?.$setIndex === 'function') {
+        doc.$setIndex(i);
+      }
+      ret.set(i, doc, true);
+    }
+  } else {
+    for (i = 0; i < len; ++i) {
+      ret[i] = clone(arr[i], options, true);
+    }
   }
 
   return ret;

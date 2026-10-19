@@ -3,53 +3,60 @@
 module.exports = parallelLimit;
 
 /*!
- * ignore
+ * Run `fn` over every entry of `params` with at most `limit` calls in flight at
+ * a time, resolving to the results in input order. Currently only used by
+ * `Model.insertMany()` to bound how many documents validate concurrently.
  */
 
-function parallelLimit(fns, limit, callback) {
-  let numInProgress = 0;
-  let numFinished = 0;
-  let error = null;
-
+async function parallelLimit(params, fn, limit) {
   if (limit <= 0) {
     throw new Error('Limit must be positive');
   }
 
-  if (fns.length === 0) {
-    return callback(null, []);
+  const length = params.length;
+  if (length === 0) {
+    return [];
   }
 
-  for (let i = 0; i < fns.length && i < limit; ++i) {
-    _start();
+  const results = new Array(length);
+  // Fast path: there's nothing to bound, so kick everything off and wait once.
+  // Avoids the per-task `Set` + `Promise.race` bookkeeping of a sliding window.
+  if (limit >= length) {
+    for (let i = 0; i < length; ++i) {
+      results[i] = fn(params[i], i);
+    }
+    return Promise.all(results);
   }
 
-  function _start() {
-    fns[numFinished + numInProgress](_done(numFinished + numInProgress));
-    ++numInProgress;
-  }
+  let nextIndex = 0;
+  let firstError = null;
 
-  const results = [];
-
-  function _done(index) {
-    return (err, res) => {
-      --numInProgress;
-      ++numFinished;
-
-      if (error != null) {
-        return;
+  function worker() {
+    if (nextIndex >= length || firstError !== null) {
+      return undefined;
+    }
+    const index = nextIndex++;
+    return Promise.resolve(fn(params[index], index)).then(
+      (val) => {
+        results[index] = val;
+        return worker();
+      },
+      (err) => {
+        if (firstError === null) {
+          firstError = err;
+        }
       }
-      if (err != null) {
-        error = err;
-        return callback(error);
-      }
-
-      results[index] = res;
-
-      if (numFinished === fns.length) {
-        return callback(null, results);
-      } else if (numFinished + numInProgress < fns.length) {
-        _start();
-      }
-    };
+    );
   }
+
+  const workers = new Array(Math.min(limit, length));
+  for (let i = 0; i < workers.length; ++i) {
+    workers[i] = worker();
+  }
+  await Promise.all(workers);
+
+  if (firstError !== null) {
+    throw firstError;
+  }
+  return results;
 }

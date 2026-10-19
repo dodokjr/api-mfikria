@@ -9,6 +9,7 @@ declare module 'mongoose' {
     | PipelineStage.CollStats
     | PipelineStage.Count
     | PipelineStage.Densify
+    | PipelineStage.Documents
     | PipelineStage.Facet
     | PipelineStage.Fill
     | PipelineStage.GeoNear
@@ -28,6 +29,7 @@ declare module 'mongoose' {
     | PipelineStage.ReplaceWith
     | PipelineStage.Sample
     | PipelineStage.Search
+    | PipelineStage.SearchMeta
     | PipelineStage.Set
     | PipelineStage.SetWindowFields
     | PipelineStage.Skip
@@ -35,7 +37,8 @@ declare module 'mongoose' {
     | PipelineStage.SortByCount
     | PipelineStage.UnionWith
     | PipelineStage.Unset
-    | PipelineStage.Unwind;
+    | PipelineStage.Unwind
+    | PipelineStage.VectorSearch;
 
   export namespace PipelineStage {
     export interface AddFields {
@@ -91,6 +94,11 @@ declare module 'mongoose' {
       }
     }
 
+    export interface Documents {
+      /** [`$documents` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/documents/) */
+      $documents: Record<string, Expression>[]
+    }
+
     export interface Fill {
       /** [`$fill` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/fill/) */
       $fill: {
@@ -107,6 +115,7 @@ declare module 'mongoose' {
     }
 
     export type FacetPipelineStage = Exclude<PipelineStage, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>;
+    export type UnionWithPipelineStage = Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>;
 
     export interface GeoNear {
       /** [`$geoNear` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/) */
@@ -176,7 +185,7 @@ declare module 'mongoose' {
 
     export interface Match {
       /** [`$match` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/match/) */
-      $match: FilterQuery<any>;
+      $match: QueryFilter<any>;
     }
 
     export interface Merge {
@@ -239,6 +248,20 @@ declare module 'mongoose' {
       }
     }
 
+    export interface SearchMeta {
+      /** [`$searchMeta` reference](https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-searchMeta) */
+      $searchMeta: {
+        index?: string;
+        highlight?: {
+          /** [`highlightPath` reference](https://docs.atlas.mongodb.com/atlas-search/path-construction/#multiple-field-search) */
+          path: string | string[] | { value: string, multi: string };
+          maxCharsToExamine?: number;
+          maxNumPassages?: number;
+        };
+        [operator: string]: any;
+      }
+    }
+
     export interface Set {
       /** [`$set` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/set/) */
       $set: Record<string, AnyExpression | any>
@@ -281,7 +304,8 @@ declare module 'mongoose' {
       /** [`$unionWith` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unionWith/) */
       $unionWith:
       | string
-      | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
+      | { coll: string; pipeline?: UnionWithPipelineStage[] }
+      | { coll?: string; pipeline: UnionWithPipelineStage[] }
     }
 
     export interface Unset {
@@ -293,5 +317,18 @@ declare module 'mongoose' {
       /** [`$unwind` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/) */
       $unwind: string | { path: string; includeArrayIndex?: string; preserveNullAndEmptyArrays?: boolean }
     }
+    export interface VectorSearch {
+      /** [`$vectorSearch` reference](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/) */
+      $vectorSearch: {
+        exact?: boolean;
+        index: string,
+        path: string,
+        queryVector: number[],
+        numCandidates?: number,
+        limit: number,
+        filter?: Expression,
+      }
+    }
+
   }
 }

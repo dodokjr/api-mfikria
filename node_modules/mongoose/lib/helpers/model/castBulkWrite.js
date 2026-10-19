@@ -1,221 +1,311 @@
 'use strict';
 
+const MongooseError = require('../../error/mongooseError');
 const getDiscriminatorByValue = require('../../helpers/discriminator/getDiscriminatorByValue');
 const applyTimestampsToChildren = require('../update/applyTimestampsToChildren');
 const applyTimestampsToUpdate = require('../update/applyTimestampsToUpdate');
 const cast = require('../../cast');
 const castUpdate = require('../query/castUpdate');
+const { castArrayFiltersForUpdate } = require('../update/castArrayFilters');
+const clone = require('../clone');
+const decorateUpdateWithVersionKey = require('../update/decorateUpdateWithVersionKey');
+const { inspect } = require('util');
 const setDefaultsOnInsert = require('../setDefaultsOnInsert');
 
 /**
  * Given a model and a bulkWrite op, return a thunk that handles casting and
  * validating the individual op.
  * @param {Model} originalModel
- * @param {Object} op
- * @param {Object} [options]
+ * @param {object} op
+ * @param {object} [options]
  * @api private
  */
 
 module.exports = function castBulkWrite(originalModel, op, options) {
-  const now = originalModel.base.now();
+  let now;
+  const timestampOpts = originalModel.schema.get('timestamps');
+  if (typeof timestampOpts?.currentTime === 'function') {
+    now = timestampOpts.currentTime();
+  } else {
+    now = originalModel.base.now();
+  }
 
   if (op['insertOne']) {
-    return (callback) => {
-      const model = decideModelByObject(originalModel, op['insertOne']['document']);
-
-      const doc = new model(op['insertOne']['document']);
-      if (model.schema.options.timestamps && options.timestamps !== false) {
-        doc.initializeTimestamps();
-      }
-      if (options.session != null) {
-        doc.$session(options.session);
-      }
-      op['insertOne']['document'] = doc;
-
-      if (options.skipValidation || op['insertOne'].skipValidation) {
-        callback(null);
-        return;
-      }
-
-      op['insertOne']['document'].$validate().then(
-        () => { callback(null); },
-        err => { callback(err, null); }
-      );
-    };
+    return callback => module.exports.castInsertOne(originalModel, op['insertOne'], options).then(() => callback(null), err => callback(err));
   } else if (op['updateOne']) {
     return (callback) => {
       try {
-        if (!op['updateOne']['filter']) {
-          throw new Error('Must provide a filter object.');
-        }
-        if (!op['updateOne']['update']) {
-          throw new Error('Must provide an update object.');
-        }
-
-        const model = decideModelByObject(originalModel, op['updateOne']['filter']);
-        const schema = model.schema;
-        const strict = options.strict != null ? options.strict : model.schema.options.strict;
-
-        _addDiscriminatorToObject(schema, op['updateOne']['filter']);
-
-        if (model.schema.$timestamps != null && op['updateOne'].timestamps !== false) {
-          const createdAt = model.schema.$timestamps.createdAt;
-          const updatedAt = model.schema.$timestamps.updatedAt;
-          applyTimestampsToUpdate(now, createdAt, updatedAt, op['updateOne']['update'], {});
-        }
-
-        applyTimestampsToChildren(now, op['updateOne']['update'], model.schema);
-
-        if (op['updateOne'].setDefaultsOnInsert !== false) {
-          setDefaultsOnInsert(op['updateOne']['filter'], model.schema, op['updateOne']['update'], {
-            setDefaultsOnInsert: true,
-            upsert: op['updateOne'].upsert
-          });
-        }
-
-        op['updateOne']['filter'] = cast(model.schema, op['updateOne']['filter'], {
-          strict: strict,
-          upsert: op['updateOne'].upsert
-        });
-
-        op['updateOne']['update'] = castUpdate(model.schema, op['updateOne']['update'], {
-          strict: strict,
-          overwrite: false,
-          upsert: op['updateOne'].upsert
-        }, model, op['updateOne']['filter']);
-      } catch (error) {
-        return callback(error, null);
+        module.exports.castUpdateOne(originalModel, op['updateOne'], options, now);
+        callback(null);
+      } catch (err) {
+        callback(err);
       }
-
-      callback(null);
     };
   } else if (op['updateMany']) {
     return (callback) => {
       try {
-        if (!op['updateMany']['filter']) {
-          throw new Error('Must provide a filter object.');
-        }
-        if (!op['updateMany']['update']) {
-          throw new Error('Must provide an update object.');
-        }
-
-        const model = decideModelByObject(originalModel, op['updateMany']['filter']);
-        const schema = model.schema;
-        const strict = options.strict != null ? options.strict : model.schema.options.strict;
-
-        if (op['updateMany'].setDefaultsOnInsert !== false) {
-          setDefaultsOnInsert(op['updateMany']['filter'], model.schema, op['updateMany']['update'], {
-            setDefaultsOnInsert: true,
-            upsert: op['updateMany'].upsert
-          });
-        }
-
-        if (model.schema.$timestamps != null && op['updateMany'].timestamps !== false) {
-          const createdAt = model.schema.$timestamps.createdAt;
-          const updatedAt = model.schema.$timestamps.updatedAt;
-          applyTimestampsToUpdate(now, createdAt, updatedAt, op['updateMany']['update'], {});
-        }
-
-        applyTimestampsToChildren(now, op['updateMany']['update'], model.schema);
-
-        _addDiscriminatorToObject(schema, op['updateMany']['filter']);
-
-        op['updateMany']['filter'] = cast(model.schema, op['updateMany']['filter'], {
-          strict: strict,
-          upsert: op['updateMany'].upsert
-        });
-
-        op['updateMany']['update'] = castUpdate(model.schema, op['updateMany']['update'], {
-          strict: strict,
-          overwrite: false,
-          upsert: op['updateMany'].upsert
-        }, model, op['updateMany']['filter']);
-      } catch (error) {
-        return callback(error, null);
+        module.exports.castUpdateMany(originalModel, op['updateMany'], options, now);
+        callback(null);
+      } catch (err) {
+        callback(err);
       }
-
-      callback(null);
     };
   } else if (op['replaceOne']) {
     return (callback) => {
-      const model = decideModelByObject(originalModel, op['replaceOne']['filter']);
-      const schema = model.schema;
-      const strict = options.strict != null ? options.strict : model.schema.options.strict;
-
-      _addDiscriminatorToObject(schema, op['replaceOne']['filter']);
-      try {
-        op['replaceOne']['filter'] = cast(model.schema, op['replaceOne']['filter'], {
-          strict: strict,
-          upsert: op['replaceOne'].upsert
-        });
-      } catch (error) {
-        return callback(error, null);
-      }
-
-      // set `skipId`, otherwise we get "_id field cannot be changed"
-      const doc = new model(op['replaceOne']['replacement'], strict, true);
-      if (model.schema.options.timestamps) {
-        doc.initializeTimestamps();
-      }
-      if (options.session != null) {
-        doc.$session(options.session);
-      }
-      op['replaceOne']['replacement'] = doc;
-
-      if (options.skipValidation || op['replaceOne'].skipValidation) {
-        op['replaceOne']['replacement'] = op['replaceOne']['replacement'].toBSON();
-        callback(null);
-        return;
-      }
-
-      op['replaceOne']['replacement'].$validate().then(
-        () => {
-          op['replaceOne']['replacement'] = op['replaceOne']['replacement'].toBSON();
-          callback(null);
-        },
-        error => {
-          callback(error, null);
-        }
-      );
+      module.exports.castReplaceOne(originalModel, op['replaceOne'], options).then(() => callback(null), err => callback(err));
     };
   } else if (op['deleteOne']) {
     return (callback) => {
-      const model = decideModelByObject(originalModel, op['deleteOne']['filter']);
-      const schema = model.schema;
-
-      _addDiscriminatorToObject(schema, op['deleteOne']['filter']);
-
       try {
-        op['deleteOne']['filter'] = cast(model.schema,
-          op['deleteOne']['filter']);
-      } catch (error) {
-        return callback(error, null);
+        module.exports.castDeleteOne(originalModel, op['deleteOne']);
+        callback(null);
+      } catch (err) {
+        callback(err);
       }
-
-      callback(null);
     };
   } else if (op['deleteMany']) {
     return (callback) => {
-      const model = decideModelByObject(originalModel, op['deleteMany']['filter']);
-      const schema = model.schema;
-
-      _addDiscriminatorToObject(schema, op['deleteMany']['filter']);
-
       try {
-        op['deleteMany']['filter'] = cast(model.schema,
-          op['deleteMany']['filter']);
-      } catch (error) {
-        return callback(error, null);
+        module.exports.castDeleteMany(originalModel, op['deleteMany']);
+        callback(null);
+      } catch (err) {
+        callback(err);
       }
-
-      callback(null);
     };
   } else {
     return (callback) => {
-      callback(new Error('Invalid op passed to `bulkWrite()`'), null);
+      const error = new MongooseError(`Invalid op passed to \`bulkWrite()\`: ${inspect(op)}`);
+      callback(error, null);
     };
   }
 };
+
+module.exports.castInsertOne = async function castInsertOne(originalModel, insertOne, options) {
+  const model = decideModelByObject(originalModel, insertOne['document']);
+
+  const doc = new model(insertOne['document']);
+  if (model.schema.options.timestamps && getTimestampsOpt(insertOne, options)) {
+    doc.initializeTimestamps();
+  }
+  if (options.session != null) {
+    doc.$session(options.session);
+  }
+  const versionKey = model?.schema?.options?.versionKey;
+  if (versionKey && doc[versionKey] == null) {
+    doc[versionKey] = 0;
+  }
+  insertOne['document'] = doc;
+
+  if (options.skipValidation || insertOne.skipValidation) {
+    return insertOne;
+  }
+
+  await insertOne['document'].$validate();
+  return insertOne;
+};
+
+module.exports.castUpdateOne = function castUpdateOne(originalModel, updateOne, options, now) {
+  if (!updateOne['filter']) {
+    throw new Error('Must provide a filter object.');
+  }
+  if (!updateOne['update']) {
+    throw new Error('Must provide an update object.');
+  }
+
+  const model = decideModelByObject(originalModel, updateOne['filter']);
+  const schema = model.schema;
+  const strict = options.strict ?? model.schema.options.strict;
+
+  const update = clone(updateOne['update']);
+
+  _addDiscriminatorToObject(schema, updateOne['filter']);
+
+  const doInitTimestamps = getTimestampsOpt(updateOne, options);
+
+  if (model.schema.$timestamps != null && doInitTimestamps) {
+    const createdAt = model.schema.$timestamps.createdAt;
+    const updatedAt = model.schema.$timestamps.updatedAt;
+    applyTimestampsToUpdate(now, createdAt, updatedAt, update, {
+      timestamps: updateOne.timestamps,
+      overwriteImmutable: updateOne.overwriteImmutable
+    }, updateOne.upsert);
+  }
+
+  if (doInitTimestamps) {
+    applyTimestampsToChildren(now, update, model.schema);
+  }
+
+  const globalSetDefaultsOnInsert = originalModel.base.options.setDefaultsOnInsert;
+  const shouldSetDefaultsOnInsert = updateOne.setDefaultsOnInsert ?? globalSetDefaultsOnInsert;
+  if (shouldSetDefaultsOnInsert !== false) {
+    setDefaultsOnInsert(updateOne['filter'], model.schema, update, {
+      setDefaultsOnInsert: true,
+      upsert: updateOne.upsert
+    });
+  }
+
+  decorateUpdateWithVersionKey(
+    update,
+    updateOne,
+    model.schema.options.versionKey
+  );
+
+  updateOne['filter'] = _castFilter(model, updateOne['filter'], {
+    strict: strict,
+    upsert: updateOne.upsert
+  });
+  if (Array.isArray(updateOne.arrayFilters)) {
+    updateOne.arrayFilters = clone(updateOne.arrayFilters);
+    castArrayFiltersForUpdate(updateOne.arrayFilters, update, schema, model, options);
+  }
+  updateOne['update'] = castUpdate(model.schema, update, {
+    strict: strict,
+    upsert: updateOne.upsert,
+    arrayFilters: updateOne.arrayFilters,
+    overwriteDiscriminatorKey: updateOne.overwriteDiscriminatorKey,
+    overwriteImmutable: updateOne.overwriteImmutable
+  }, model, updateOne['filter']);
+
+  return updateOne;
+};
+
+module.exports.castUpdateMany = function castUpdateMany(originalModel, updateMany, options, now) {
+  if (!updateMany['filter']) {
+    throw new Error('Must provide a filter object.');
+  }
+  if (!updateMany['update']) {
+    throw new Error('Must provide an update object.');
+  }
+
+  const model = decideModelByObject(originalModel, updateMany['filter']);
+  const schema = model.schema;
+  const strict = options.strict ?? model.schema.options.strict;
+
+  const update = clone(updateMany['update']);
+
+  const globalSetDefaultsOnInsert = originalModel.base.options.setDefaultsOnInsert;
+  const shouldSetDefaultsOnInsert = updateMany.setDefaultsOnInsert ?? globalSetDefaultsOnInsert;
+
+  if (shouldSetDefaultsOnInsert !== false) {
+    setDefaultsOnInsert(updateMany['filter'], model.schema, update, {
+      setDefaultsOnInsert: true,
+      upsert: updateMany.upsert
+    });
+  }
+
+  const doInitTimestamps = getTimestampsOpt(updateMany, options);
+
+  if (model.schema.$timestamps != null && doInitTimestamps) {
+    const createdAt = model.schema.$timestamps.createdAt;
+    const updatedAt = model.schema.$timestamps.updatedAt;
+    applyTimestampsToUpdate(now, createdAt, updatedAt, update, {
+      timestamps: updateMany.timestamps,
+      overwriteImmutable: updateMany.overwriteImmutable
+    }, updateMany.upsert);
+  }
+  if (doInitTimestamps) {
+    applyTimestampsToChildren(now, update, model.schema);
+  }
+
+  _addDiscriminatorToObject(schema, updateMany['filter']);
+
+  decorateUpdateWithVersionKey(
+    update,
+    updateMany,
+    model.schema.options.versionKey
+  );
+
+  updateMany['filter'] = _castFilter(model, updateMany['filter'], {
+    strict: strict,
+    upsert: updateMany.upsert
+  });
+  if (Array.isArray(updateMany.arrayFilters)) {
+    updateMany.arrayFilters = clone(updateMany.arrayFilters);
+    castArrayFiltersForUpdate(updateMany.arrayFilters, update, schema, model, options);
+  }
+
+  updateMany['update'] = castUpdate(model.schema, update, {
+    strict: strict,
+    upsert: updateMany.upsert,
+    arrayFilters: updateMany.arrayFilters,
+    overwriteDiscriminatorKey: updateMany.overwriteDiscriminatorKey,
+    overwriteImmutable: updateMany.overwriteImmutable
+  }, model, updateMany['filter']);
+};
+
+module.exports.castReplaceOne = async function castReplaceOne(originalModel, replaceOne, options) {
+  const model = decideModelByObject(originalModel, replaceOne['filter']);
+  const schema = model.schema;
+  const strict = options.strict ?? model.schema.options.strict;
+
+  _addDiscriminatorToObject(schema, replaceOne['filter']);
+  replaceOne['filter'] = _castFilter(model, replaceOne['filter'], {
+    strict: strict,
+    upsert: replaceOne.upsert
+  });
+
+  // set `skipId`, otherwise we get "_id field cannot be changed"
+  const doc = new model(replaceOne['replacement'], strict, { skipId: true });
+  if (model.schema.options.timestamps && getTimestampsOpt(replaceOne, options)) {
+    doc.initializeTimestamps();
+  }
+  if (options.session != null) {
+    doc.$session(options.session);
+  }
+  const versionKey = model?.schema?.options?.versionKey;
+  if (versionKey && doc[versionKey] == null) {
+    doc[versionKey] = 0;
+  }
+  replaceOne['replacement'] = doc;
+
+  if (options.skipValidation || replaceOne.skipValidation) {
+    replaceOne['replacement'] = replaceOne['replacement'].toBSON();
+    return;
+  }
+
+  await replaceOne['replacement'].$validate();
+  replaceOne['replacement'] = replaceOne['replacement'].toBSON();
+};
+
+module.exports.castDeleteOne = function castDeleteOne(originalModel, deleteOne) {
+  const model = decideModelByObject(originalModel, deleteOne['filter']);
+  const schema = model.schema;
+
+  _addDiscriminatorToObject(schema, deleteOne['filter']);
+
+  deleteOne['filter'] = _castFilter(model, deleteOne['filter']);
+};
+
+module.exports.castDeleteMany = function castDeleteMany(originalModel, deleteMany) {
+  const model = decideModelByObject(originalModel, deleteMany['filter']);
+  const schema = model.schema;
+
+  _addDiscriminatorToObject(schema, deleteMany['filter']);
+
+  deleteMany['filter'] = _castFilter(model, deleteMany['filter']);
+};
+
+module.exports.cast = {
+  insertOne: module.exports.castInsertOne,
+  updateOne: module.exports.castUpdateOne,
+  updateMany: module.exports.castUpdateMany,
+  replaceOne: module.exports.castReplaceOne,
+  deleteOne: module.exports.castDeleteOne,
+  deleteMany: module.exports.castDeleteMany
+};
+
+function _castFilter(model, filter, options) {
+  try {
+    return cast(model.schema, filter, options);
+  } catch (err) {
+    // Set the model on cast errors so `{MODEL}` gets replaced, like it is for
+    // query filter casting (gh-8300)
+    if (typeof err.setModel === 'function') {
+      err.setModel(model);
+    }
+    throw err;
+  }
+}
 
 function _addDiscriminatorToObject(schema, obj) {
   if (schema == null) {
@@ -233,8 +323,24 @@ function _addDiscriminatorToObject(schema, obj) {
 
 function decideModelByObject(model, object) {
   const discriminatorKey = model.schema.options.discriminatorKey;
-  if (object != null && object.hasOwnProperty(discriminatorKey)) {
+  if (object != null && Object.hasOwn(object, discriminatorKey)) {
     model = getDiscriminatorByValue(model.discriminators, object[discriminatorKey]) || model;
   }
   return model;
+}
+
+/**
+ * gets timestamps option for a given operation. If the option is set within an individual operation, use it. Otherwise, use the global timestamps option configured in the `bulkWrite` options. Overall default is `true`.
+ * @api private
+ */
+
+function getTimestampsOpt(opCommand, options) {
+  const opLevelOpt = opCommand.timestamps;
+  const bulkLevelOpt = options.timestamps;
+  if (opLevelOpt != null) {
+    return opLevelOpt;
+  } else if (bulkLevelOpt != null) {
+    return bulkLevelOpt;
+  }
+  return true;
 }

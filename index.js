@@ -125,16 +125,33 @@ app.use(express.static(__dirname + '/__public/'));
 
 // ---------- routes ----------
 app.use('/link', limiter, require('./routes/v2/link-media/api'));
-app.use('/v3/youtube', limiter, require('./routes/v3/youtube/api'));
-app.use('/v2/anime', limiter, require('./routes/v2/anime/api'));
 app.use('/v2/github', limiter, githubRoutes); // ganti router lama ./routes/v2/github/api (sudah dihapus)
 app.use('/status', limiter, require('./routes/status'));
-app.use('/lk21', limiter, require('./routes/v3/lk21/api'));
 app.use('/u', limiter, require('./routes/v2/link-media/link'));
 
-app.use('/mfanimelist', limiter, require('./routes/mfanimelist'));
 app.use('/contributors', limiter, require('./routes/web/contributors'));
 app.use('/v1/', require('./routes/mfikria/home-api'));
+
+// New V2
+const access = require('./routes/newV2/controllers/accesstokencontroller');
+
+const must = (name, value) => {
+    if (typeof value !== 'function') {
+        throw new Error(`"${name}" bukan function (tipe: ${typeof value})`);
+    }
+    return value;
+};
+
+app.use('/v2/token', limiter,
+    must('accessTokenRoute', require('./routes/newV2/routes/accessTokenRoute')));
+
+app.use('/v2/anime/otaku', limiter,
+    must('requireAccessToken', access.requireAccessToken),
+    must('otakudesuRoute', require('./routes/newV2/routes/otakudesuRoute')));
+
+app.use('/v2/donghua/anichi', limiter,
+    must('requireAccessToken', access.requireAccessToken),
+    must('anichinRoute', require('./routes/newV2/routes/anichinRoute')));
 
 // Portfolio
 app.use(express.urlencoded({ extended: true }));
@@ -191,7 +208,8 @@ app.get('/id', function (req, res) {
 });
 
 // ---------- 404 (must stay last) ----------
-app.get('*', (req, res) => {
+// ---------- 404 (must stay last) ----------
+app.use((req, res) => {
      const now = new Date();
      const timeZone = 'Asia/Jakarta'; // WIB
 
@@ -209,7 +227,7 @@ app.get('*', (req, res) => {
           second: '2-digit',
           hour12: false,
           timeZone
-     }).replace(/\./g, ':'); // id-ID uses "." between h/m/s, convert to ":"
+     }).replace(/\./g, ':');
 
      const code = Math.random().toString(36).substring(2, 10);
 

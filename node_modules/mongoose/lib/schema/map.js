@@ -5,28 +5,45 @@
  */
 
 const MongooseMap = require('../types/map');
-const SchemaMapOptions = require('../options/SchemaMapOptions');
-const SchemaType = require('../schematype');
-/*!
- * ignore
- */
+const SchemaMapOptions = require('../options/schemaMapOptions');
+const SchemaType = require('../schemaType');
+const MongooseError = require('../error/mongooseError');
+const Schema = require('../schema');
+const utils = require('../utils');
 
-class Map extends SchemaType {
-  constructor(key, options) {
-    super(key, options, 'Map');
+class SchemaMap extends SchemaType {
+  /**
+   * Map SchemaType constructor.
+   *
+   * @param {string} path
+   * @param {object} options
+   * @param {object} schemaOptions
+   * @param {Schema} parentSchema
+   * @inherits SchemaType
+   * @api public
+   */
+
+  constructor(key, options, schemaOptions, parentSchema) {
+    super(key, options, 'Map', parentSchema);
     this.$isSchemaMap = true;
+    // Create the nested schema type for the map values
+    this._createNestedSchemaType(parentSchema, key, options, schemaOptions);
   }
 
-  set(option, value) {
-    return SchemaType.set(option, value);
-  }
+  /**
+   * Casts to Map
+   *
+   * @param {object} value
+   * @param {object} model this value is optional
+   * @api private
+   */
 
-  cast(val, doc, init) {
+  cast(val, doc, init, prev, options) {
     if (val instanceof MongooseMap) {
       return val;
     }
 
-    const path = this.path;
+    const path = options?.path ?? this.path;
 
     if (init) {
       const map = new MongooseMap({}, path, doc, this.$__schemaType);
@@ -37,7 +54,7 @@ class Map extends SchemaType {
           if (_val == null) {
             _val = map.$__schemaType._castNullish(_val);
           } else {
-            _val = map.$__schemaType.cast(_val, doc, true, null, { path: path + '.' + key });
+            _val = map.$__schemaType.cast(_val, doc, true, null, { ...options, path: path + '.' + key });
           }
           map.$init(key, _val);
         }
@@ -47,7 +64,7 @@ class Map extends SchemaType {
           if (_val == null) {
             _val = map.$__schemaType._castNullish(_val);
           } else {
-            _val = map.$__schemaType.cast(_val, doc, true, null, { path: path + '.' + key });
+            _val = map.$__schemaType.cast(_val, doc, true, null, { ...options, path: path + '.' + key });
           }
           map.$init(key, _val);
         }
@@ -59,6 +76,12 @@ class Map extends SchemaType {
     return new MongooseMap(val, path, doc, this.$__schemaType);
   }
 
+  /**
+   * Creates a copy of this map schema type.
+   *
+   * @api private
+   */
+
   clone() {
     const schematype = super.clone();
 
@@ -67,7 +90,57 @@ class Map extends SchemaType {
     }
     return schematype;
   }
+
+  /**
+   * Returns the embedded schema type (i.e. the `.$*` path)
+   *
+   * @api public
+   */
+
+  getEmbeddedSchemaType() {
+    return this.$__schemaType;
+  }
+
+  /**
+   * Returns this schema type's representation in a JSON schema.
+   *
+   * @param {object} [options]
+   * @param {boolean} [options.useBsonType=false] If true, return a representation with `bsonType` for use with MongoDB's `$jsonSchema`.
+   * @returns {object} JSON schema properties
+   */
+
+  toJSONSchema(options) {
+    const embeddedSchemaType = this.getEmbeddedSchemaType();
+
+    const result = this._createJSONSchemaTypeDefinition('object', 'object', options);
+    result.additionalProperties = embeddedSchemaType.toJSONSchema(options);
+
+    return result;
+  }
+
+  /**
+   * Returns the auto encryption type for this schema type.
+   *
+   * @api public
+   */
+
+  autoEncryptionType() {
+    return 'object';
+  }
 }
+
+/**
+ * Sets a default option for all Map instances.
+ *
+ * @param {string} option The option you'd like to set the value for
+ * @param {any} value value for option
+ * @return {undefined}
+ * @function set
+ * @static
+ * @api public
+ */
+
+SchemaMap.set = SchemaType.set;
 
 /**
  * This schema type's name, to defend against minifiers that mangle
@@ -75,10 +148,46 @@ class Map extends SchemaType {
  *
  * @api public
  */
-Map.schemaName = 'Map';
 
-Map.prototype.OptionsConstructor = SchemaMapOptions;
+SchemaMap.schemaName = 'Map';
 
-Map.defaultOptions = {};
+SchemaMap.prototype.OptionsConstructor = SchemaMapOptions;
 
-module.exports = Map;
+SchemaMap.defaultOptions = {};
+
+/*!
+ * ignore
+ */
+
+SchemaMap.prototype._createNestedSchemaType = function _createNestedSchemaType(schema, path, obj, options) {
+  const mapPath = path + '.$*';
+  let _mapType = { type: {} };
+  if (utils.hasUserDefinedProperty(obj, 'of')) {
+    const isInlineSchema = utils.isPOJO(obj.of) &&
+      utils.hasOwnKeys(obj.of) &&
+      !utils.hasUserDefinedProperty(obj.of, schema.options.typeKey);
+    if (isInlineSchema) {
+      _mapType = { [schema.options.typeKey]: new Schema(obj.of) };
+    } else if (utils.isPOJO(obj.of)) {
+      _mapType = Object.assign({}, obj.of);
+    } else {
+      _mapType = { [schema.options.typeKey]: obj.of };
+    }
+
+    if (_mapType[schema.options.typeKey] && _mapType[schema.options.typeKey].instanceOfSchema) {
+      const subdocumentSchema = _mapType[schema.options.typeKey];
+      subdocumentSchema.eachPath((subpath, type) => {
+        if (type.options.select === true || type.options.select === false) {
+          throw new MongooseError('Cannot use schema-level projections (`select: true` or `select: false`) within maps at path "' + path + '.' + subpath + '"');
+        }
+      });
+    }
+
+    if (utils.hasUserDefinedProperty(obj, 'ref')) {
+      _mapType.ref = obj.ref;
+    }
+  }
+  this.$__schemaType = schema.interpretAsType(mapPath, _mapType, options);
+};
+
+module.exports = SchemaMap;

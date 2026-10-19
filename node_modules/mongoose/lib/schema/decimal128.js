@@ -4,23 +4,24 @@
 
 'use strict';
 
-const SchemaType = require('../schematype');
+const SchemaType = require('../schemaType');
 const CastError = SchemaType.CastError;
 const castDecimal128 = require('../cast/decimal128');
-const utils = require('../utils');
 const isBsonType = require('../helpers/isBsonType');
 
 /**
  * Decimal128 SchemaType constructor.
  *
- * @param {String} key
- * @param {Object} options
+ * @param {string} key
+ * @param {object} options
+ * @param {object} schemaOptions
+ * @param {Schema} parentSchema
  * @inherits SchemaType
  * @api public
  */
 
-function Decimal128(key, options) {
-  SchemaType.call(this, key, options, 'Decimal128');
+function SchemaDecimal128(key, options, _schemaOptions, parentSchema) {
+  SchemaType.call(this, key, options, 'Decimal128', parentSchema);
 }
 
 /**
@@ -29,21 +30,21 @@ function Decimal128(key, options) {
  *
  * @api public
  */
-Decimal128.schemaName = 'Decimal128';
+SchemaDecimal128.schemaName = 'Decimal128';
 
-Decimal128.defaultOptions = {};
+SchemaDecimal128.defaultOptions = {};
 
 /*!
  * Inherits from SchemaType.
  */
-Decimal128.prototype = Object.create(SchemaType.prototype);
-Decimal128.prototype.constructor = Decimal128;
+SchemaDecimal128.prototype = Object.create(SchemaType.prototype);
+SchemaDecimal128.prototype.constructor = SchemaDecimal128;
 
 /*!
  * ignore
  */
 
-Decimal128._cast = castDecimal128;
+SchemaDecimal128._cast = castDecimal128;
 
 /**
  * Sets a default option for all Decimal128 instances.
@@ -51,20 +52,39 @@ Decimal128._cast = castDecimal128;
  * #### Example:
  *
  *     // Make all decimal 128s have `required` of true by default.
- *     mongoose.Schema.Decimal128.set('required', true);
+ *     mongoose.Schema.Types.Decimal128.set('required', true);
  *
  *     const User = mongoose.model('User', new Schema({ test: mongoose.Decimal128 }));
  *     new User({ }).validateSync().errors.test.message; // Path `test` is required.
  *
- * @param {String} option The option you'd like to set the value for
- * @param {Any} value value for option
+ * @param {string} option The option you'd like to set the value for
+ * @param {any} value value for option
  * @return {undefined}
  * @function set
  * @static
  * @api public
  */
 
-Decimal128.set = SchemaType.set;
+SchemaDecimal128.set = SchemaType.set;
+
+SchemaDecimal128.setters = [];
+
+/**
+ * Attaches a getter for all Decimal128 instances
+ *
+ * #### Example:
+ *
+ *     // Automatically convert Decimal128s to Numbers
+ *     mongoose.Schema.Types.Decimal128.get(v => v == null ? v : Number(v));
+ *
+ * @param {Function} getter
+ * @return {this}
+ * @function get
+ * @static
+ * @api public
+ */
+
+SchemaDecimal128.get = SchemaType.get;
 
 /**
  * Get/set the function used to cast arbitrary values to decimals.
@@ -88,7 +108,7 @@ Decimal128.set = SchemaType.set;
  * @api public
  */
 
-Decimal128.cast = function cast(caster) {
+SchemaDecimal128.cast = function cast(caster) {
   if (arguments.length === 0) {
     return this._cast;
   }
@@ -104,7 +124,7 @@ Decimal128.cast = function cast(caster) {
  * ignore
  */
 
-Decimal128._defaultCaster = v => {
+SchemaDecimal128._defaultCaster = v => {
   if (v != null && !isBsonType(v, 'Decimal128')) {
     throw new Error();
   }
@@ -115,7 +135,7 @@ Decimal128._defaultCaster = v => {
  * ignore
  */
 
-Decimal128._checkRequired = v => isBsonType(v, 'Decimal128');
+SchemaDecimal128._checkRequired = v => isBsonType(v, 'Decimal128');
 
 /**
  * Override the function the required validator uses to check whether a string
@@ -128,18 +148,18 @@ Decimal128._checkRequired = v => isBsonType(v, 'Decimal128');
  * @api public
  */
 
-Decimal128.checkRequired = SchemaType.checkRequired;
+SchemaDecimal128.checkRequired = SchemaType.checkRequired;
 
 /**
  * Check if the given value satisfies a required validator.
  *
- * @param {Any} value
+ * @param {any} value
  * @param {Document} doc
- * @return {Boolean}
+ * @return {boolean}
  * @api public
  */
 
-Decimal128.prototype.checkRequired = function checkRequired(value, doc) {
+SchemaDecimal128.prototype.checkRequired = function checkRequired(value, doc) {
   if (SchemaType._isRef(this, value, doc, true)) {
     return !!value;
   }
@@ -148,7 +168,7 @@ Decimal128.prototype.checkRequired = function checkRequired(value, doc) {
   // plugins like mongoose-float use `inherits()` for pre-ES6.
   const _checkRequired = typeof this.constructor.checkRequired === 'function' ?
     this.constructor.checkRequired() :
-    Decimal128.checkRequired();
+    SchemaDecimal128.checkRequired();
 
   return _checkRequired(value);
 };
@@ -156,19 +176,19 @@ Decimal128.prototype.checkRequired = function checkRequired(value, doc) {
 /**
  * Casts to Decimal128
  *
- * @param {Object} value
- * @param {Object} doc
- * @param {Boolean} init whether this is an initialization cast
+ * @param {object} value
+ * @param {object} doc
+ * @param {boolean} init whether this is an initialization cast
  * @api private
  */
 
-Decimal128.prototype.cast = function(value, doc, init) {
+SchemaDecimal128.prototype.cast = function(value, doc, init, prev, options) {
   if (SchemaType._isRef(this, value, doc, init)) {
     if (isBsonType(value, 'Decimal128')) {
       return value;
     }
 
-    return this._castRef(value, doc, init);
+    return this._castRef(value, doc, init, options);
   }
 
   let castDecimal128;
@@ -177,7 +197,7 @@ Decimal128.prototype.cast = function(value, doc, init) {
   } else if (typeof this.constructor.cast === 'function') {
     castDecimal128 = this.constructor.cast();
   } else {
-    castDecimal128 = Decimal128.cast();
+    castDecimal128 = SchemaDecimal128.cast();
   }
 
   try {
@@ -195,16 +215,47 @@ function handleSingle(val) {
   return this.cast(val);
 }
 
-Decimal128.prototype.$conditionalHandlers =
-    utils.options(SchemaType.prototype.$conditionalHandlers, {
-      $gt: handleSingle,
-      $gte: handleSingle,
-      $lt: handleSingle,
-      $lte: handleSingle
-    });
+const $conditionalHandlers = {
+  ...SchemaType.prototype.$conditionalHandlers,
+  $gt: handleSingle,
+  $gte: handleSingle,
+  $lt: handleSingle,
+  $lte: handleSingle
+};
+
+/**
+ * Contains the handlers for different query operators for this schema type.
+ * For example, `$conditionalHandlers.$lte` is the function Mongoose calls to cast `$lte` filter operators.
+ *
+ * @property $conditionalHandlers
+ * @memberOf SchemaDecimal128
+ * @instance
+ * @api public
+ */
+
+Object.defineProperty(SchemaDecimal128.prototype, '$conditionalHandlers', {
+  enumerable: false,
+  value: $conditionalHandlers
+});
+
+/**
+ * Returns this schema type's representation in a JSON schema.
+ *
+ * @param {object} [options]
+ * @param {boolean} [options.useBsonType=false] If true, return a representation with `bsonType` for use with MongoDB's `$jsonSchema`.
+ * @returns {object} JSON schema properties
+ */
+
+SchemaDecimal128.prototype.toJSONSchema = function toJSONSchema(options) {
+  return this._createJSONSchemaTypeDefinition('string', 'decimal', options);
+};
+
+SchemaDecimal128.prototype.autoEncryptionType = function autoEncryptionType() {
+  return 'decimal';
+};
 
 /*!
  * Module exports.
  */
 
-module.exports = Decimal128;
+module.exports = SchemaDecimal128;

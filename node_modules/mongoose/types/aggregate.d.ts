@@ -4,8 +4,23 @@ declare module 'mongoose' {
   /** Extract generic type from Aggregate class */
   type AggregateExtract<P> = P extends Aggregate<infer T> ? T : never;
 
-  interface AggregateOptions extends Omit<mongodb.AggregateOptions, 'session'>, SessionOption {
+  interface AggregateOptions extends Omit<mongodb.AggregateOptions & mongodb.Abortable, 'session'>, SessionOption {
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
     [key: string]: any;
+  }
+
+  interface AggregateCursorMiddlewareOptions {
+    /** If `false`, skip pre aggregate middleware. Aggregate cursors do not run post aggregate middleware. */
+    pre?: boolean;
+    post?: never;
+  }
+
+  interface AggregateCursorOptions extends Omit<mongodb.AggregationCursorOptions & mongodb.Abortable, 'session'>, SessionOption {
+    middleware?: boolean | AggregateCursorMiddlewareOptions;
+    transform?: (doc: any) => any;
+    useMongooseAggCursor?: boolean;
+    [key: string]: unknown;
   }
 
   class Aggregate<ResultType> implements SessionOperation {
@@ -15,6 +30,9 @@ declare module 'mongoose' {
      * will call it for you.
      */
     [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<ResultType>>;
+
+    // Returns a string representation of this aggregation.
+    [Symbol.toStringTag]: string;
 
     options: AggregateOptions;
 
@@ -57,7 +75,7 @@ declare module 'mongoose' {
     /**
      * Sets the cursor option for the aggregation query
      */
-    cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
+    cursor<DocType = any>(options?: AggregateCursorOptions): Cursor<DocType>;
 
 
     /** Executes the aggregate pipeline on the currently bound Model. */
@@ -72,6 +90,12 @@ declare module 'mongoose' {
 
     /** Appends a new $fill operator to this aggregate pipeline */
     fill(arg: PipelineStage.Fill['$fill']): this;
+
+    /**
+     * Executes the aggregation returning a `Promise` which will be
+     * resolved with `.finally()` chained.
+     */
+    finally: Promise<ResultType>['finally'];
 
     /** Appends new custom $graphLookup operator(s) to this aggregate pipeline, performing a recursive search on a collection. */
     graphLookup(options: PipelineStage.GraphLookup['$graphLookup']): this;
@@ -101,7 +125,7 @@ declare module 'mongoose' {
      * Binds this aggregate to a model.
      * @param model the model to which the aggregate is to be bound
      */
-    model(model: Model<any>): this;
+    model(model: Model<any, any, any, any>): this;
 
     /**
      * Returns the current model bound to this aggregate object
@@ -114,8 +138,11 @@ declare module 'mongoose' {
     /** Returns the current pipeline */
     pipeline(): PipelineStage[];
 
+    /** Returns the current pipeline typed for use in `$unionWith` */
+    pipelineForUnionWith(): PipelineStage.UnionWithPipelineStage[];
+
     /** Appends a new $project operator to this aggregate pipeline. */
-    project(arg: PipelineStage.Project['$project']): this;
+    project(arg: PipelineStage.Project['$project'] | string): this;
 
     /** Sets the readPreference option for the aggregation query. */
     read(pref: mongodb.ReadPreferenceLike): this;

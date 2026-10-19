@@ -3,6 +3,7 @@
 const CastError = require('../../error/cast');
 const StrictModeError = require('../../error/strict');
 const castNumber = require('../../cast/number');
+const omitUndefined = require('../omitUndefined');
 
 const booleanComparison = new Set(['$and', '$or']);
 const comparisonOperator = new Set(['$cmp', '$eq', '$lt', '$lte', '$gt', '$gte']);
@@ -29,7 +30,6 @@ const arithmeticOperatorNumber = new Set([
   '$floor',
   '$ln',
   '$log10',
-  '$round',
   '$sqrt',
   '$sin',
   '$cos',
@@ -69,8 +69,11 @@ const dateOperators = new Set([
 const expressionOperator = new Set(['$not']);
 
 module.exports = function cast$expr(val, schema, strictQuery) {
+  if (typeof val === 'boolean') {
+    return val;
+  }
   if (typeof val !== 'object' || val === null) {
-    throw new Error('`$expr` must be an object');
+    throw new Error('`$expr` must be an object or boolean literal');
   }
 
   return _castExpression(val, schema, strictQuery);
@@ -93,8 +96,20 @@ function _castExpression(val, schema, strictQuery) {
   } else if (val.$ifNull != null) {
     val.$ifNull.map(v => _castExpression(v, schema, strictQuery));
   } else if (val.$switch != null) {
-    val.branches.map(v => _castExpression(v, schema, strictQuery));
-    val.default = _castExpression(val.default, schema, strictQuery);
+    if (Array.isArray(val.$switch.branches)) {
+      for (const branch of val.$switch.branches) {
+        if (branch?.case != null) {
+          branch.case = _castExpression(branch.case, schema, strictQuery);
+        }
+        if (branch?.then != null) {
+          branch.then = _castExpression(branch.then, schema, strictQuery);
+        }
+        omitUndefined(branch);
+      }
+    }
+    if ('default' in val.$switch) {
+      val.$switch.default = _castExpression(val.$switch.default, schema, strictQuery);
+    }
   }
 
   const keys = Object.keys(val);
@@ -118,17 +133,17 @@ function _castExpression(val, schema, strictQuery) {
   if (val.$size) {
     val.$size = castNumberOperator(val.$size, schema, strictQuery);
   }
+  if (val.$round) {
+    const $round = val.$round;
+    if (!Array.isArray($round) || $round.length < 1 || $round.length > 2) {
+      throw new CastError('Array', $round, '$round');
+    }
+    val.$round = $round.map(v => castNumberOperator(v, schema, strictQuery));
+  }
 
-  _omitUndefined(val);
+  omitUndefined(val);
 
   return val;
-}
-
-function _omitUndefined(val) {
-  const keys = Object.keys(val);
-  for (let i = 0, len = keys.length; i < len; ++i) {
-    (val[keys[i]] === void 0) && delete val[keys[i]];
-  }
 }
 
 // { $op: <number> }
@@ -139,7 +154,7 @@ function castNumberOperator(val) {
 
   try {
     return castNumber(val);
-  } catch (err) {
+  } catch {
     throw new CastError('Number', val);
   }
 }
@@ -167,7 +182,7 @@ function castIn(val, schema, strictQuery) {
   }
 
   return [
-    schematype.$isMongooseDocumentArray ? schematype.$embeddedSchemaType.cast(search) : schematype.caster.cast(search),
+    schematype.embeddedSchemaType.cast(search),
     path
   ];
 }
@@ -180,7 +195,7 @@ function castArithmetic(val) {
     }
     try {
       return castNumber(val);
-    } catch (err) {
+    } catch {
       throw new CastError('Number', val);
     }
   }
@@ -191,7 +206,7 @@ function castArithmetic(val) {
     }
     try {
       return castNumber(v);
-    } catch (err) {
+    } catch {
       throw new CastError('Number', v);
     }
   });
@@ -222,10 +237,8 @@ function castComparison(val, schema, strictQuery) {
           path = lhs[key].slice(1) + '.' + key;
           schematype = schema.path(lhs[key].slice(1));
           if (schematype != null) {
-            if (schematype.$isMongooseDocumentArray) {
-              schematype = schematype.$embeddedSchemaType;
-            } else if (schematype.$isMongooseArray) {
-              schematype = schematype.caster;
+            if (schematype.$isMongooseArray) {
+              schematype = schematype.embeddedSchemaType;
             }
           }
         }
@@ -243,13 +256,13 @@ function castComparison(val, schema, strictQuery) {
       if (is$literal) {
         try {
           val[1] = { $literal: caster(val[1].$literal) };
-        } catch (err) {
+        } catch {
           throw new CastError(caster.name.replace(/^cast/, ''), val[1], path + '.$literal');
         }
       } else {
         try {
           val[1] = caster(val[1]);
-        } catch (err) {
+        } catch {
           throw new CastError(caster.name.replace(/^cast/, ''), val[1], path);
         }
       }
@@ -259,7 +272,7 @@ function castComparison(val, schema, strictQuery) {
       throw new StrictModeError(path);
     }
   } else {
-    val[1] = _castExpression(val[1]);
+    val[1] = _castExpression(val[1], schema, strictQuery);
   }
 
   return val;

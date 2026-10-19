@@ -1,10 +1,19 @@
 'use strict';
 
-const get = require('../get');
+const utils = require('../../utils');
 
 module.exports = function applyWriteConcern(schema, options) {
-  const writeConcern = get(schema, 'options.writeConcern', {});
-  if (Object.keys(writeConcern).length != 0) {
+  if (options.writeConcern != null) {
+    return;
+  }
+  // Don't apply default write concern to operations in transactions,
+  // because setting write concern on an operation in a transaction is an error
+  // See: https://www.mongodb.com/docs/manual/reference/write-concern/
+  if (options?.session?.transaction) {
+    return;
+  }
+  const writeConcern = schema.options.writeConcern ?? {};
+  if (utils.hasOwnKeys(writeConcern)) {
     options.writeConcern = {};
     if (!('w' in options) && writeConcern.w != null) {
       options.writeConcern.w = writeConcern.w;

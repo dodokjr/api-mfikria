@@ -4,7 +4,7 @@
 
 'use strict';
 
-const StateMachine = require('./statemachine');
+const StateMachine = require('./stateMachine');
 const ActiveRoster = StateMachine.ctor('require', 'modify', 'init', 'default', 'ignore');
 
 module.exports = exports = InternalCache;
@@ -17,6 +17,8 @@ InternalCache.prototype.strictMode = true;
 
 InternalCache.prototype.fullPath = undefined;
 InternalCache.prototype.selected = undefined;
+// Lazily computed index over `selected`, see `_getProjectionIndex()` in document.js
+InternalCache.prototype.selectedIndex = undefined;
 InternalCache.prototype.shardval = undefined;
 InternalCache.prototype.saveError = undefined;
 InternalCache.prototype.validationError = undefined;

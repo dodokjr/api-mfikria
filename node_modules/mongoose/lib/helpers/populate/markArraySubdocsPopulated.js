@@ -12,16 +12,16 @@ const utils = require('../../utils');
  *     doc.comments[0].populated('author'); // Should be set
  *
  * @param {Document} doc
- * @param {Object} [populated]
+ * @param {object} [populated]
  * @api private
  */
 
 module.exports = function markArraySubdocsPopulated(doc, populated) {
-  if (doc._id == null || populated == null || populated.length === 0) {
+  if (doc._doc._id == null || populated == null || populated.length === 0) {
     return;
   }
 
-  const id = String(doc._id);
+  const id = String(doc._doc._id);
   for (const item of populated) {
     if (item.isVirtual) {
       continue;
@@ -38,7 +38,9 @@ module.exports = function markArraySubdocsPopulated(doc, populated) {
 
       if (utils.isMongooseDocumentArray(val)) {
         for (let j = 0; j < val.length; ++j) {
-          val[j].populated(rest, item._docs[id] == null ? void 0 : item._docs[id][j], item);
+          if (val[j]) {
+            val[j].populated(rest, item._docs[id] == null ? void 0 : item._docs[id][j], item);
+          }
         }
         break;
       }

@@ -8,14 +8,14 @@ const castString = require('../../cast/string');
  * Casts val to an object suitable for `$text`. Throws an error if the object
  * can't be casted.
  *
- * @param {Any} val value to cast
- * @param {String} [path] path to associate with any errors that occured
- * @return {Object} casted object
+ * @param {any} val value to cast
+ * @param {string} [path] path to associate with any errors that occurred
+ * @return {object} casted object
  * @see https://www.mongodb.com/docs/manual/reference/operator/query/text/
  * @api private
  */
 
-module.exports = function(val, path) {
+module.exports = function castTextSearch(val, path) {
   if (val == null || typeof val !== 'object') {
     throw new CastError('$text', val, path);
   }
@@ -28,7 +28,7 @@ module.exports = function(val, path) {
   }
   if (val.$caseSensitive != null) {
     val.$caseSensitive = castBoolean(val.$caseSensitive,
-      path + '.$castSensitive');
+      path + '.$caseSensitive');
   }
   if (val.$diacriticSensitive != null) {
     val.$diacriticSensitive = castBoolean(val.$diacriticSensitive,

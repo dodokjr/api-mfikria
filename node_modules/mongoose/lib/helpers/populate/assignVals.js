@@ -1,7 +1,7 @@
 'use strict';
 
 const MongooseMap = require('../../types/map');
-const SkipPopulateValue = require('./SkipPopulateValue');
+const SkipPopulateValue = require('./skipPopulateValue');
 const assignRawDocsToIdStructure = require('./assignRawDocsToIdStructure');
 const get = require('../get');
 const getVirtual = require('./getVirtual');
@@ -19,7 +19,8 @@ module.exports = function assignVals(o) {
   // `o.options` contains options explicitly listed in `populateOptions`, like
   // `match` and `limit`.
   const populateOptions = Object.assign({}, o.options, userOptions, {
-    justOne: o.justOne
+    justOne: o.justOne,
+    isVirtual: o.isVirtual
   });
   populateOptions.$nullIfNotFound = o.isVirtual;
   const populatedModel = o.populatedModel;
@@ -38,8 +39,10 @@ module.exports = function assignVals(o) {
   const options = o.options;
   const count = o.count && o.isVirtual;
   let i;
+  let setValueIndex = 0;
 
   function setValue(val) {
+    ++setValueIndex;
     if (count) {
       return val;
     }
@@ -79,11 +82,14 @@ module.exports = function assignVals(o) {
       return valueFilter(val[0], options, populateOptions, _allIds);
     } else if (o.justOne === false && !Array.isArray(val)) {
       return valueFilter([val], options, populateOptions, _allIds);
+    } else if (o.justOne === true && !Array.isArray(val) && Array.isArray(_allIds)) {
+      return valueFilter(val, options, populateOptions, val == null ? val : _allIds[setValueIndex - 1]);
     }
     return valueFilter(val, options, populateOptions, _allIds);
   }
 
   for (i = 0; i < docs.length; ++i) {
+    setValueIndex = 0;
     const _path = o.path.endsWith('.$*') ? o.path.slice(0, -3) : o.path;
     const existingVal = mpath.get(_path, docs[i], lookupLocalFields);
     if (existingVal == null && !getVirtual(o.originalModel.schema, _path)) {
@@ -95,8 +101,8 @@ module.exports = function assignVals(o) {
       valueToSet = numDocs(rawIds[i]);
     } else if (Array.isArray(o.match)) {
       valueToSet = Array.isArray(rawIds[i]) ?
-        rawIds[i].filter(sift(o.match[i])) :
-        [rawIds[i]].filter(sift(o.match[i]))[0];
+        rawIds[i].filter(v => v == null || sift(o.match[i])(v)) :
+        [rawIds[i]].filter(v => v == null || sift(o.match[i])(v))[0];
     } else {
       valueToSet = rawIds[i];
     }
@@ -123,11 +129,11 @@ module.exports = function assignVals(o) {
 
     if (isDoc && Array.isArray(valueToSet)) {
       for (const val of valueToSet) {
-        if (val != null && val.$__ != null) {
+        if (val?.$__ != null) {
           val.$__.parent = docs[i];
         }
       }
-    } else if (isDoc && valueToSet != null && valueToSet.$__ != null) {
+    } else if (isDoc && valueToSet?.$__ != null) {
       valueToSet.$__.parent = docs[i];
     }
 
@@ -138,13 +144,29 @@ module.exports = function assignVals(o) {
       if (Array.isArray(valueToSet)) {
         valueToSet = valueToSet.map(v => v == null ? void 0 : v);
       }
-      mpath.set(_path, valueToSet, docs[i], void 0, setValue, false);
+      mpath.set(
+        _path,
+        valueToSet,
+        docs[i],
+        // Handle setting paths underneath maps using $* by converting arrays into maps of values
+        function lookup(obj, part, val) {
+          if (arguments.length >= 3) {
+            obj[part] = val;
+            return obj[part];
+          }
+          if (obj instanceof Map && part === '$*') {
+            return [...obj.values()];
+          }
+          return obj[part];
+        },
+        setValue,
+        false
+      );
       continue;
     }
 
     const parts = _path.split('.');
     let cur = docs[i];
-    const curPath = parts[0];
     for (let j = 0; j < parts.length - 1; ++j) {
       // If we get to an array with a dotted path, like `arr.foo`, don't set
       // `foo` on the array.
@@ -160,8 +182,9 @@ module.exports = function assignVals(o) {
         // If nothing to set, avoid creating an unnecessary array. Otherwise
         // we'll end up with a single doc in the array with only defaults.
         // See gh-8342, gh-8455
+        const curPath = parts.slice(0, j + 1).join('.');
         const schematype = originalSchema._getSchema(curPath);
-        if (valueToSet == null && schematype != null && schematype.$isMongooseArray) {
+        if (valueToSet == null && schematype?.$isMongooseArray) {
           break;
         }
         cur[parts[j]] = {};
@@ -177,7 +200,7 @@ module.exports = function assignVals(o) {
       o.allOptions.options[populateModelSymbol] = o.allOptions.model;
       docs[i].$populated(_path, o.unpopulatedValues[i], o.allOptions.options);
 
-      if (valueToSet != null && valueToSet.$__ != null) {
+      if (valueToSet?.$__ != null) {
         valueToSet.$__.wasPopulated = { value: o.unpopulatedValues[i] };
       }
 
@@ -233,17 +256,17 @@ function numDocs(v) {
  * background:
  * _ids are left in the query even when user excludes them so
  * that population mapping can occur.
- * @param {Any} val
- * @param {Object} assignmentOpts
- * @param {Object} populateOptions
+ * @param {any} val
+ * @param {object} assignmentOpts
+ * @param {object} populateOptions
  * @param {Function} [populateOptions.transform]
- * @param {Boolean} allIds
+ * @param {boolean} allIds
  * @api private
  */
 
 function valueFilter(val, assignmentOpts, populateOptions, allIds) {
   const userSpecifiedTransform = typeof populateOptions.transform === 'function';
-  const transform = userSpecifiedTransform ? populateOptions.transform : noop;
+  const transform = userSpecifiedTransform ? populateOptions.transform : v => v;
   if (Array.isArray(val)) {
     // find logic
     const ret = [];
@@ -304,7 +327,7 @@ function valueFilter(val, assignmentOpts, populateOptions, allIds) {
 /**
  * Remove _id from `subdoc` if user specified "lean" query option
  * @param {Document} subdoc
- * @param {Object} assignmentOpts
+ * @param {object} assignmentOpts
  * @api private
  */
 
@@ -321,7 +344,7 @@ function maybeRemoveId(subdoc, assignmentOpts) {
 /**
  * Determine if `obj` is something we can set a populated path to. Can be a
  * document, a lean document, or an array/map that contains docs.
- * @param {Any} obj
+ * @param {any} obj
  * @api private
  */
 
@@ -334,8 +357,4 @@ function isPopulatedObject(obj) {
     obj.$isMongooseMap ||
     obj.$__ != null ||
     leanPopulateMap.has(obj);
-}
-
-function noop(v) {
-  return v;
 }
