@@ -81,6 +81,9 @@
           <a href="#akun" class="whitespace-nowrap hover:text-red-600">Akun</a>
           <a href="#anime" class="whitespace-nowrap hover:text-red-600">Anime</a>
           <a href="#newv2" class="whitespace-nowrap hover:text-red-600">Otaku &amp; Anichi</a>
+          <a href="#world" class="whitespace-nowrap hover:text-red-600">World</a>
+          <a href="#country" class="whitespace-nowrap hover:text-red-600">Country</a>
+          <a href="#currency" class="whitespace-nowrap hover:text-red-600">Currency</a>
         </nav>
       </aside>
 
@@ -90,7 +93,7 @@
           <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Semua endpoint memakai method yang tertera dan membalas JSON. Respons sukses berisi <code>"status": "success"</code>, respons gagal berisi <code>"status": "error"</code> dan <code>"message"</code>.</p>
 
           <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800">
-            <p class="text-slate-600 dark:text-slate-300">Endpoint <code>/v2/anime/otaku</code> dan <code>/v2/donghua/anichi</code> memakai <strong>Access Token</strong> yang dikirim lewat header <code>Authorization: Bearer</code>. Endpoint lain (GitHub, video, share-info) memakai guest token.</p>
+            <p class="text-slate-600 dark:text-slate-300">Endpoint <code>/v2/anime/otaku</code>, <code>/v2/donghua/anichi</code>, <code>/v2/world</code>, <code>/v2/country</code>, <code>/v2/currencies</code>, dan <code>/v2/currency</code> memakai <strong>Access Token</strong> yang dikirim lewat header <code>Authorization: Bearer</code>. Endpoint lain (GitHub, video, share-info) memakai guest token.</p>
             <a href="./InputToken.html" class="mt-3 inline-block rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Buat Access Token</a>
           </div>
 
@@ -117,6 +120,9 @@ localStorage.setItem('guest_tgl', tanggal);</code></pre>
             <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/token</code><span class="text-slate-500 dark:text-slate-400">Access token (buat dan cek status)</span></li>
             <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/anime/otaku</code><span class="text-slate-500 dark:text-slate-400">Anime Otakudesu (butuh access token)</span></li>
             <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/donghua/anichi</code><span class="text-slate-500 dark:text-slate-400">Donghua Anichin (butuh access token)</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/world</code><span class="text-slate-500 dark:text-slate-400">Ekonomi dunia, semua negara (butuh access token)</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/country</code><span class="text-slate-500 dark:text-slate-400">Cari satu negara, contoh <code>/v2/country/ID</code> (butuh access token)</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/currency</code><span class="text-slate-500 dark:text-slate-400">Kurs dan daftar mata uang, termasuk <code>/v2/currencies</code> (butuh access token)</span></li>
           </ul>
 
           <h3 class="mt-6 text-sm font-semibold">Alur singkat</h3>
@@ -133,7 +139,7 @@ localStorage.setItem('guest_tgl', tanggal);</code></pre>
         <!-- Access Token -->
         <section id="token" class="scroll-mt-20">
           <h2 class="text-xl font-semibold tracking-tight">Access Token</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Token untuk memanggil <code>/v2/anime/otaku</code> dan <code>/v2/donghua/anichi</code>. Token berlaku <strong>10 hari</strong> dan setiap token tercatat di Google Sheet (tab <code>AccessTokens</code>). Cara termudah: buat lewat halaman Access Token.</p>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Token untuk memanggil <code>/v2/anime/otaku</code>, <code>/v2/donghua/anichi</code>, <code>/v2/world</code>, <code>/v2/country</code>, <code>/v2/currencies</code>, dan <code>/v2/currency</code>. Token berlaku <strong>10 hari</strong> dan setiap token tercatat di Google Sheet (tab <code>AccessTokens</code>). Cara termudah: buat lewat halaman Access Token.</p>
           <a href="./InputToken.html" class="mt-4 inline-block rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Buat Access Token</a>
 
           <ul class="mt-5 divide-y divide-slate-200 text-sm dark:divide-slate-800">
@@ -605,6 +611,264 @@ console.log(await res.json());</code></pre>
             <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_EXPIRED</code><span class="text-slate-500 dark:text-slate-400">Token lewat 10 hari, buat token baru</span></li>
             <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_REVOKED</code><span class="text-slate-500 dark:text-slate-400">Token dicabut admin</span></li>
             <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Terlalu banyak permintaan</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">503</code><span class="text-slate-500 dark:text-slate-400">Validasi token sementara tidak tersedia, coba lagi sebentar</span></li>
+          </ul>
+        </section>
+
+        <!-- World: ekonomi dunia (Access Token sama dengan Otaku & Anichi) -->
+        <section id="world" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">World</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Data ekonomi semua negara dari World Bank, digabung dalam satu respons. Endpoint ini memakai <strong>Access Token yang sama</strong> dengan Otaku &amp; Anichi, dikirim lewat header <code>Authorization: Bearer {token}</code>. Token berlaku 10 hari dan dibuat lewat halaman Access Token.</p>
+          <a href="./InputToken.html" class="mt-4 inline-block rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Buat Access Token</a>
+          <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800">
+            <p class="text-slate-600 dark:text-slate-300">Berbeda dengan endpoint lain, respons bagian Ekonomi dan Mata Uang (World, Country, Currency) memakai <code>"success": true</code> atau <code>"success": false</code>, bukan <code>"status"</code>.</p>
+          </div>
+          <h3 class="mt-6 text-sm font-semibold">Endpoint</h3>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/world</code><span class="text-slate-500 dark:text-slate-400">Semua negara beserta indikator ekonomi, dengan filter, urutan kaya/miskin, dan paginasi</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/world/{kode}</code><span class="text-slate-500 dark:text-slate-400">Satu negara berdasarkan kode (hasilnya sama dengan <code>/v2/country/{kode}</code>)</span></li>
+          </ul>
+          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Setiap negara berisi nama, region, level pendapatan, ibu kota, koordinat, dan indikator: <code>gdp</code> (PDB, US$), <code>gdpPerCapita</code> (PDB per kapita, US$), <code>gdpGrowth</code> (pertumbuhan PDB, %), <code>inflation</code> (inflasi, %), <code>unemployment</code> (pengangguran, %), dan <code>population</code> (populasi). Tiap indikator berisi <code>value</code> dan <code>year</code>, atau <code>null</code> bila datanya tidak ada.</p>
+          <h3 class="mt-6 text-sm font-semibold">Parameter /v2/world</h3>
+          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">q</code><span class="text-slate-500 dark:text-slate-400">Cari berdasarkan nama negara, contoh <code>?q=indo</code></span></li>
+            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">region</code><span class="text-slate-500 dark:text-slate-400">Filter region, contoh <code>?region=East Asia</code></span></li>
+            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">incomeLevel</code><span class="text-slate-500 dark:text-slate-400">Filter level pendapatan, contoh <code>?incomeLevel=High</code></span></li>
+            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">sort</code><span class="text-slate-500 dark:text-slate-400"><code>richest</code> (paling kaya) atau <code>poorest</code> (paling miskin). Hasil diberi nomor <code>rank</code></span></li>
+            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">by</code><span class="text-slate-500 dark:text-slate-400">Ukuran kaya untuk <code>sort</code>: <code>gdpPerCapita</code> (default) atau <code>gdp</code> (total PDB). Negara tanpa data dibuang dari urutan</span></li>
+            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">page</code><span class="text-slate-500 dark:text-slate-400">Nomor halaman, bilangan bulat &ge; 1 (default 1)</span></li>
+            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">limit</code><span class="text-slate-500 dark:text-slate-400">Data per halaman, 1&ndash;250 (default 20). Pakai <code>?limit=250</code> untuk mengambil semua negara sekaligus</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Contoh</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
+const token = localStorage.getItem('access_token');
+const headers = { Authorization: `Bearer ${token}` };
+
+// 10 negara terkaya (per kapita), halaman 1
+const rich = await fetch(`${API}/v2/world?sort=richest&amp;limit=10`, { headers });
+console.log(await rich.json());
+
+// 5 negara termiskin berdasarkan total PDB, halaman 2
+const poor = await fetch(`${API}/v2/world?sort=poorest&amp;by=gdp&amp;page=2&amp;limit=5`, { headers });
+
+// Negara Eropa, 3 terkaya
+const eu = await fetch(`${API}/v2/world?region=Europe&amp;sort=richest&amp;limit=3`, { headers });
+
+if (rich.status === 401) {
+  // token kedaluwarsa atau tidak valid: buat token baru
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Nilai pada contoh hanya ilustrasi.</p>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+  "success": true,
+  "source": "World Bank API v2",
+  "sort": "richest",
+  "by": "gdpPerCapita",
+  "count": 1,
+  "pagination": {
+    "page": 1, "limit": 1,
+    "totalItems": 200, "totalPages": 200,
+    "hasPrev": false, "hasNext": true,
+    "prevPage": null, "nextPage": 2
+  },
+  "data": [
+    {
+      "rank": 1,
+      "iso2": "XX", "iso3": "XXX",
+      "name": "Nama Negara",
+      "region": "Europe &amp; Central Asia",
+      "incomeLevel": "High income",
+      "capital": "Nama Ibu Kota",
+      "longitude": "0.0", "latitude": "0.0",
+      "indicators": {
+        "gdp":          { "value": 1000000000, "year": "2024" },
+        "gdpPerCapita": { "value": 100000,     "year": "2024" },
+        "gdpGrowth":    { "value": 2.1,        "year": "2024" },
+        "inflation":    { "value": 2.4,        "year": "2024" },
+        "unemployment": null,
+        "population":   { "value": 10000,      "year": "2024" }
+      }
+    }
+  ]
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Catatan</h3>
+          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400">
+            <li>Data di-cache 1 jam, jadi nilai bisa sedikit terlambat dari World Bank.</li>
+            <li>Indikator memakai nilai terbaru yang tersedia untuk tiap negara, sehingga tahun datanya bisa berbeda-beda. Lihat field <code>year</code>.</li>
+            <li><code>rank</code> dihitung sebelum data dipotong per halaman, jadi halaman 2 dengan <code>limit=10</code> dimulai dari peringkat 11.</li>
+            <li><code>totalItems</code> mengikuti hasil setelah semua filter diterapkan.</li>
+            <li>Halaman yang melewati <code>totalPages</code> membalas <code>data</code> kosong dengan <code>pagination</code> tetap benar.</li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
+          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400"><code>page</code> bukan bilangan bulat &ge; 1, <code>limit</code> di luar 1&ndash;250, atau <code>sort</code>/<code>by</code> tidak valid</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_MISSING</code><span class="text-slate-500 dark:text-slate-400">Header Authorization kosong</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_INVALID</code><span class="text-slate-500 dark:text-slate-400">Token salah atau tidak dikenali</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_EXPIRED</code><span class="text-slate-500 dark:text-slate-400">Token lewat 10 hari, buat token baru</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_REVOKED</code><span class="text-slate-500 dark:text-slate-400">Token dicabut admin</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Kode negara tidak ditemukan (<code>/v2/world/{kode}</code>)</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Terlalu banyak permintaan</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">502</code><span class="text-slate-500 dark:text-slate-400">Gagal mengambil data dari World Bank</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">503</code><span class="text-slate-500 dark:text-slate-400">Validasi token sementara tidak tersedia, coba lagi sebentar</span></li>
+          </ul>
+        </section>
+
+        <!-- Country: cari satu negara -->
+        <section id="country" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Country</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Cari satu negara berdasarkan kode, lengkap dengan indikator ekonominya. Memakai Access Token yang sama dengan bagian World dan Otaku &amp; Anichi (header <code>Authorization: Bearer {token}</code>).</p>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/country/{kode}</code><span class="text-slate-500 dark:text-slate-400">Data ekonomi satu negara</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Kode negara</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>{kode}</code> bisa kode ISO2 (2 huruf) atau ISO3 (3 huruf), huruf besar atau kecil sama saja.</p>
+          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/country/ID</code><span class="text-slate-500 dark:text-slate-400">Indonesia</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/country/USA</code><span class="text-slate-500 dark:text-slate-400">Amerika Serikat</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/country/JP</code><span class="text-slate-500 dark:text-slate-400">Jepang</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/country/SGP</code><span class="text-slate-500 dark:text-slate-400">Singapura</span></li>
+          </ul>
+          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Daftar semua negara dan kodenya ada di <code>/v2/world?limit=250</code> (field <code>iso2</code> dan <code>iso3</code>).</p>
+          <h3 class="mt-6 text-sm font-semibold">Contoh</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
+const token = localStorage.getItem('access_token');
+const headers = { Authorization: `Bearer ${token}` };
+
+const id = await fetch(`${API}/v2/country/ID`, { headers });
+const usa = await fetch(`${API}/v2/country/USA`, { headers });
+
+if (id.status === 404) {
+  // kode negara tidak ditemukan
+}
+if (id.status === 401) {
+  // token kedaluwarsa atau tidak valid: buat token baru
+}
+
+const { data } = await id.json();
+console.log(data.name, data.indicators.gdpPerCapita);</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Nilai pada contoh hanya ilustrasi.</p>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+  "success": true,
+  "source": "World Bank API v2",
+  "data": {
+    "iso2": "ID",
+    "iso3": "IDN",
+    "name": "Indonesia",
+    "region": "East Asia &amp; Pacific",
+    "incomeLevel": "Upper middle income",
+    "capital": "Jakarta",
+    "longitude": "106.83",
+    "latitude": "-6.19",
+    "indicators": {
+      "gdp":          { "value": 1000000000000, "year": "2024" },
+      "gdpPerCapita": { "value": 5000,          "year": "2024" },
+      "gdpGrowth":    { "value": 5.0,           "year": "2024" },
+      "inflation":    { "value": 2.0,           "year": "2024" },
+      "unemployment": { "value": 5.0,           "year": "2024" },
+      "population":   { "value": 280000000,     "year": "2024" }
+    }
+  }
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons jika kode tidak ditemukan</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+  "success": false,
+  "message": "Negara dengan kode 'ZZ' tidak ditemukan",
+  "hint": "Gunakan kode ISO2 (ID, US) atau ISO3 (IDN, USA). Lihat daftar di /v2/world"
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
+          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_MISSING</code><span class="text-slate-500 dark:text-slate-400">Header Authorization kosong</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_INVALID</code><span class="text-slate-500 dark:text-slate-400">Token salah atau tidak dikenali</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_EXPIRED</code><span class="text-slate-500 dark:text-slate-400">Token lewat 10 hari, buat token baru</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_REVOKED</code><span class="text-slate-500 dark:text-slate-400">Token dicabut admin</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Kode negara tidak ditemukan</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Terlalu banyak permintaan</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">502</code><span class="text-slate-500 dark:text-slate-400">Gagal mengambil data dari World Bank</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">503</code><span class="text-slate-500 dark:text-slate-400">Validasi token sementara tidak tersedia, coba lagi sebentar</span></li>
+          </ul>
+        </section>
+
+        <!-- Currency: kurs mata uang -->
+        <section id="currency" class="scroll-mt-20">
+          <h2 class="text-xl font-semibold tracking-tight">Currency</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Kurs dan daftar mata uang dunia dari CurrencyFreaks. Memakai Access Token yang sama dengan bagian World dan Otaku &amp; Anichi (header <code>Authorization: Bearer {token}</code>). Kunci API CurrencyFreaks disimpan di server, jadi client cukup memakai access token Anda.</p>
+          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/currencies</code><span class="text-slate-500 dark:text-slate-400">Semua mata uang dunia (fiat, logam, dan kripto) beserta kurs terhadap USD. Parameter: <code>q</code> (kode, nama mata uang, atau negara) dan <code>limit</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/currency</code><span class="text-slate-500 dark:text-slate-400">Semua kurs terbaru. Parameter opsional: <code>symbols</code>, contoh <code>?symbols=IDR,EUR,JPY</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/currency/{kode}</code><span class="text-slate-500 dark:text-slate-400">Kurs satu mata uang, contoh <code>/v2/currency/IDR</code> (1 USD = berapa IDR)</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/currency/convert</code><span class="text-slate-500 dark:text-slate-400">Konversi antar mata uang. Parameter: <code>from</code> (default USD), <code>to</code> (wajib), <code>amount</code> (default 1)</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Contoh</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
+const token = localStorage.getItem('access_token');
+const headers = { Authorization: `Bearer ${token}` };
+
+// Daftar mata uang, cari berdasarkan nama
+await fetch(`${API}/v2/currencies?q=rupiah`, { headers });
+
+// Kurs beberapa mata uang sekaligus
+await fetch(`${API}/v2/currency?symbols=IDR,EUR,JPY`, { headers });
+
+// Kurs satu mata uang
+await fetch(`${API}/v2/currency/IDR`, { headers });
+
+// Konversi 100 USD ke IDR
+const res = await fetch(`${API}/v2/currency/convert?from=USD&amp;to=IDR&amp;amount=100`, { headers });
+const { data } = await res.json();
+console.log(data.result);</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/currencies</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Nilai pada contoh hanya ilustrasi.</p>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+  "success": true,
+  "source": "CurrencyFreaks",
+  "date": "2026-10-20 08:00:00+00",
+  "base": "USD",
+  "count": 1,
+  "data": [
+    {
+      "code": "IDR",
+      "name": "Indonesian Rupiah",
+      "countryCode": "ID",
+      "country": "Indonesia",
+      "status": "AVAILABLE",
+      "icon": "https://...",
+      "rate": 16000
+    }
+  ]
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/currency/convert</h3>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+  "success": true,
+  "source": "CurrencyFreaks",
+  "date": "2026-10-20 08:00:00+00",
+  "base": "USD",
+  "data": {
+    "from": "USD",
+    "to": "IDR",
+    "amount": 100,
+    "rate": 16000,
+    "result": 1600000
+  }
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Catatan</h3>
+          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400">
+            <li>Kurs di-cache 15 menit dan daftar mata uang 24 jam, jadi nilai bisa sedikit terlambat dari sumbernya.</li>
+            <li>Kurs dihitung terhadap USD. Konversi antar dua mata uang lain dihitung sebagai kurs silang lewat USD.</li>
+            <li>Bila kurs sedang tidak bisa diambil, <code>/v2/currencies</code> tetap membalas daftar mata uang dengan <code>rate</code> bernilai <code>null</code>.</li>
+            <li>Daftar mata uang mencakup fiat, logam, dan kripto, jadi jumlahnya jauh lebih banyak dari mata uang resmi negara.</li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
+          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400"><code>to</code> kosong atau <code>amount</code> bukan angka &ge; 0 (convert)</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_MISSING</code><span class="text-slate-500 dark:text-slate-400">Header Authorization kosong</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_INVALID</code><span class="text-slate-500 dark:text-slate-400">Token salah atau tidak dikenali</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_EXPIRED</code><span class="text-slate-500 dark:text-slate-400">Token lewat 10 hari, buat token baru</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_REVOKED</code><span class="text-slate-500 dark:text-slate-400">Token dicabut admin</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Mata uang tidak ditemukan</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Terlalu banyak permintaan</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">500</code><span class="text-slate-500 dark:text-slate-400">Kunci API CurrencyFreaks belum dikonfigurasi di server</span></li>
+            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">502</code><span class="text-slate-500 dark:text-slate-400">Gagal mengambil data dari CurrencyFreaks</span></li>
             <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">503</code><span class="text-slate-500 dark:text-slate-400">Validasi token sementara tidak tersedia, coba lagi sebentar</span></li>
           </ul>
         </section>
