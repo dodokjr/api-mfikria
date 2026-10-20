@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="public/js/index.js"></script>
-    <script src="public/js/nav.js"></script>
+    <script src="public/js/api.js"></script>
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -24,9 +24,6 @@
         };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
-    <style>
-      html { scroll-behavior: smooth; }
-    </style>
     <title>Mfikria Docs</title>
   </head>
   <body style="font-family: 'Poppins', sans-serif" class="bg-white text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-200">
@@ -67,719 +64,87 @@
       </div>
     </header>
 
-    <div class="mx-auto flex max-w-4xl flex-col gap-8 px-5 py-10 md:flex-row md:gap-12">
-      <!-- Menu samping -->
-      <aside class="md:w-44 md:shrink-0">
-        <nav class="flex gap-5 overflow-x-auto text-sm md:sticky md:top-20 md:flex-col md:gap-3" role="navigation">
-          <a href="#mulai" class="whitespace-nowrap hover:text-red-600">Getting Started</a>
-          <a href="#token" class="whitespace-nowrap hover:text-red-600">Access Token</a>
-          <a href="#guest" class="whitespace-nowrap hover:text-red-600">Guest Token</a>
-          <a href="#contoh" class="whitespace-nowrap hover:text-red-600">Contoh Kode</a>
-          <a href="#github" class="whitespace-nowrap hover:text-red-600">GitHub</a>
-          <a href="#video" class="whitespace-nowrap hover:text-red-600">Video</a>
-          <a href="#share" class="whitespace-nowrap hover:text-red-600">Share &amp; Embed</a>
-          <a href="#akun" class="whitespace-nowrap hover:text-red-600">Akun</a>
-          <a href="#anime" class="whitespace-nowrap hover:text-red-600">Anime</a>
-          <a href="#newv2" class="whitespace-nowrap hover:text-red-600">Otaku &amp; Anichi</a>
-          <a href="#ekonomi" class="whitespace-nowrap hover:text-red-600">Ekonomi &amp; Mata Uang</a>
-        </nav>
-      </aside>
-
-      <main class="min-w-0 flex-1 space-y-14">
-        <section id="mulai" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Getting Started</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Semua endpoint memakai method yang tertera dan membalas JSON. Respons sukses berisi <code>"status": "success"</code>, respons gagal berisi <code>"status": "error"</code> dan <code>"message"</code>.</p>
-
-          <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800">
-            <p class="text-slate-600 dark:text-slate-300">Endpoint <code>/v2/anime/otaku</code>, <code>/v2/donghua/anichi</code>, <code>/v2/world</code>, <code>/v2/country</code>, <code>/v2/currencies</code>, dan <code>/v2/currency</code> memakai <strong>Access Token</strong> yang dikirim lewat header <code>Authorization: Bearer</code>. Endpoint lain (GitHub, video, share-info) memakai guest token.</p>
-            <a href="./InputToken.html" class="mt-3 inline-block rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Buat Access Token</a>
-          </div>
-
-          <h3 class="mt-6 text-sm font-semibold">Langkah pertama: dapatkan token</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Sebelum memakai endpoint apa pun yang butuh token (GitHub, video, share-info), kirim request <code>POST</code> ke URL berikut untuk mendapatkan guest token, lalu <strong>simpan token tersebut</strong>.</p>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> https://api-mfikria.vercel.app/mfikria/v1/guest-token</code><span class="text-slate-500 dark:text-slate-400">Tanpa body dan tanpa header</span></li>
-          </ul>
-
-          <pre class="mt-3 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const res = await fetch('https://api-mfikria.vercel.app/mfikria/v1/guest-token', { method: 'POST' });
-const { Access_Token, tanggal } = (await res.json()).data;
-
-// simpan token supaya bisa dipakai ulang
-localStorage.setItem('guest_token', Access_Token);
-localStorage.setItem('guest_tgl', tanggal);</code></pre>
-
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Simpan <code>Access_Token</code> dan <code>tanggal</code> dari respons (misalnya di <code>localStorage</code>, variabel environment, atau database). Token berlaku 24 jam dan dibatasi 10 token per IP per jam, jadi pakai ulang token yang sudah tersimpan dan jangan buat token baru di setiap request. Buat token baru hanya jika belum punya atau sudah kedaluwarsa (dibalas 401).</p>
-
-          <h3 class="mt-6 text-sm font-semibold">Base URL</h3>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/mfikria/v1</code><span class="text-slate-500 dark:text-slate-400">Guest token, video, share/embed, dan akun</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/github</code><span class="text-slate-500 dark:text-slate-400">GitHub</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/anime</code><span class="text-slate-500 dark:text-slate-400">Anime</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/token</code><span class="text-slate-500 dark:text-slate-400">Access token (buat dan cek status)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/anime/otaku</code><span class="text-slate-500 dark:text-slate-400">Anime Otakudesu (butuh access token)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/donghua/anichi</code><span class="text-slate-500 dark:text-slate-400">Donghua Anichin (butuh access token)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/world</code><span class="text-slate-500 dark:text-slate-400">Ekonomi dunia: semua negara dan <code>/v2/country/{kode}</code> (butuh access token)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0">https://api-mfikria.vercel.app/v2/currency</code><span class="text-slate-500 dark:text-slate-400">Kurs mata uang dan <code>/v2/currencies</code> (butuh access token)</span></li>
-          </ul>
-
-          <h3 class="mt-6 text-sm font-semibold">Alur singkat</h3>
-          <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400">
-            <li>Kirim <code>POST /mfikria/v1/guest-token</code> untuk mendapatkan token, lalu <strong>simpan</strong> <code>Access_Token</code> dan <code>tanggal</code>.</li>
-            <li>Tempelkan <code>?query={Access_Token}&amp;tgl={tanggal}</code> pada endpoint yang butuh token (GitHub, video, share-info).</li>
-            <li>Pakai ulang token yang tersimpan sampai kedaluwarsa, jangan buat token baru di setiap request.</li>
-            <li>Untuk <code>/v2/anime/otaku</code> dan <code>/v2/donghua/anichi</code>, buat Access Token di halaman <a href="./InputToken.html" class="text-red-600 hover:underline">Access Token</a>, lalu kirim di header <code>Authorization: Bearer</code>.</li>
-          </ol>
-
-          <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Endpoint publik tanpa token: <code>/guest-token</code>, <code>/guest-view</code>, <code>/share</code>, <code>/embed</code>, <code>/s/{id}/stream</code>, <code>/s/{id}/view</code>, serta <code>POST /v2/token</code> dan <code>GET /v2/token/status</code>.</p>
-        </section>
-
-        <!-- Access Token -->
-        <section id="token" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Access Token</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Token untuk memanggil <code>/v2/anime/otaku</code>, <code>/v2/donghua/anichi</code>, <code>/v2/world</code>, <code>/v2/country</code>, <code>/v2/currencies</code>, dan <code>/v2/currency</code>. Token berlaku <strong>10 hari</strong> dan setiap token tercatat di Google Sheet (tab <code>AccessTokens</code>). Cara termudah: buat lewat halaman Access Token.</p>
-          <a href="./InputToken.html" class="mt-4 inline-block rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Buat Access Token</a>
-
-          <ul class="mt-5 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /v2/token</code><span class="text-slate-500 dark:text-slate-400">Buat access token. Body JSON <code>{ "name": "..." }</code>, opsional (teks bebas maksimal 15 karakter, kosong = nama acak 15 karakter)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/token/status</code><span class="text-slate-500 dark:text-slate-400">Cek token masih berlaku atau tidak (header <code>Authorization: Bearer {token}</code>)</span></li>
-          </ul>
-
-          <h3 class="mt-6 text-sm font-semibold">Contoh membuat token</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
-
-const res = await fetch(`${API}/v2/token`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ name: 'Budi' }) // opsional, maks 15 karakter
-});
-const { data } = await res.json();
-
-// simpan token dan waktu kedaluwarsanya
-localStorage.setItem('access_token', data.token);
-localStorage.setItem('access_token_exp', String(data.expiresAt));</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Contoh respons</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-  "status": "success",
-  "data": {
-    "token": "mfa_Budi_5ad8f0c5c08c1f1700d10164_PgQgYB2EoLQBRSgcN3tECG",
-    "id": "acc-1a2b3c4d5e6f",
-    "name": "Budi",
-    "totalDays": 10,
-    "expiresAt": 1792400000000,
-    "expiresInMs": 864000000
-  }
-}</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Cara memakai token</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Kirim token di header <code>Authorization: Bearer</code>. Kalau dibalas <code>401</code> dengan <code>code: "TOKEN_EXPIRED"</code>, buat token baru.</p>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const token = localStorage.getItem('access_token');
-
-const res = await fetch('https://api-mfikria.vercel.app/v2/donghua/anichi/latest', {
-  headers: { Authorization: `Bearer ${token}` }
-});
-
-if (res.status === 401) {
-  // token kedaluwarsa atau tidak valid: buat token baru
-}</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Cek status token</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>/v2/token/status</code> selalu membalas 200. Baca <code>data.valid</code>; kalau <code>false</code>, <code>data.code</code> berisi alasannya.</p>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-  "status": "success",
-  "data": {
-    "valid": true,
-    "id": "acc-1a2b3c4d5e6f",
-    "type": "session",
-    "name": "Budi",
-    "expiresAt": 1792400000000,
-    "remainingMs": 863000000,
-    "remainingDays": 10
-  }
-}</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Batasan</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Pembuatan token dibatasi 10 permintaan per menit per IP (lebih dari itu dibalas 429, lihat header <code>Retry-After</code>). Pakai ulang token yang sudah tersimpan sampai kedaluwarsa.</p>
-
-          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
-          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_MISSING</code><span class="text-slate-500 dark:text-slate-400">Header Authorization kosong</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_INVALID</code><span class="text-slate-500 dark:text-slate-400">Token salah atau tidak dikenali</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_EXPIRED</code><span class="text-slate-500 dark:text-slate-400">Lewat 10 hari, buat token baru</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_REVOKED</code><span class="text-slate-500 dark:text-slate-400">Token dicabut admin</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Terlalu banyak permintaan</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">503</code><span class="text-slate-500 dark:text-slate-400">Validasi token sementara tidak tersedia, coba lagi sebentar</span></li>
-          </ul>
-        </section>
-
-        <section id="guest" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Guest Token</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Token untuk pengunjung tanpa login. Setiap token tercatat di Google Sheet (tab <code>GuestTokens</code>).</p>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/guest-token</code><span class="text-slate-500 dark:text-slate-400">Buat guest token. Tanpa body dan tanpa header</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/guest-view</code><span class="text-slate-500 dark:text-slate-400">Jumlah guest yang pernah masuk (<code>view</code>), di-cache 30 detik</span></li>
-          </ul>
-          <h3 class="mt-6 text-sm font-semibold">Contoh respons</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-  "status": "success",
-  "message": "Guest token berhasil dibuat.",
-  "data": {
-    "userId": "G001",
-    "Access_Token": "...",
-    "pukul": "1535",
-    "tanggal": "091026"
-  }
-}</code></pre>
-          <h3 class="mt-6 text-sm font-semibold">Cara memakai token</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Kirim sebagai query pada endpoint yang butuh guest token: <code>?query={Access_Token}&amp;tgl={tanggal}</code>, dengan nilai dari respons di atas.</p>
-          <h3 class="mt-6 text-sm font-semibold">Batasan</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Maksimal 10 token per IP per jam (lebih dari itu dibalas 429) dan token berlaku 24 jam secara default. Token yang salah atau kedaluwarsa dibalas 401.</p>
-        </section>
-
-        <section id="contoh" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Contoh Kode</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Ambil guest token, lalu pakai untuk mengambil 5 repository milik <code>dodokjr</code>.</p>
-
-          <div class="mt-5 flex gap-1 overflow-x-auto border-b border-slate-200 text-sm dark:border-slate-800">
-            <button type="button" data-tab="js" class="-mb-px whitespace-nowrap border-b-2 border-red-600 text-red-600 px-3 py-2 font-medium">JavaScript</button>
-            <button type="button" data-tab="react" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">React</button>
-            <button type="button" data-tab="node" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Node.js</button>
-            <button type="button" data-tab="python" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Python</button>
-            <button type="button" data-tab="go" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Go</button>
-            <button type="button" data-tab="java" class="-mb-px whitespace-nowrap border-b-2 border-transparent text-slate-500 hover:text-red-600 px-3 py-2 font-medium">Java</button>
-          </div>
-
-          <div data-panel="js">
-            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">JavaScript vanilla (di browser)</p>
-            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
-
-async function getRepos() {
-  // 1. ambil guest token
-  const tokenRes = await fetch(`${API}/mfikria/v1/guest-token`, { method: 'POST' });
-  const { Access_Token, tanggal } = (await tokenRes.json()).data;
-
-  // 2. pakai token di endpoint GitHub
-  const params = new URLSearchParams({ per_page: 5, query: Access_Token, tgl: tanggal });
-  const res = await fetch(`${API}/v2/github/dodokjr/repos?${params}`);
-  console.log(await res.json());
-}
-
-getRepos().catch(console.error);</code></pre>
-          </div>
-
-          <div data-panel="react" class="hidden">
-            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">React (function component + hooks)</p>
-            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>import { useEffect, useState } from 'react';
-
-const API = 'https://api-mfikria.vercel.app';
-
-export default function Repos() {
-  const [repos, setRepos] = useState([]);
-
-  useEffect(() =&gt; {
-    async function load() {
-      const tokenRes = await fetch(`${API}/mfikria/v1/guest-token`, { method: 'POST' });
-      const { Access_Token, tanggal } = (await tokenRes.json()).data;
-
-      const params = new URLSearchParams({ per_page: 5, query: Access_Token, tgl: tanggal });
-      const res = await fetch(`${API}/v2/github/dodokjr/repos?${params}`);
-      const data = await res.json();
-      setRepos(Array.isArray(data) ? data : []);
-    }
-    load().catch(console.error);
-  }, []);
-
-  return (
-    &lt;ul&gt;
-      {repos.map((r) =&gt; (
-        &lt;li key={r.id}&gt;{r.name}&lt;/li&gt;
-      ))}
-    &lt;/ul&gt;
-  );
-}</code></pre>
-          </div>
-
-          <div data-panel="node" class="hidden">
-            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Node.js 18 atau lebih baru (<code>fetch</code> sudah bawaan)</p>
-            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
-
-async function main() {
-  const tokenRes = await fetch(`${API}/mfikria/v1/guest-token`, { method: 'POST' });
-  const { Access_Token, tanggal } = (await tokenRes.json()).data;
-
-  const params = new URLSearchParams({ per_page: 5, query: Access_Token, tgl: tanggal });
-  const res = await fetch(`${API}/v2/github/dodokjr/repos?${params}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-  const repos = await res.json();
-  repos.forEach((r) =&gt; console.log(r.name));
-}
-
-main().catch(console.error);</code></pre>
-          </div>
-
-          <div data-panel="python" class="hidden">
-            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Python (<code>pip install requests</code>)</p>
-            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>import requests
-
-API = 'https://api-mfikria.vercel.app'
-
-# 1. ambil guest token
-token = requests.post(f'{API}/mfikria/v1/guest-token', timeout=10).json()['data']
-
-# 2. pakai token di endpoint GitHub
-res = requests.get(
-    f'{API}/v2/github/dodokjr/repos',
-    params={'per_page': 5, 'query': token['Access_Token'], 'tgl': token['tanggal']},
-    timeout=10,
-)
-res.raise_for_status()
-
-for repo in res.json():
-    print(repo['name'])</code></pre>
-          </div>
-
-          <div data-panel="go" class="hidden">
-            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Go (hanya library standar)</p>
-            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>package main
-
-import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
-	"net/url"
-)
-
-const api = "https://api-mfikria.vercel.app"
-
-func main() {
-	// 1. ambil guest token
-	res, err := http.Post(api+"/mfikria/v1/guest-token", "application/json", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-
-	var tok struct {
-		Data struct {
-			AccessToken string `json:"Access_Token"`
-			Tanggal     string `json:"tanggal"`
-		} `json:"data"`
-	}
-	if err := json.NewDecoder(res.Body).Decode(&amp;tok); err != nil {
-		log.Fatal(err)
-	}
-
-	// 2. pakai token di endpoint GitHub
-	q := url.Values{}
-	q.Set("per_page", "5")
-	q.Set("query", tok.Data.AccessToken)
-	q.Set("tgl", tok.Data.Tanggal)
-
-	res2, err := http.Get(api + "/v2/github/dodokjr/repos?" + q.Encode())
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res2.Body.Close()
-
-	var repos []struct {
-		Name string `json:"name"`
-	}
-	if err := json.NewDecoder(res2.Body).Decode(&amp;repos); err != nil {
-		log.Fatal(err)
-	}
-	for _, r := range repos {
-		fmt.Println(r.Name)
-	}
-}</code></pre>
-          </div>
-
-          <div data-panel="java" class="hidden">
-            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Java 11 atau lebih baru (<code>java.net.http</code> bawaan, tanpa library tambahan)</p>
-            <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public class Main {
-    static final String API = "https://api-mfikria.vercel.app";
-
-    // Ambil nilai string dari JSON sederhana (tanpa library JSON)
-    static String find(String json, String key) {
-        Matcher m = Pattern.compile("\"" + key + "\"\\s*:\\s*\"([^\"]*)\"").matcher(json);
-        if (!m.find()) throw new IllegalStateException("Field tidak ditemukan: " + key);
-        return m.group(1);
-    }
-
-    public static void main(String[] args) throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
-
-        // 1. ambil guest token
-        HttpRequest tokenReq = HttpRequest.newBuilder()
-                .uri(URI.create(API + "/mfikria/v1/guest-token"))
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .build();
-        String tokenBody = client.send(tokenReq, HttpResponse.BodyHandlers.ofString()).body();
-        String token = find(tokenBody, "Access_Token");
-        String tanggal = find(tokenBody, "tanggal");
-
-        // 2. pakai token di endpoint GitHub
-        String url = API + "/v2/github/dodokjr/repos?per_page=5"
-                + "&amp;query=" + URLEncoder.encode(token, StandardCharsets.UTF_8)
-                + "&amp;tgl=" + URLEncoder.encode(tanggal, StandardCharsets.UTF_8);
-
-        HttpRequest reposReq = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
-        HttpResponse&lt;String&gt; res = client.send(reposReq, HttpResponse.BodyHandlers.ofString());
-        if (res.statusCode() != 200) {
-            throw new RuntimeException("HTTP " + res.statusCode());
-        }
-        System.out.println(res.body());
-    }
-}</code></pre>
-          </div>
-        </section>
-
-        <section id="github" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">GitHub</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Ganti <code>{nama}</code> dengan username GitHub dan <code>{repo}</code> dengan nama repository. Semua endpoint butuh guest token (<code>?query=&amp;tgl=</code>) dan dibatasi 60 request per menit per IP.</p>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}</code><span class="text-slate-500 dark:text-slate-400">Profil pengguna</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}/repos</code><span class="text-slate-500 dark:text-slate-400">Daftar repository</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}/repos/{repo}</code><span class="text-slate-500 dark:text-slate-400">Detail satu repository</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}/repos/{repo}/events</code><span class="text-slate-500 dark:text-slate-400">Aktivitas repository</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/{nama}/repos/{repo}/languages</code><span class="text-slate-500 dark:text-slate-400">Bahasa pemrograman yang dipakai</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/github/l/limit</code><span class="text-slate-500 dark:text-slate-400">Sisa kuota GitHub API (limit, remaining, reset)</span></li>
-          </ul>
-          <h3 class="mt-6 text-sm font-semibold">Parameter opsional</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Untuk <code>/repos</code> dan <code>/events</code>: <code>per_page</code> (1&ndash;100) dan <code>page</code> (1&ndash;1000). Contoh: <code>/v2/github/dodokjr/repos?per_page=5&amp;page=1&amp;query=...&amp;tgl=...</code></p>
-          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
-          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400">Username atau nama repo tidak valid</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">401</code><span class="text-slate-500 dark:text-slate-400">Guest token tidak ada atau tidak valid</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">User atau repository tidak ditemukan</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Batas request tercapai (server atau GitHub)</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">502</code><span class="text-slate-500 dark:text-slate-400">Gagal mengambil data dari GitHub</span></li>
-          </ul>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Respons di-cache sekitar 60 detik, jadi data bisa terlambat sedikit dari GitHub.</p>
-        </section>
-
-        <section id="video" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Video</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Semua endpoint butuh guest token (<code>?query=&amp;tgl=</code>). <code>{token}</code> adalah <code>videoToken</code> (10 karakter) dari daftar video.</p>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/videos</code><span class="text-slate-500 dark:text-slate-400">Daftar video beserta views, tanggal upload, dan info share</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/video/{token}</code><span class="text-slate-500 dark:text-slate-400">Stream video (mendukung Range), pakai sebagai <code>src</code> elemen <code>&lt;video&gt;</code></span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/video-info/{token}</code><span class="text-slate-500 dark:text-slate-400">Info satu video: judul, ukuran, views, tanggal upload, share</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/video-view/{token}</code><span class="text-slate-500 dark:text-slate-400">Catat 1 view. Panggil sekali setelah video diputar beberapa detik</span></li>
-          </ul>
-          <h3 class="mt-6 text-sm font-semibold">Contoh respons /videos</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-  "status": "success",
-  "totalVideos": 1,
-  "data": [
-    {
-      "title": "the_weekend_Time",
-      "mimeType": "video/mp4",
-      "size": 12345678,
-      "videoToken": "k4n8lSIppy",
-      "views": 0,
-      "uploadedAt": "2026-10-09T08:35:00.000Z",
-      "uploadedAtLocal": { "tanggal": "09-10-2026", "pukul": "15:35" },
-      "videoUrl": "/mfikria/v1/video/k4n8lSIppy?query=...&amp;tgl=...",
-      "share": {
-        "shareId": "k4n8lSIppy",
-        "shareUrl": ".../mfikria/v1/share/k4n8lSIppy",
-        "embedUrl": ".../mfikria/v1/embed/k4n8lSIppy",
-        "embedCode": "&lt;iframe ...&gt;&lt;/iframe&gt;",
-        "social": { "whatsapp": "...", "facebook": "...", "twitter": "...", "telegram": "...", "linkedin": "..." }
-      }
-    }
-  ]
-}</code></pre>
-          <h3 class="mt-6 text-sm font-semibold">Catatan</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>/video-view</code> membalas <code>{ views, counted }</code>. Satu guest hanya dihitung sekali untuk setiap video, jadi <code>counted</code> bernilai <code>false</code> pada panggilan berikutnya.</p>
-          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
-          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">401</code><span class="text-slate-500 dark:text-slate-400">Guest token tidak valid</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Video tidak ditemukan</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">500</code><span class="text-slate-500 dark:text-slate-400">Terjadi kesalahan di server</span></li>
-          </ul>
-        </section>
-
-        <section id="share" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Share &amp; Embed</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>{id}</code> adalah <code>shareId</code> dari objek <code>share</code> pada daftar video (sama dengan <code>videoToken</code>). Endpoint ini publik, tanpa guest token, kecuali <code>/share-info</code>.</p>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/share/{id}</code><span class="text-slate-500 dark:text-slate-400">Link untuk dibagikan. Langsung diarahkan ke halaman nonton di situs</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/embed/{id}</code><span class="text-slate-500 dark:text-slate-400">Player polos untuk <code>&lt;iframe&gt;</code></span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/share-info/{id}</code><span class="text-slate-500 dark:text-slate-400">Link share, kode iframe, dan link media sosial satu video (butuh guest token)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/s/{id}/stream</code><span class="text-slate-500 dark:text-slate-400">Stream video bertanda tangan (<code>?e=&amp;s=</code>), dipakai halaman embed</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/s/{id}/view</code><span class="text-slate-500 dark:text-slate-400">Catat view dari halaman embed (<code>?e=&amp;s=</code>)</span></li>
-          </ul>
-          <h3 class="mt-6 text-sm font-semibold">Contoh embed</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>&lt;iframe src="https://api-mfikria.vercel.app/mfikria/v1/embed/k4n8lSIppy" width="640" height="360" frameborder="0" allow="fullscreen; autoplay" allowfullscreen loading="lazy" title="Judul video"&gt;&lt;/iframe&gt;</code></pre>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Bot media sosial (WhatsApp, Facebook, Telegram, dan lain-lain) tetap mendapat halaman dengan meta Open Graph supaya preview link muncul. Link stream bertanda tangan berlaku 6 jam.</p>
-        </section>
-
-        <section id="akun" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Akun</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Endpoint akun memakai header <code>Authorization: Bearer {token akses}</code> (token akses user atau admin). Body dikirim sebagai JSON.</p>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/register</code><span class="text-slate-500 dark:text-slate-400">Daftar akun. Body: <code>username</code>, <code>password</code>, <code>role</code> (opsional), <code>photoId</code> (opsional)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/login</code><span class="text-slate-500 dark:text-slate-400">Masuk. Body: <code>username</code>, <code>password</code></span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">POST</span> /mfikria/v1/logout</code><span class="text-slate-500 dark:text-slate-400">Keluar. Body: <code>username</code>, <code>encryptedQueryToken</code></span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/photos</code><span class="text-slate-500 dark:text-slate-400">Daftar foto di folder Google Drive</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/photoProfile/{token}</code><span class="text-slate-500 dark:text-slate-400">Foto profil dari token terenkripsi</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/assets/photo/{photoId}?q={token}</code><span class="text-slate-500 dark:text-slate-400">Foto profil dengan <code>photoId</code> dan token</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /mfikria/v1/assets/session-photo/{photoId}?query={encryptedQueryToken}</code><span class="text-slate-500 dark:text-slate-400">Validasi sesi, atau ambil foto. Dengan <code>Accept: application/json</code> hanya data verifikasi</span></li>
-          </ul>
-          <h3 class="mt-6 text-sm font-semibold">Aturan</h3>
-          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400"><li>Username maksimal 50 karakter, password 6&ndash;128 karakter.</li><li>Akun <code>admin</code> hanya bisa dibuat dengan token akses admin.</li><li>Satu akun hanya bisa aktif di satu sesi. Login saat akun masih online dibalas 403.</li><li>Password disimpan sebagai hash (scrypt), bukan teks asli.</li></ul>
-          <h3 class="mt-6 text-sm font-semibold">Contoh respons /login</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-  "status": "success",
-  "message": "Login Berhasil sebagai USER",
-  "dashboardData": {
-    "profile": { "userId": "U001", "username": "...", "role": "user", "statusLogin": "true",
-                 "terakhirLogin": { "tanggal": "...", "pukul": "..." } },
-    "permissions": { "canUploadFile": false, "canModifyData": false, "accessLevel": "View Only (User)" },
-    "sessionTokens": { "accessToken": "...", "encryptedQueryToken": "..." },
-    "googleDrivePhoto": { "photoId": "...", "token": "..." }
-  }
-}</code></pre>
-          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
-          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400">Data wajib tidak lengkap atau tidak valid</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">403</code><span class="text-slate-500 dark:text-slate-400">Token akses salah, username atau password salah, atau akun sedang online</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Username tidak ditemukan (logout)</span></li>
-            <li class="flex gap-4 py-2"><code class="w-10 shrink-0 text-red-600 dark:text-red-400">500</code><span class="text-slate-500 dark:text-slate-400">Terjadi kesalahan di server</span></li>
-          </ul>
-        </section>
-
-        <!-- Anime -->
-        <section id="anime" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Anime</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Endpoint dasar <code>/v2/anime</code> langsung menampilkan halaman home. Masih dalam pengembangan.</p>
-          <ul class="mt-4 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime</code><span class="text-slate-500 dark:text-slate-400">Halaman home</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/{query}</code><span class="text-slate-500 dark:text-slate-400">Cari anime, contoh <code>/v2/anime/naruto</code></span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/full/{id}</code><span class="text-slate-500 dark:text-slate-400">Detail lengkap anime</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/popular</code><span class="text-slate-500 dark:text-slate-400">Anime populer (Top Anime)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/populer/page/{id}</code><span class="text-slate-500 dark:text-slate-400">Anime populer per halaman</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/character/{id}</code><span class="text-slate-500 dark:text-slate-400">Karakter anime</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0">/v2/anime/character/people/{id}</code><span class="text-slate-500 dark:text-slate-400">Pengisi suara karakter</span></li>
-          </ul>
-        </section>
-
-        <!-- Otaku & Anichi (newV2, butuh access token) -->
-        <section id="newv2" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Otaku &amp; Anichi</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Anime dari Otakudesu dan donghua dari Anichin. Semua endpoint butuh <strong>Access Token</strong> lewat header <code>Authorization: Bearer {token}</code>. Masih dalam pengembangan.</p>
-          <a href="./InputToken.html" class="mt-4 inline-block rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Buat Access Token</a>
-
-          <ul class="mt-5 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/anime/otaku</code><span class="text-slate-500 dark:text-slate-400">Anime Otakudesu</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/donghua/anichi</code><span class="text-slate-500 dark:text-slate-400">Donghua Anichin</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/donghua/anichi/latest</code><span class="text-slate-500 dark:text-slate-400">Donghua terbaru</span></li>
-          </ul>
-
-          <h3 class="mt-6 text-sm font-semibold">Contoh</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
-const token = localStorage.getItem('access_token');
-
-const res = await fetch(`${API}/v2/donghua/anichi/latest`, {
-  headers: { Authorization: `Bearer ${token}` }
-});
-
-if (res.status === 401) {
-  // token kedaluwarsa atau tidak valid: buat token baru
-}
-console.log(await res.json());</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
-          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_MISSING</code><span class="text-slate-500 dark:text-slate-400">Header Authorization kosong</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_INVALID</code><span class="text-slate-500 dark:text-slate-400">Token salah atau tidak dikenali</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_EXPIRED</code><span class="text-slate-500 dark:text-slate-400">Token lewat 10 hari, buat token baru</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_REVOKED</code><span class="text-slate-500 dark:text-slate-400">Token dicabut admin</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Terlalu banyak permintaan</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">503</code><span class="text-slate-500 dark:text-slate-400">Validasi token sementara tidak tersedia, coba lagi sebentar</span></li>
-          </ul>
-        </section>
-
-        <!-- Ekonomi & Mata Uang (butuh access token yang sama dengan Otaku & Anichi) -->
-        <section id="ekonomi" class="scroll-mt-20">
-          <h2 class="text-xl font-semibold tracking-tight">Ekonomi &amp; Mata Uang</h2>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Data ekonomi semua negara (sumber World Bank) dan kurs mata uang dunia (sumber CurrencyFreaks). Semua endpoint memakai <strong>Access Token yang sama</strong> dengan Otaku &amp; Anichi, dikirim lewat header <code>Authorization: Bearer {token}</code>. Token berlaku 10 hari dan dibuat lewat halaman Access Token.</p>
-          <a href="./InputToken.html" class="mt-4 inline-block rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Buat Access Token</a>
-
-          <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800">
-            <p class="text-slate-600 dark:text-slate-300">Berbeda dengan endpoint lain, respons endpoint ini memakai <code>"success": true</code> atau <code>"success": false</code> (bukan <code>"status"</code>). Kunci API CurrencyFreaks disimpan di server, jadi client cukup memakai access token Anda.</p>
-          </div>
-
-          <h3 class="mt-6 text-sm font-semibold">Ekonomi dunia</h3>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/world</code><span class="text-slate-500 dark:text-slate-400">Semua negara beserta indikator ekonomi dalam satu respons, dengan filter dan paginasi</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/world/{kode}</code><span class="text-slate-500 dark:text-slate-400">Satu negara berdasarkan kode</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/country/{kode}</code><span class="text-slate-500 dark:text-slate-400">Cari satu negara. Contoh: <code>/v2/country/ID</code> (Indonesia), <code>/v2/country/USA</code> (Amerika Serikat)</span></li>
-          </ul>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400"><code>{kode}</code> bisa kode ISO2 (<code>ID</code>, <code>US</code>, <code>JP</code>) atau ISO3 (<code>IDN</code>, <code>USA</code>, <code>JPN</code>), huruf besar atau kecil sama saja. Setiap negara berisi nama, region, level pendapatan, ibu kota, koordinat, dan indikator: <code>gdp</code> (PDB, US$), <code>gdpPerCapita</code> (PDB per kapita, US$), <code>gdpGrowth</code> (pertumbuhan PDB, %), <code>inflation</code> (inflasi, %), <code>unemployment</code> (pengangguran, %), dan <code>population</code> (populasi). Tiap indikator berisi <code>value</code> dan <code>year</code>, atau <code>null</code> bila datanya tidak ada.</p>
-
-          <h3 class="mt-6 text-sm font-semibold">Parameter /v2/world</h3>
-          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">q</code><span class="text-slate-500 dark:text-slate-400">Cari berdasarkan nama negara, contoh <code>?q=indo</code></span></li>
-            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">region</code><span class="text-slate-500 dark:text-slate-400">Filter region, contoh <code>?region=East Asia</code></span></li>
-            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">incomeLevel</code><span class="text-slate-500 dark:text-slate-400">Filter level pendapatan, contoh <code>?incomeLevel=High</code></span></li>
-            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">sort</code><span class="text-slate-500 dark:text-slate-400"><code>richest</code> (paling kaya) atau <code>poorest</code> (paling miskin). Hasil diberi nomor <code>rank</code></span></li>
-            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">by</code><span class="text-slate-500 dark:text-slate-400">Ukuran kaya untuk <code>sort</code>: <code>gdpPerCapita</code> (default) atau <code>gdp</code> (total PDB). Negara tanpa data dibuang dari urutan</span></li>
-            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">page</code><span class="text-slate-500 dark:text-slate-400">Nomor halaman, bilangan bulat &ge; 1 (default 1)</span></li>
-            <li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">limit</code><span class="text-slate-500 dark:text-slate-400">Data per halaman, 1&ndash;250 (default 20). Pakai <code>?limit=250</code> untuk mengambil semua negara sekaligus</span></li>
-          </ul>
-
-          <h3 class="mt-6 text-sm font-semibold">Contoh</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
-const token = localStorage.getItem('access_token');
-const headers = { Authorization: `Bearer ${token}` };
-
-// 10 negara terkaya (per kapita), halaman 1
-const rich = await fetch(`${API}/v2/world?sort=richest&amp;limit=10`, { headers });
-console.log(await rich.json());
-
-// 5 negara termiskin berdasarkan total PDB, halaman 2
-const poor = await fetch(`${API}/v2/world?sort=poorest&amp;by=gdp&amp;page=2&amp;limit=5`, { headers });
-
-// Cari satu negara
-const id = await fetch(`${API}/v2/country/ID`, { headers });
-const usa = await fetch(`${API}/v2/country/USA`, { headers });
-
-if (id.status === 401) {
-  // token kedaluwarsa atau tidak valid: buat token baru
-}</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/world</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Nilai pada contoh hanya ilustrasi.</p>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-  "success": true,
-  "source": "World Bank API v2",
-  "sort": "richest",
-  "by": "gdpPerCapita",
-  "count": 1,
-  "pagination": {
-    "page": 1, "limit": 1,
-    "totalItems": 200, "totalPages": 200,
-    "hasPrev": false, "hasNext": true,
-    "prevPage": null, "nextPage": 2
-  },
-  "data": [
-    {
-      "rank": 1,
-      "iso2": "XX", "iso3": "XXX",
-      "name": "Nama Negara",
-      "region": "Europe &amp; Central Asia",
-      "incomeLevel": "High income",
-      "capital": "Nama Ibu Kota",
-      "longitude": "0.0", "latitude": "0.0",
-      "indicators": {
-        "gdp":          { "value": 1000000000, "year": "2024" },
-        "gdpPerCapita": { "value": 100000,     "year": "2024" },
-        "gdpGrowth":    { "value": 2.1,        "year": "2024" },
-        "inflation":    { "value": 2.4,        "year": "2024" },
-        "unemployment": null,
-        "population":   { "value": 10000,      "year": "2024" }
-      }
-    }
-  ]
-}</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Mata uang</h3>
-          <ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/currencies</code><span class="text-slate-500 dark:text-slate-400">Semua mata uang dunia (fiat, logam, dan kripto) beserta kurs terhadap USD. Parameter: <code>q</code> (kode, nama mata uang, atau negara) dan <code>limit</code></span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/currency</code><span class="text-slate-500 dark:text-slate-400">Semua kurs terbaru. Parameter opsional: <code>symbols</code>, contoh <code>?symbols=IDR,EUR,JPY</code></span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/currency/{kode}</code><span class="text-slate-500 dark:text-slate-400">Kurs satu mata uang, contoh <code>/v2/currency/IDR</code> (1 USD = berapa IDR)</span></li>
-            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-80 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/currency/convert</code><span class="text-slate-500 dark:text-slate-400">Konversi antar mata uang. Parameter: <code>from</code> (default USD), <code>to</code> (wajib), <code>amount</code> (default 1)</span></li>
-          </ul>
-
-          <h3 class="mt-6 text-sm font-semibold">Contoh</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
-const token = localStorage.getItem('access_token');
-const headers = { Authorization: `Bearer ${token}` };
-
-// Cari mata uang
-await fetch(`${API}/v2/currencies?q=rupiah`, { headers });
-
-// Kurs beberapa mata uang sekaligus
-await fetch(`${API}/v2/currency?symbols=IDR,EUR,JPY`, { headers });
-
-// Konversi 100 USD ke IDR
-const res = await fetch(`${API}/v2/currency/convert?from=USD&amp;to=IDR&amp;amount=100`, { headers });
-const { data } = await res.json();
-console.log(data.result);</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/currency/convert</h3>
-          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Nilai pada contoh hanya ilustrasi.</p>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-  "success": true,
-  "source": "CurrencyFreaks",
-  "date": "2026-10-20 08:00:00+00",
-  "base": "USD",
-  "data": {
-    "from": "USD",
-    "to": "IDR",
-    "amount": 100,
-    "rate": 16000,
-    "result": 1600000
-  }
-}</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/currencies</h3>
-          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-  "success": true,
-  "source": "CurrencyFreaks",
-  "date": "2026-10-20 08:00:00+00",
-  "base": "USD",
-  "count": 1,
-  "data": [
-    {
-      "code": "IDR",
-      "name": "Indonesian Rupiah",
-      "countryCode": "ID",
-      "country": "Indonesia",
-      "status": "AVAILABLE",
-      "icon": "https://...",
-      "rate": 16000
-    }
-  ]
-}</code></pre>
-
-          <h3 class="mt-6 text-sm font-semibold">Catatan</h3>
-          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400">
-            <li>Data ekonomi di-cache 1 jam, kurs 15 menit, dan daftar mata uang 24 jam, jadi nilai bisa sedikit terlambat dari sumbernya.</li>
-            <li>Indikator memakai nilai terbaru yang tersedia untuk tiap negara, sehingga tahun datanya bisa berbeda-beda. Lihat field <code>year</code>.</li>
-            <li>Kurs dihitung terhadap USD. Konversi antar dua mata uang lain dihitung sebagai kurs silang lewat USD.</li>
-            <li>Bila kurs sedang tidak bisa diambil, <code>/v2/currencies</code> tetap membalas daftar mata uang dengan <code>rate</code> bernilai <code>null</code>.</li>
-          </ul>
-
-          <h3 class="mt-6 text-sm font-semibold">Kode error</h3>
-          <ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400"><code>page</code>, <code>limit</code>, <code>sort</code>, <code>by</code>, <code>to</code>, atau <code>amount</code> tidak valid</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_MISSING</code><span class="text-slate-500 dark:text-slate-400">Header Authorization kosong</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_INVALID</code><span class="text-slate-500 dark:text-slate-400">Token salah atau tidak dikenali</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_EXPIRED</code><span class="text-slate-500 dark:text-slate-400">Token lewat 10 hari, buat token baru</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_REVOKED</code><span class="text-slate-500 dark:text-slate-400">Token dicabut admin</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Negara atau mata uang tidak ditemukan</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Terlalu banyak permintaan</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">500</code><span class="text-slate-500 dark:text-slate-400">Kunci API CurrencyFreaks belum dikonfigurasi di server</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">502</code><span class="text-slate-500 dark:text-slate-400">Gagal mengambil data dari World Bank atau CurrencyFreaks</span></li>
-            <li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">503</code><span class="text-slate-500 dark:text-slate-400">Validasi token sementara tidak tersedia, coba lagi sebentar</span></li>
-          </ul>
-        </section>
-      </main>
-    </div>
+    <main class="mx-auto max-w-4xl px-5">
+      <!-- Hero -->
+      <section class="py-20 text-center">
+        <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Documentation</h1>
+        <p class="mx-auto mt-4 max-w-md text-slate-500 dark:text-slate-400">
+          API buatan sendiri yang bisa dipakai untuk project apa saja.
+        </p>
+        <a href="./docs.html" class="mt-8 inline-block rounded-md bg-red-600 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-red-700">
+          Memulai itu mudah
+        </a>
+      </section>
+
+      <!-- Fitur -->
+      <section class="grid gap-8 border-t border-slate-200 py-14 dark:border-slate-800 sm:grid-cols-3">
+        <div>
+          <h2 class="font-medium">Introduction</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Perkenalan singkat, mulai dari halaman home.</p>
+        </div>
+        <div>
+          <h2 class="font-medium">Installation</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Ayo mulai dengan instalasinya.</p>
+        </div>
+        <div>
+          <h2 class="project-setup font-medium">Integration</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Dibuat untuk diri sendiri, bisa dipakai semua orang.</p>
+        </div>
+      </section>
+
+      <!-- Test API -->
+      <section class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Test API</h2>
+        <button onclick="testApi()" id="hidden" class="mt-5 rounded-md border border-slate-300 px-5 py-2 text-sm transition hover:border-red-600 hover:text-red-600 dark:border-slate-700">
+          Jalankan
+        </button>
+        <div id="loading" class="mt-4 text-sm text-slate-500" style="display: none">Memuat...</div>
+        <div id="res" class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4"></div>
+      </section>
+
+      <!-- Api Test Tools -->
+      <section class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Api Test Tools</h2>
+        <p class="mx-auto mt-4 max-w-md text-sm text-slate-500 dark:text-slate-400">
+          Uji API dari localhost atau host publik. Kirim GET, POST, PUT, PATCH, dan DELETE dengan header dan body, lalu lihat kode status serta respons lengkap.
+        </p>
+        <a href="./api_tester.html" class="mt-5 inline-block rounded-md border border-slate-300 px-5 py-2 text-sm transition hover:border-red-600 hover:text-red-600 dark:border-slate-700">
+          Buka Api Test Tools
+        </a>
+      </section>
+
+      <!-- Stack -->
+      <section class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Project setup</h2>
+        <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Node.js &middot; Tailwind CSS &middot; Vercel</p>
+      </section>
+
+      <!-- Pengguna API -->
+      <section id="users" class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Pengguna API</h2>
+        <p class="mx-auto mt-4 max-w-md text-sm text-slate-500 dark:text-slate-400">Platform yang sudah memakai API ini.</p>
+
+        <div role="list" aria-label="Platform pengguna API" class="mt-8 grid justify-center gap-4 sm:grid-cols-2">
+          <a
+            role="listitem"
+            href="https://mfikria.vercel.app/app"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="block rounded-lg border border-slate-200 p-5 text-left transition hover:border-red-600 dark:border-slate-800 dark:hover:border-red-600"
+          >
+            <h3 class="font-medium">Mfikria App</h3>
+            <p class="mt-1 break-all text-sm text-slate-500 dark:text-slate-400">mfikria.vercel.app/app</p>
+            <span class="mt-3 inline-block text-xs font-medium text-red-600">Kunjungi &rarr;</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Kontributor -->
+      <section id="contributors" class="border-t border-slate-200 py-14 text-center dark:border-slate-800">
+        <h2 class="text-lg font-medium">Contributors</h2>
+        <div role="list" id="ress" aria-label="Team members" class="mt-8 grid grid-flow-row justify-center gap-8 md:grid-flow-col"></div>
+      </section>
+    </main>
 
     <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
       Copyright &copy;
@@ -788,88 +153,5 @@ console.log(data.result);</code></pre>
       </script>
       Mfikria. All rights reserved.
     </footer>
-
-    <!-- Tab "Contoh Kode": dipasang di akhir body supaya tombolnya sudah ada saat script jalan -->
-    <script>
-      document.querySelectorAll('[data-tab]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var name = btn.getAttribute('data-tab');
-
-          document.querySelectorAll('[data-tab]').forEach(function (b) {
-            var on = b === btn;
-            b.classList.toggle('border-red-600', on);
-            b.classList.toggle('text-red-600', on);
-            b.classList.toggle('border-transparent', !on);
-            b.classList.toggle('text-slate-500', !on);
-          });
-
-          document.querySelectorAll('[data-panel]').forEach(function (p) {
-            p.classList.toggle('hidden', p.getAttribute('data-panel') !== name);
-          });
-        });
-      });
-    </script>
-
-    <!-- Tombol "Salin" otomatis di setiap blok kode -->
-    <script>
-      (function () {
-        function copyText(text) {
-          if (navigator.clipboard && window.isSecureContext) {
-            return navigator.clipboard.writeText(text);
-          }
-          // Cadangan untuk browser lama / halaman non-HTTPS
-          return new Promise(function (resolve, reject) {
-            var ta = document.createElement('textarea');
-            ta.value = text;
-            ta.setAttribute('readonly', '');
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-              document.execCommand('copy') ? resolve() : reject();
-            } catch (e) {
-              reject(e);
-            }
-            document.body.removeChild(ta);
-          });
-        }
-
-        document.querySelectorAll('main pre').forEach(function (pre) {
-          var code = pre.querySelector('code') || pre;
-
-          // Bungkus supaya tombol tetap diam saat kode di-scroll ke samping
-          var wrap = document.createElement('div');
-          wrap.className = 'relative mt-2';
-          pre.classList.remove('mt-2');
-          pre.parentNode.insertBefore(wrap, pre);
-          wrap.appendChild(pre);
-
-          var btn = document.createElement('button');
-          btn.type = 'button';
-          btn.textContent = 'Salin';
-          btn.setAttribute('aria-label', 'Salin kode');
-          btn.className =
-            'absolute right-2 top-2 rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-600 shadow-sm hover:text-red-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:text-red-400';
-          wrap.appendChild(btn);
-
-          var timer;
-          btn.addEventListener('click', function () {
-            copyText(code.textContent).then(
-              function () {
-                btn.textContent = 'Tersalin \u2713';
-              },
-              function () {
-                btn.textContent = 'Gagal';
-              }
-            );
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-              btn.textContent = 'Salin';
-            }, 1800);
-          });
-        });
-      })();
-    </script>
   </body>
 </html>
