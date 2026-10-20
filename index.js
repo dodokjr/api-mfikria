@@ -188,7 +188,7 @@ app.use('/v2/donghua/anichi', limiter,
 
 app.use('/v2/WE', limiter,
      must('requireAccessToken', access.requireAccessToken),
-    must('anichinRoute', require('./routes/newV2/routes/anichinRoute')));
+    must('anichinRoute', require('./routes/newV2/routes/World.route')));
 // Portfolio
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
