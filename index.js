@@ -183,6 +183,9 @@ app.use('/v2/', limiter,
      must('requireAccessToken', access.requireAccessToken),
      must('App', require('./routes/newV2/App')));
 
+// developer
+app.use('/dev/v2/', limiter, require('./routes/newV2/App'))
+
 // Portfolio
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

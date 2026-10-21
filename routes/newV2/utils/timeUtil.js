@@ -73,12 +73,17 @@ function getTimeInfo(timeZone, date = new Date(), lang = DEFAULT_LANG) {
 // ---------------------------------------------------------------------------
 // SSE dengan broadcaster bersama:
 // - 1 timer per "channel" (bukan per klien)
-// - payload dihitung & di-stringify 1x per detik, lalu dikirim ke semua klien
+// - payload dihitung & di-stringify 1x per interval, lalu dikirim ke semua klien
+// - klien baru mendapat payload yang dihitung ulang (bukan cache basi)
+// - heartbeat berkala agar koneksi tidak diputus proxy saat idle
 // - channel otomatis berhenti saat tidak ada klien
 // ---------------------------------------------------------------------------
 const channels = new Map();
 
-function streamSSE(req, res, key, buildPayload, intervalMs = 1000) {
+const DEFAULT_INTERVAL_MS = 120000; // 120 detik (2 menit)
+const HEARTBEAT_MS = 25000;         // di bawah batas idle umum proxy (30-60 detik)
+
+function streamSSE(req, res, key, buildPayload, intervalMs = DEFAULT_INTERVAL_MS) {
   res.set({
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
@@ -91,7 +96,7 @@ function streamSSE(req, res, key, buildPayload, intervalMs = 1000) {
   const isNew = !ch;
 
   if (isNew) {
-    ch = { clients: new Set(), last: null, timer: null };
+    ch = { clients: new Set(), last: null, timer: null, heartbeat: null };
     ch.tick = () => {
       ch.last = `data: ${JSON.stringify(buildPayload())}\n\n`;
       for (const client of ch.clients) {
@@ -106,14 +111,21 @@ function streamSSE(req, res, key, buildPayload, intervalMs = 1000) {
   if (isNew) {
     ch.tick();
     ch.timer = setInterval(ch.tick, intervalMs);
-  } else if (ch.last) {
-    res.write(ch.last); // klien baru langsung dapat data terakhir
+    ch.heartbeat = setInterval(() => {
+      for (const client of ch.clients) {
+        if (!client.writableNeedDrain) client.write(': ping\n\n'); // komentar SSE, tidak memicu event
+      }
+    }, HEARTBEAT_MS);
+  } else {
+    // hitung ulang agar waktu akurat, bukan cache yang bisa sudah 2 menit
+    res.write(`data: ${JSON.stringify(buildPayload())}\n\n`);
   }
 
   req.on('close', () => {
     ch.clients.delete(res);
     if (ch.clients.size === 0) {
       clearInterval(ch.timer);
+      clearInterval(ch.heartbeat);
       channels.delete(key);
     }
   });

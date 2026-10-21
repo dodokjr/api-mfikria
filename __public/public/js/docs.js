@@ -957,84 +957,123 @@
       },
   
       /* ============================ Time (baru) ============================ */
-      {
-        id: 'time',
-        nav: 'Time',
-        html: `
-            <h2 class="text-xl font-semibold tracking-tight">Time</h2>
-            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Waktu real time seluruh dunia: 419 zona waktu dan negara per zona (contoh Indonesia: WIB, WITA, WIT). Nama hari tersedia dalam 20 bahasa. Endpoint ini <strong>tanpa token</strong>. Respons memakai <code>"success": true</code> atau <code>"success": false</code>, sama seperti bagian World dan Currency.</p>
-            <h3 class="mt-6 text-sm font-semibold">Endpoint</h3><ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world</code><span class="text-slate-500 dark:text-slate-400">Kota-kota utama dunia</span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/regions</code><span class="text-slate-500 dark:text-slate-400">Daftar region beserta jumlah zona</span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/zones</code><span class="text-slate-500 dark:text-slate-400">Nama seluruh zona waktu (419 zona), dikelompokkan per region</span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/all</code><span class="text-slate-500 dark:text-slate-400">Waktu seluruh zona dunia, paginasi 10 data per halaman</span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/region/{region}</code><span class="text-slate-500 dark:text-slate-400">Semua zona dalam satu region, contoh <code>/v2/time/world/region/Asia</code></span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/zone?tz=Asia/Jakarta</code><span class="text-slate-500 dark:text-slate-400">Waktu satu zona</span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/stream</code><span class="text-slate-500 dark:text-slate-400">Real time (SSE), 1 detik sekali</span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country</code><span class="text-slate-500 dark:text-slate-400">Daftar negara yang tersedia</span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country/{kode}</code><span class="text-slate-500 dark:text-slate-400">Semua zona satu negara, contoh <code>/v2/time/country/ID</code></span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country/{kode}/{zona}</code><span class="text-slate-500 dark:text-slate-400">Satu zona, data jadi satu objek, contoh <code>/v2/time/country/ID/WIB</code></span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country/{kode}/stream</code><span class="text-slate-500 dark:text-slate-400">Real time (SSE) semua zona negara</span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country/{kode}/{zona}/stream</code><span class="text-slate-500 dark:text-slate-400">Real time (SSE) satu zona, contoh <code>/v2/time/country/ID/WIB/stream</code></span></li>
-              <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/languages</code><span class="text-slate-500 dark:text-slate-400">Daftar bahasa untuk nama hari</span></li>
-            </ul>
-            <h3 class="mt-6 text-sm font-semibold">Parameter</h3><ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800"><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">lang</code><span class="text-slate-500 dark:text-slate-400">Bahasa nama hari (default <code>id</code>), berlaku di semua endpoint. Contoh <code>?lang=ja</code></span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">tz</code><span class="text-slate-500 dark:text-slate-400">Nama zona IANA untuk <code>/world/zone</code> dan <code>/world/stream</code>, contoh <code>Asia/Tokyo</code></span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">region</code><span class="text-slate-500 dark:text-slate-400">Filter region untuk <code>/world/all</code> dan <code>/world/stream</code>, contoh <code>Europe</code></span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">search</code><span class="text-slate-500 dark:text-slate-400">Cari nama zona di <code>/world/all</code>, contoh <code>?search=jak</code></span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">page</code><span class="text-slate-500 dark:text-slate-400">Nomor halaman <code>/world/all</code> (default 1)</span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">limit</code><span class="text-slate-500 dark:text-slate-400">Data per halaman <code>/world/all</code>, 1&ndash;100 (default 10)</span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">all=true</code><span class="text-slate-500 dark:text-slate-400">Khusus <code>/world/stream</code>: kirim seluruh zona dunia sekaligus</span></li></ul>
-            <h3 class="mt-6 text-sm font-semibold">Kode bahasa</h3><p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>id</code> Indonesia, <code>en</code> Inggris, <code>zh</code> Mandarin, <code>ar</code> Arab, <code>ja</code> Jepang, <code>ko</code> Korea, <code>es</code> Spanyol, <code>tl</code> Tagalog, <code>ca</code> Katalan, <code>fr</code> Prancis, <code>de</code> Jerman, <code>pt</code> Portugis, <code>it</code> Italia, <code>nl</code> Belanda, <code>ru</code> Rusia, <code>hi</code> Hindi, <code>tr</code> Turki, <code>ms</code> Melayu, <code>th</code> Thai, <code>vi</code> Vietnam. Alias <code>cn</code>, <code>jp</code>, <code>kr</code>, <code>fil</code>, dan format <code>zh-CN</code> atau <code>ja_JP</code> juga diterima. Daftar lengkap beserta nama harinya ada di <code>/v2/time/languages</code>.</p><h3 class="mt-6 text-sm font-semibold">Contoh</h3><pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
-  
-  // Waktu satu zona (tanpa token)
-  const res = await fetch(\`\${API}/v2/time/country/ID/WIB?lang=ja\`);
-  const { data } = await res.json();
-  console.log(data.day, data.time); // 水曜日 10:35:10
-  
-  // Seluruh zona dunia, halaman 2, hanya Asia
-  await fetch(\`\${API}/v2/time/world/all?region=Asia&amp;page=2\`);
-  
-  // Real time lewat SSE: server mengirim data baru setiap 1 detik
-  const es = new EventSource(\`\${API}/v2/time/country/ID/WIB/stream?lang=en\`);
-  es.onmessage = (e) =&gt; {
-    const t = JSON.parse(e.data);
-    console.log(t.day, t.date, t.time);
-  };
-  // es.close() kalau sudah tidak dipakai</code></pre><h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/time/country/ID/WIB</h3><p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Nilai pada contoh hanya ilustrasi.</p><pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-    "success": true,
-    "data": {
-      "code": "ID",
-      "country": "Indonesia",
-      "label": "WIB",
-      "timezone": "Asia/Jakarta",
-      "utcOffset": "+07:00",
-      "day": "Rabu",
-      "date": "2026-10-21",
-      "time": "10:35:10",
-      "datetime": "2026-10-21T10:35:10+07:00",
-      "timestamp": 1792553710609
+     /* ============================ Time ============================ */
+     {
+      id: 'time',
+      nav: 'Time',
+      html: `
+          <h2 class="text-xl font-semibold tracking-tight">Time</h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Waktu seluruh dunia: 419 zona waktu dan negara per zona (contoh Indonesia: WIB, WITA, WIT). Nama hari tersedia dalam 20 bahasa. Semua endpoint butuh <strong>Access Token</strong> yang sama dengan Otaku &amp; Anichi, dikirim lewat header <code>Authorization: Bearer {token}</code>. Token berlaku 10 hari dan dibuat lewat halaman Access Token. Respons memakai <code>"success": true</code> atau <code>"success": false</code>, sama seperti bagian World dan Currency.</p>
+          <a href="./InputToken.html" class="mt-4 inline-block rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Buat Access Token</a>
+          <h3 class="mt-6 text-sm font-semibold">Endpoint</h3><ul class="mt-3 divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world</code><span class="text-slate-500 dark:text-slate-400">Kota-kota utama dunia</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/regions</code><span class="text-slate-500 dark:text-slate-400">Daftar region beserta jumlah zona</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/zones</code><span class="text-slate-500 dark:text-slate-400">Nama seluruh zona waktu (419 zona), dikelompokkan per region</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/all</code><span class="text-slate-500 dark:text-slate-400">Waktu seluruh zona dunia, paginasi 10 data per halaman</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/region/{region}</code><span class="text-slate-500 dark:text-slate-400">Semua zona dalam satu region, contoh <code>/v2/time/world/region/Asia</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/zone?tz=Asia/Jakarta</code><span class="text-slate-500 dark:text-slate-400">Waktu satu zona</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/world/stream</code><span class="text-slate-500 dark:text-slate-400">Pembaruan otomatis (SSE), 2 menit sekali</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country</code><span class="text-slate-500 dark:text-slate-400">Daftar negara yang tersedia</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country/{kode}</code><span class="text-slate-500 dark:text-slate-400">Semua zona satu negara, contoh <code>/v2/time/country/ID</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country/{kode}/{zona}</code><span class="text-slate-500 dark:text-slate-400">Satu zona, data jadi satu objek, contoh <code>/v2/time/country/ID/WIB</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country/{kode}/stream</code><span class="text-slate-500 dark:text-slate-400">Pembaruan otomatis (SSE) semua zona negara, 2 menit sekali</span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/country/{kode}/{zona}/stream</code><span class="text-slate-500 dark:text-slate-400">Pembaruan otomatis (SSE) satu zona, contoh <code>/v2/time/country/ID/WIB/stream</code></span></li>
+            <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6"><code class="break-all text-red-600 dark:text-red-400 sm:w-96 sm:shrink-0"><span class="font-semibold text-slate-700 dark:text-slate-300">GET</span> /v2/time/languages</code><span class="text-slate-500 dark:text-slate-400">Daftar bahasa untuk nama hari</span></li>
+          </ul>
+          <h3 class="mt-6 text-sm font-semibold">Parameter</h3><ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800"><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">lang</code><span class="text-slate-500 dark:text-slate-400">Bahasa nama hari (default <code>id</code>), berlaku di semua endpoint. Contoh <code>?lang=ja</code></span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">tz</code><span class="text-slate-500 dark:text-slate-400">Nama zona IANA untuk <code>/world/zone</code> dan <code>/world/stream</code>, contoh <code>Asia/Tokyo</code></span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">region</code><span class="text-slate-500 dark:text-slate-400">Filter region untuk <code>/world/all</code> dan <code>/world/stream</code>, contoh <code>Europe</code></span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">search</code><span class="text-slate-500 dark:text-slate-400">Cari nama zona di <code>/world/all</code>, contoh <code>?search=jak</code></span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">page</code><span class="text-slate-500 dark:text-slate-400">Nomor halaman <code>/world/all</code> (default 1)</span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">limit</code><span class="text-slate-500 dark:text-slate-400">Data per halaman <code>/world/all</code>, 1&ndash;100 (default 10)</span></li><li class="flex flex-col gap-1 py-2 sm:flex-row sm:gap-6"><code class="w-44 shrink-0 text-red-600 dark:text-red-400">all=true</code><span class="text-slate-500 dark:text-slate-400">Khusus <code>/world/stream</code>: kirim seluruh zona dunia sekaligus</span></li></ul>
+          <h3 class="mt-6 text-sm font-semibold">Kode bahasa</h3><p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>id</code> Indonesia, <code>en</code> Inggris, <code>zh</code> Mandarin, <code>ar</code> Arab, <code>ja</code> Jepang, <code>ko</code> Korea, <code>es</code> Spanyol, <code>tl</code> Tagalog, <code>ca</code> Katalan, <code>fr</code> Prancis, <code>de</code> Jerman, <code>pt</code> Portugis, <code>it</code> Italia, <code>nl</code> Belanda, <code>ru</code> Rusia, <code>hi</code> Hindi, <code>tr</code> Turki, <code>ms</code> Melayu, <code>th</code> Thai, <code>vi</code> Vietnam. Alias <code>cn</code>, <code>jp</code>, <code>kr</code>, <code>fil</code>, dan format <code>zh-CN</code> atau <code>ja_JP</code> juga diterima. Daftar lengkap beserta nama harinya ada di <code>/v2/time/languages</code>.</p>
+          <h3 class="mt-6 text-sm font-semibold">Contoh</h3><pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
+const token = localStorage.getItem('access_token');
+const headers = { Authorization: \`Bearer \${token}\` };
+
+// Waktu satu zona
+const res = await fetch(\`\${API}/v2/time/country/ID/WIB?lang=ja\`, { headers });
+const { data } = await res.json();
+console.log(data.day, data.time); // 水曜日 10:35:10
+
+// Seluruh zona dunia, halaman 2, hanya Asia
+await fetch(\`\${API}/v2/time/world/all?region=Asia&amp;page=2\`, { headers });
+
+if (res.status === 401) {
+// token kedaluwarsa atau tidak valid: buat token baru
+}</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Contoh stream (SSE)</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><code>EventSource</code> bawaan browser tidak bisa mengirim header <code>Authorization</code>, jadi stream dibaca dengan <code>fetch</code>. Server mengirim data baru <strong>2 menit sekali</strong>, dan data pertama langsung dikirim saat koneksi terbuka. Baris yang diawali <code>:</code> (heartbeat) hanya penjaga koneksi dan boleh diabaikan.</p>
+          <pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>const API = 'https://api-mfikria.vercel.app';
+const token = localStorage.getItem('access_token');
+
+async function streamTime(path, onData, signal) {
+const res = await fetch(\`\${API}\${path}\`, {
+  headers: { Authorization: \`Bearer \${token}\` },
+  signal
+});
+if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
+
+const reader = res.body.getReader();
+const decoder = new TextDecoder();
+let buffer = '';
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
+
+  const events = buffer.split('\\n\\n');
+  buffer = events.pop(); // sisa event yang belum lengkap
+
+  for (const ev of events) {
+    const line = ev.split('\\n').find((l) =&gt; l.startsWith('data: '));
+    if (line) onData(JSON.parse(line.slice(6)));
+  }
+}
+}
+
+const ctrl = new AbortController();
+streamTime('/v2/time/country/ID/WIB/stream?lang=en', (t) =&gt; {
+console.log(t.day, t.date, t.time);
+}, ctrl.signal).catch(console.error);
+
+// ctrl.abort() kalau sudah tidak dipakai</code></pre>
+          <h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/time/country/ID/WIB</h3><p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Nilai pada contoh hanya ilustrasi.</p><pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+"success": true,
+"data": {
+  "code": "ID",
+  "country": "Indonesia",
+  "label": "WIB",
+  "timezone": "Asia/Jakarta",
+  "utcOffset": "+07:00",
+  "day": "Rabu",
+  "date": "2026-10-21",
+  "time": "10:35:10",
+  "datetime": "2026-10-21T10:35:10+07:00",
+  "timestamp": 1792553710609
+}
+}</code></pre><h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/time/world/all</h3><pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
+"success": true,
+"utc": "2026-10-21T03:35:10.000Z",
+"total": 419,
+"page": 1,
+"limit": 10,
+"totalPages": 42,
+"hasNext": true,
+"hasPrev": false,
+"data": [
+  {
+    "region": "Africa",
+    "city": "Abidjan",
+    "timezone": "Africa/Abidjan",
+    "utcOffset": "+00:00",
+    "day": "Rabu",
+    "date": "2026-10-21",
+    "time": "03:35:10",
+    "datetime": "2026-10-21T03:35:10+00:00",
+    "timestamp": 1792553710609
+  }
+]
+}</code></pre><h3 class="mt-6 text-sm font-semibold">Catatan</h3><ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400"><li>Endpoint <code>/stream</code> memakai Server-Sent Events. Setiap event adalah objek data langsung (tanpa pembungkus <code>success</code>) dan dikirim 2 menit sekali.</li><li>Karena jeda 2 menit, nilai <code>time</code> pada stream hanya akurat saat event diterima. Untuk jam yang berjalan, hitung sendiri di client dari <code>timestamp</code> dan <code>utcOffset</code>, lalu pakai stream untuk sinkronisasi ulang.</li><li><code>/world/stream?all=true</code> mengirim 419 zona di setiap event (payload besar). Untuk aplikasi, lebih hemat memakai <code>?tz=</code> atau <code>?region=</code>.</li><li>Waktu dan offset mengikuti aturan zona IANA, termasuk pergantian waktu musim panas (DST).</li><li><code>{kode}</code> memakai kode negara ISO2 (contoh <code>ID</code>, <code>US</code>, <code>JP</code>) dan <code>{zona}</code> memakai label zona (contoh <code>WIB</code>, <code>PT</code>), huruf besar atau kecil sama saja. Daftar kode ada di <code>/v2/time/country</code>.</li><li>Yang diterjemahkan hanya nama hari. Nama kota dan negara tetap dalam bahasa Inggris.</li></ul>
+          <h3 class="mt-6 text-sm font-semibold">Kode error</h3><ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800"><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400"><code>tz</code>, <code>region</code>, atau <code>lang</code> tidak valid. Pesan berisi pilihan yang benar</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_MISSING</code><span class="text-slate-500 dark:text-slate-400">Header Authorization kosong</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_INVALID</code><span class="text-slate-500 dark:text-slate-400">Token salah atau tidak dikenali</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_EXPIRED</code><span class="text-slate-500 dark:text-slate-400">Token lewat 10 hari, buat token baru</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">401 TOKEN_REVOKED</code><span class="text-slate-500 dark:text-slate-400">Token dicabut admin</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Negara atau zona tidak ditemukan. Pesan berisi daftar zona yang tersedia untuk negara itu</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">429</code><span class="text-slate-500 dark:text-slate-400">Terlalu banyak permintaan</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">500</code><span class="text-slate-500 dark:text-slate-400">Terjadi kesalahan di server</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">503</code><span class="text-slate-500 dark:text-slate-400">Validasi token sementara tidak tersedia, coba lagi sebentar</span></li></ul>
+`
     }
-  }</code></pre><h3 class="mt-6 text-sm font-semibold">Contoh respons /v2/time/world/all</h3><pre class="mt-2 overflow-x-auto rounded-md bg-slate-100 p-4 text-sm leading-6 dark:bg-slate-800"><code>{
-    "success": true,
-    "utc": "2026-10-21T03:35:10.000Z",
-    "total": 419,
-    "page": 1,
-    "limit": 10,
-    "totalPages": 42,
-    "hasNext": true,
-    "hasPrev": false,
-    "data": [
-      {
-        "region": "Africa",
-        "city": "Abidjan",
-        "timezone": "Africa/Abidjan",
-        "utcOffset": "+00:00",
-        "day": "Rabu",
-        "date": "2026-10-21",
-        "time": "03:35:10",
-        "datetime": "2026-10-21T03:35:10+00:00",
-        "timestamp": 1792553710609
-      }
-    ]
-  }</code></pre><h3 class="mt-6 text-sm font-semibold">Catatan</h3><ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-500 dark:text-slate-400"><li>Endpoint <code>/stream</code> memakai Server-Sent Events. Setiap event adalah objek data langsung (tanpa pembungkus <code>success</code>) dan dikirim 1 detik sekali.</li><li><code>/world/stream?all=true</code> mengirim 419 zona tiap detik (payload besar). Untuk aplikasi, lebih hemat memakai <code>?tz=</code> atau <code>?region=</code>.</li><li>Waktu dan offset mengikuti aturan zona IANA, termasuk pergantian waktu musim panas (DST).</li><li><code>{kode}</code> memakai kode negara ISO2 (contoh <code>ID</code>, <code>US</code>, <code>JP</code>) dan <code>{zona}</code> memakai label zona (contoh <code>WIB</code>, <code>PT</code>), huruf besar atau kecil sama saja. Daftar kode ada di <code>/v2/time/country</code>.</li><li>Yang diterjemahkan hanya nama hari. Nama kota dan negara tetap dalam bahasa Inggris.</li></ul>
-            <h3 class="mt-6 text-sm font-semibold">Kode error</h3><ul class="mt-2 divide-y divide-slate-200 text-sm dark:divide-slate-800"><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">400</code><span class="text-slate-500 dark:text-slate-400"><code>tz</code>, <code>region</code>, atau <code>lang</code> tidak valid. Pesan berisi pilihan yang benar</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">404</code><span class="text-slate-500 dark:text-slate-400">Negara atau zona tidak ditemukan. Pesan berisi daftar zona yang tersedia untuk negara itu</span></li><li class="flex gap-4 py-2"><code class="w-36 shrink-0 text-red-600 dark:text-red-400">500</code><span class="text-slate-500 dark:text-slate-400">Terjadi kesalahan di server</span></li></ul>
-  `
-      }
     ];
   
     /* ------------------------------------------------------------------ */

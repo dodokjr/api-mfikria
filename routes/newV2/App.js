@@ -3,13 +3,18 @@ require('dotenv').config(); // baca .env (GITHUB_TOKEN, dll). Install: npm i dot
 const express = require('express');
 
 const worldRoutes = require('./routes/TimeWorldroutes');
-const countryRoutes = require('./routes/TimeWorldroutes');
+const countryRoutes = require('./routes/TimeWorldroutes'); // TODO: cek, sama persis dengan worldRoutes di atas
 const animeOtaku = require('./routes/otakudesuRoute');
 const donghuaAnichi = require('./routes/anichinRoute');
 const worldRoutesBank = require('./routes/World.route');
 const githubRoutes = require('./routes/Githubroute');
 const langMiddleware = require('./utils/Lang');
+const Ppnrouter = require('./routes/Ppnroutes ');         // spasi di akhir nama file dihapus
+const WeatherRouter = require('./routes/Weatherroutes '); // spasi di akhir nama file dihapus
+
+const { notFound, errorHandler } = require('./utils/Errorhandler');
 const { LANGUAGES, DEFAULT_LANG } = require('./data/Daynames');
+
 
 const app = express();
 
@@ -62,19 +67,18 @@ app.use('/time/api/country', countryRoutes);
 app.use('/anime/otaku', animeOtaku);
 app.use('/donghua/anichi', donghuaAnichi);
 
+// Github
 app.use('/public/github', githubRoutes);
 
+// Ekonomi
 app.use('/we', worldRoutesBank);
+app.use('/ppn', Ppnrouter);
 
-// 404
-app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Endpoint tidak ditemukan' });
-});
+// Ramalan cuaca
+app.use('/weather', WeatherRouter);
 
-// Error handler
-app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
-});
+// 404 dan error handler: harus PALING AKHIR, setelah semua route
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
