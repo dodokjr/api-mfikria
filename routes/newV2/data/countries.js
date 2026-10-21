@@ -1,0 +1,46 @@
+// Data negara -> daftar timezone (IANA). Silakan tambah sesuai kebutuhan.
+module.exports = {
+    ID: { name: 'Indonesia', timezones: [
+      { label: 'WIB',  zone: 'Asia/Jakarta' },
+      { label: 'WITA', zone: 'Asia/Makassar' },
+      { label: 'WIT',  zone: 'Asia/Jayapura' },
+    ]},
+    MY: { name: 'Malaysia',       timezones: [{ label: 'MYT', zone: 'Asia/Kuala_Lumpur' }] },
+    SG: { name: 'Singapore',      timezones: [{ label: 'SGT', zone: 'Asia/Singapore' }] },
+    TH: { name: 'Thailand',       timezones: [{ label: 'ICT', zone: 'Asia/Bangkok' }] },
+    PH: { name: 'Philippines',    timezones: [{ label: 'PHT', zone: 'Asia/Manila' }] },
+    JP: { name: 'Japan',          timezones: [{ label: 'JST', zone: 'Asia/Tokyo' }] },
+    KR: { name: 'South Korea',    timezones: [{ label: 'KST', zone: 'Asia/Seoul' }] },
+    CN: { name: 'China',          timezones: [{ label: 'CST', zone: 'Asia/Shanghai' }] },
+    IN: { name: 'India',          timezones: [{ label: 'IST', zone: 'Asia/Kolkata' }] },
+    AE: { name: 'United Arab Emirates', timezones: [{ label: 'GST', zone: 'Asia/Dubai' }] },
+    SA: { name: 'Saudi Arabia',   timezones: [{ label: 'AST', zone: 'Asia/Riyadh' }] },
+    TR: { name: 'Turkey',         timezones: [{ label: 'TRT', zone: 'Europe/Istanbul' }] },
+    GB: { name: 'United Kingdom', timezones: [{ label: 'GMT/BST', zone: 'Europe/London' }] },
+    FR: { name: 'France',         timezones: [{ label: 'CET', zone: 'Europe/Paris' }] },
+    DE: { name: 'Germany',        timezones: [{ label: 'CET', zone: 'Europe/Berlin' }] },
+    NL: { name: 'Netherlands',    timezones: [{ label: 'CET', zone: 'Europe/Amsterdam' }] },
+    EG: { name: 'Egypt',          timezones: [{ label: 'EET', zone: 'Africa/Cairo' }] },
+    ZA: { name: 'South Africa',   timezones: [{ label: 'SAST', zone: 'Africa/Johannesburg' }] },
+    AU: { name: 'Australia', timezones: [
+      { label: 'AWST', zone: 'Australia/Perth' },
+      { label: 'ACST', zone: 'Australia/Adelaide' },
+      { label: 'AEST', zone: 'Australia/Sydney' },
+    ]},
+    NZ: { name: 'New Zealand',    timezones: [{ label: 'NZST', zone: 'Pacific/Auckland' }] },
+    BR: { name: 'Brazil', timezones: [
+      { label: 'BRT',  zone: 'America/Sao_Paulo' },
+      { label: 'AMT',  zone: 'America/Manaus' },
+    ]},
+    US: { name: 'United States', timezones: [
+      { label: 'ET', zone: 'America/New_York' },
+      { label: 'CT', zone: 'America/Chicago' },
+      { label: 'MT', zone: 'America/Denver' },
+      { label: 'PT', zone: 'America/Los_Angeles' },
+    ]},
+    CA: { name: 'Canada', timezones: [
+      { label: 'ET', zone: 'America/Toronto' },
+      { label: 'PT', zone: 'America/Vancouver' },
+    ]},
+    MX: { name: 'Mexico',         timezones: [{ label: 'CST', zone: 'America/Mexico_City' }] },
+  };

@@ -178,17 +178,11 @@ const must = (name, value) => {
 app.use('/v2/token', limiter,
     must('accessTokenRoute', require('./routes/newV2/routes/accessTokenRoute')));
 
-app.use('/v2/anime/otaku', limiter,
-    must('requireAccessToken', access.requireAccessToken),
-    must('otakudesuRoute', require('./routes/newV2/routes/otakudesuRoute')));
 
-app.use('/v2/donghua/anichi', limiter,
-    must('requireAccessToken', access.requireAccessToken),
-    must('anichinRoute', require('./routes/newV2/routes/anichinRoute')));
-
-app.use('/v2/WE', limiter,
+app.use('/v2/', limiter, 
      must('requireAccessToken', access.requireAccessToken),
-    must('anichinRoute', require('./routes/newV2/routes/World.route')));
+     must('App', require('./routes/newV2/App')));
+
 // Portfolio
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

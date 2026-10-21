@@ -7,10 +7,8 @@ const BASE_URL = (process.env.ANICHIN_BASE_URL || 'https://anichin.moe').replace
 const WATCH_PATH = process.env.ANICHIN_WATCH_PATH || '/v2/donghua/anichi/watch';
 
 // Total waktu maksimal untuk satu fetchHtml (semua retry digabung).
-// Harus LEBIH KECIL dari maxDuration fungsi Vercel Anda.
-// Default: 9 dtk tanpa scraper, 25 dtk dengan scraper. Override lewat FETCH_BUDGET_MS.
-const FETCH_BUDGET_MS =
-    parseInt(process.env.FETCH_BUDGET_MS, 10) || (process.env.SCRAPER_URL_TEMPLATE ? 25000 : 9000);
+// Harus LEBIH KECIL dari maxDuration fungsi Vercel Anda. Default 9 dtk; override lewat FETCH_BUDGET_MS.
+const FETCH_BUDGET_MS = parseInt(process.env.FETCH_BUDGET_MS, 10) || 9000;
 
 // "https://anichin.moe/slug/" -> "/slug/"
 const pathOf = (u) => {
@@ -54,23 +52,16 @@ const isChallenge = (html) =>
 
 const blocked = (status) => {
     const err = new Error(
-        `Situs target memblokir request${status ? ` (HTTP ${status})` : ''}, kemungkinan proteksi Cloudflare/anti-bot atau IP server diblokir. Di Vercel, set SCRAPER_URL_TEMPLATE untuk memakai layanan scraping.`
+        `Situs target memblokir request${status ? ` (HTTP ${status})` : ''}, kemungkinan proteksi Cloudflare/anti-bot atau IP server diblokir. Coba pastikan ANICHIN_BASE_URL memakai domain yang masih aktif.`
     );
     err.status = 502;
     err.upstreamStatus = status || null;
     return err;
 };
 
-// Ambil HTML dengan retry dan batas waktu total.
-// Opsional lewat layanan scraping: SCRAPER_URL_TEMPLATE=https://api.scraperapi.com/?api_key=KUNCI&url={url}
+// Ambil HTML dengan retry dan batas waktu total (semua percobaan digabung)
 async function fetchHtml(url, retries = 2) {
     const deadline = Date.now() + FETCH_BUDGET_MS;
-    const template = (process.env.SCRAPER_URL_TEMPLATE || '').trim().replace(/^["']|["']$/g, '');
-    if (template && !template.includes('{url}')) {
-        const err = new Error('SCRAPER_URL_TEMPLATE tidak mengandung placeholder {url}.');
-        err.status = 500;
-        throw err;
-    }
     let lastError;
 
     for (let attempt = 0; attempt <= retries; attempt++) {
@@ -78,11 +69,7 @@ async function fetchHtml(url, retries = 2) {
         if (remaining < 1500) break; // sisa waktu terlalu sedikit untuk percobaan lagi
 
         try {
-            const { data } = template
-                ? await axios.get(template.replace('{url}', encodeURIComponent(url)), {
-                      timeout: Math.min(remaining, 60000)
-                  })
-                : await client.get(url, { timeout: Math.min(remaining, 15000) });
+            const { data } = await client.get(url, { timeout: Math.min(remaining, 15000) });
             if (isChallenge(data)) throw blocked(200);
             return data;
         } catch (error) {
@@ -103,7 +90,7 @@ async function fetchHtml(url, retries = 2) {
     if (lastError.status === 502) throw lastError;
     if (status === 403 || status === 503) throw blocked(status);
     if (lastError.code === 'ECONNABORTED' || lastError.code === 'ETIMEDOUT') {
-        const err = new Error('Koneksi ke situs sumber timeout. Kemungkinan IP server diblokir atau scraper terlalu lambat.');
+        const err = new Error('Koneksi ke situs sumber timeout. Kemungkinan IP server diblokir atau situs sumber sedang lambat.');
         err.status = 504;
         throw err;
     }
@@ -175,7 +162,7 @@ function parseCards($, scope) {
             type: $el.find('.typez').first().text().trim(),
             status: $el.find('.sb').first().text().trim(),
             link: abs(link),
-            path: link, // bentuk relatif, bisa langsung dipakai untuk endpoint watch
+            path: pathOf(link), // selalu bentuk relatif, bisa langsung dipakai untuk endpoint watch
             poster: imgSrc($el)
         });
     });
