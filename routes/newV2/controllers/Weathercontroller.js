@@ -1,11 +1,13 @@
 // Controller cuaca realtime berbasis Open-Meteo (gratis, tanpa API key, Node >= 18)
-// - cache hasil cuaca 5 menit dan hasil geocoding 24 jam
+// - cache hasil cuaca 5 menit, prediksi 15 menit, dan hasil geocoding 24 jam
 // - SSE dengan 1 timer per lokasi (bukan per klien), pembaruan 2 menit sekali
+// - prediksi harian (1-16 hari) dan opsional per jam (maks 168 jam)
 
 const GEO_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 
 const WEATHER_CACHE_MS = 5 * 60 * 1000;
+const FORECAST_CACHE_MS = 15 * 60 * 1000;
 const GEO_CACHE_MS = 24 * 60 * 60 * 1000;
 const STREAM_INTERVAL_MS = 120000; // 2 menit
 const HEARTBEAT_MS = 25000;        // jaga koneksi SSE dari proxy
@@ -180,6 +182,136 @@ async function getWeather(loc) {
   return pending;
 }
 
+// ---------------------------------------------------------------------------
+// Prediksi: harian (days) dan opsional per jam (hours), cache + dedup
+// ---------------------------------------------------------------------------
+const forecastCache = new Map();
+
+function parseIntParam(value, name, def, min, max) {
+  if (value === undefined || value === '') return def;
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < min || n > max) {
+    throw new HttpError(400, `${name} harus bilangan bulat antara ${min} dan ${max}`);
+  }
+  return n;
+}
+
+async function loadForecast(loc, days, hours) {
+  const params = new URLSearchParams({
+    latitude: String(loc.latitude),
+    longitude: String(loc.longitude),
+    daily: [
+      'weather_code', 'temperature_2m_max', 'temperature_2m_min',
+      'apparent_temperature_max', 'apparent_temperature_min',
+      'precipitation_sum', 'precipitation_probability_max',
+      'wind_speed_10m_max', 'wind_gusts_10m_max', 'wind_direction_10m_dominant',
+      'uv_index_max', 'sunrise', 'sunset',
+    ].join(','),
+    forecast_days: String(days),
+    timezone: 'auto',
+    wind_speed_unit: 'kmh',
+  });
+  if (hours > 0) {
+    params.set('hourly', [
+      'temperature_2m', 'apparent_temperature', 'relative_humidity_2m',
+      'precipitation_probability', 'precipitation', 'weather_code',
+      'wind_speed_10m', 'wind_direction_10m',
+    ].join(','));
+    params.set('forecast_hours', String(hours));
+  }
+
+  const d = await fetchJson(`${FORECAST_URL}?${params}`);
+  const day = d.daily || {};
+  const du = d.daily_units || {};
+  const times = day.time || [];
+
+  const daily = times.map((date, i) => ({
+    date,
+    weatherCode: day.weather_code[i],
+    condition: WMO[day.weather_code[i]] || 'Tidak diketahui',
+    temperature: { max: day.temperature_2m_max[i], min: day.temperature_2m_min[i], unit: du.temperature_2m_max || '°C' },
+    feelsLike: { max: day.apparent_temperature_max[i], min: day.apparent_temperature_min[i], unit: du.apparent_temperature_max || '°C' },
+    precipitation: {
+      sum: day.precipitation_sum[i],
+      probability: day.precipitation_probability_max[i],
+      unit: du.precipitation_sum || 'mm',
+      probabilityUnit: du.precipitation_probability_max || '%',
+    },
+    wind: {
+      maxSpeed: day.wind_speed_10m_max[i],
+      maxGusts: day.wind_gusts_10m_max[i],
+      dominantDirection: day.wind_direction_10m_dominant[i],
+      compass: degToCompass(day.wind_direction_10m_dominant[i]),
+      unit: du.wind_speed_10m_max || 'km/h',
+    },
+    uvIndexMax: day.uv_index_max[i],
+    sunrise: day.sunrise[i],
+    sunset: day.sunset[i],
+  }));
+
+  let hourly;
+  if (hours > 0 && d.hourly && d.hourly.time) {
+    const h = d.hourly;
+    const hu = d.hourly_units || {};
+    hourly = h.time.map((time, i) => ({
+      time,
+      weatherCode: h.weather_code[i],
+      condition: WMO[h.weather_code[i]] || 'Tidak diketahui',
+      temperature: { value: h.temperature_2m[i], feelsLike: h.apparent_temperature[i], unit: hu.temperature_2m || '°C' },
+      humidity: { value: h.relative_humidity_2m[i], unit: hu.relative_humidity_2m || '%' },
+      precipitation: {
+        value: h.precipitation[i],
+        probability: h.precipitation_probability[i],
+        unit: hu.precipitation || 'mm',
+        probabilityUnit: hu.precipitation_probability || '%',
+      },
+      wind: {
+        speed: h.wind_speed_10m[i],
+        direction: h.wind_direction_10m[i],
+        compass: degToCompass(h.wind_direction_10m[i]),
+        unit: hu.wind_speed_10m || 'km/h',
+      },
+    }));
+  }
+
+  return {
+    location: {
+      name: loc.name,
+      region: loc.region,
+      country: loc.country,
+      latitude: d.latitude,
+      longitude: d.longitude,
+      elevation: d.elevation,
+      timezone: d.timezone,
+      utcOffsetSeconds: d.utc_offset_seconds,
+    },
+    days,
+    daily,
+    ...(hourly ? { hours, hourly } : {}),
+    source: 'Open-Meteo',
+    fetchedAt: new Date().toISOString(),
+  };
+}
+
+async function getForecast(loc, days, hours) {
+  const key = `f:${locKey(loc)}:${days}:${hours}`;
+
+  const hit = forecastCache.get(key);
+  if (hit && hit.exp > Date.now()) return hit.value;
+
+  let pending = inflight.get(key);
+  if (!pending) {
+    pending = loadForecast(loc, days, hours)
+      .then((value) => {
+        setCache(forecastCache, key, { value, exp: Date.now() + FORECAST_CACHE_MS });
+        return value;
+      })
+      .finally(() => inflight.delete(key));
+    inflight.set(key, pending);
+  }
+  return pending;
+}
+
 function sendError(res, err) {
   const status = err.status || 500;
   const message = err.status ? err.message : 'Terjadi kesalahan di server';
@@ -193,6 +325,23 @@ async function current(req, res) {
   try {
     const loc = await resolveLocation(req.query);
     const data = await getWeather(loc);
+    res.json({ success: true, data });
+  } catch (err) {
+    sendError(res, err);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GET /v2/weather/forecast?city=Jakarta&days=7&hours=24
+//   days  : 1-16 (default 7), prediksi harian
+//   hours : 0-168 (default 0), prediksi per jam mulai dari jam sekarang
+// ---------------------------------------------------------------------------
+async function forecast(req, res) {
+  try {
+    const days = parseIntParam(req.query.days, 'days', 7, 1, 16);
+    const hours = parseIntParam(req.query.hours, 'hours', 0, 0, 168);
+    const loc = await resolveLocation(req.query);
+    const data = await getForecast(loc, days, hours);
     res.json({ success: true, data });
   } catch (err) {
     sendError(res, err);
@@ -271,4 +420,4 @@ async function stream(req, res) {
   }
 }
 
-module.exports = { current, stream };
+module.exports = { current, forecast, stream };

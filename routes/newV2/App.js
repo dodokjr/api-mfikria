@@ -46,6 +46,47 @@ app.get('/time', (req, res) => {
                 'GET /time/api/country/ID/WIB/stream     (real time 1 zona)',
             ],
         },
+        params: {
+            lang: 'Kode bahasa untuk semua endpoint, contoh: id, en, ja (default: id)',
+            world: {
+                'all?region': 'Filter region, tidak peka huruf besar/kecil. Contoh: Asia, Europe (lihat /time/api/world/regions)',
+                'all?search': 'Cari nama zona, contoh: jak, new york (spasi dibaca sebagai _)',
+                'all?page': 'Nomor halaman, default 1',
+                'all?limit': 'Data per halaman, default 10, maksimal 100',
+                'region/:region': 'Nama region di path, contoh: /region/Asia',
+                'zone?tz': 'Nama zona IANA, wajib, contoh: Asia/Jakarta',
+                'stream': 'Prioritas parameter: tz, lalu region, lalu all=true. Tanpa parameter = kota utama',
+            },
+            country: {
+                ':code': 'Kode negara ISO, tidak peka huruf besar/kecil. Contoh: ID, US, JP',
+                ':zone': 'Label zona di dalam negara tersebut, tidak peka huruf besar/kecil. Contoh: WIB, WITA, WIT (ID) atau ET, PT (US)',
+            },
+        },
+        response: {
+            success: '{ "success": true, ... }',
+            error: '{ "success": false, "message": "..." }',
+            list: {
+                '/world': '{ success, utc, data: [{ city, ...info waktu }] }',
+                '/world/all': '{ success, utc, total, page, limit, totalPages, hasNext, hasPrev, data: [{ region, city, ...info waktu }] }',
+                '/world/region/:region': '{ success, region, total, data: [{ region, city, ...info waktu }] }',
+                '/world/zone': '{ success, data: { ...info waktu } }',
+                '/country': '{ success, total, data: [{ code, name, timezones }] }',
+                '/country/:code': '{ success, data: { code, country, zones: [{ label, ...info waktu }] } }',
+                '/country/:code/:zone': '{ success, data: { code, country, label, ...info waktu } }',
+            },
+            stream: 'Server-Sent Events (text/event-stream). Gunakan EventSource, mis. new EventSource(url); es.onmessage = (e) => JSON.parse(e.data)',
+        },
+        errors: {
+            400: [
+                'Timezone tidak valid (zone?tz atau stream?tz)',
+                'Region tidak valid (all?region atau stream?region)',
+            ],
+            404: [
+                'Region tidak ditemukan (world/region/:region)',
+                'Negara tidak ditemukan, gunakan kode ISO, contoh: ID, US, JP',
+                "Zona tidak ada di negara tersebut (pesan error menyebutkan pilihan zona yang tersedia)",
+            ],
+        },
     });
 });
 
