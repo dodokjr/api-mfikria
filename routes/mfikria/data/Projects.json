@@ -79,7 +79,7 @@
     },
     "gambar": [
       "https://api-mfikria.vercel.app/public/assets/project/S3com.png",
-      "https://api-mfikria.vercel.app/public/assets/project/S3com-2.png"
+      "https://api-mfikria.vercel.app/public/assets/project/S3com_2.png"
     ]
   },
   {
@@ -115,12 +115,12 @@
       "Express.js"
     ],
     "tautan": {
-      "github": "https://github.com/dodokjr/S3-Frontend",
+      "github": "https://github.com/dodokjr/mfikriaPorto",
       "demo": "https://mfikria.vercel.app/"
     },
     "gambar": [
-      "https://api-mfikria.vercel.app/public/assets/project/App_page_2.png",
-      "https://api-mfikria.vercel.app/public/assets/project/App_page.png"
+      "https://api-mfikria.vercel.app/public/assets/project/mf_pc.png",
+      "https://api-mfikria.vercel.app/public/assets/project/mf_mobile.png"
     ]
   }
 ]
