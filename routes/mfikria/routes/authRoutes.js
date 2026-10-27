@@ -6,6 +6,7 @@ const express = require('express');
 const auth = require('../controllers/authController');
 const video = require('../controllers/Videocontroller');
 const share = require('../controllers/Sharecontroller');
+const guestScope = require('../controllers/Guesttokenparamscontroller'); // guest token per scope (spreadsheet sendiri)
 
 const router = express.Router();
 
@@ -18,9 +19,10 @@ router.get('/photoProfile/:token', auth.getProfilePhoto);
 router.get('/assets/photo/:photoId', auth.getProfilePhoto);        // dipakai front end: ?q={token}
 router.get('/assets/session-photo/:photoId', auth.getPhotoAsset);  // validasi sesi: ?query={encryptedQueryToken}
 
-// guest token (berlaku 24 jam). Dua route ini TIDAK boleh di belakang pengecekan guest token.
-router.post('/guest-token', video.issueGuestToken);
-router.get('/guest-token/status', video.guestTokenStatus); // frontend cek token dari sessionStorage masih berlaku atau tidak
+// guest token (berlaku 24 jam). Route guest-token TIDAK boleh di belakang pengecekan guest token.
+router.post('/guest-token', video.issueGuestToken);                                  // tab GuestTokens (asli)
+router.get('/guest-token/status', video.guestTokenStatus);                           // frontend cek token dari sessionStorage masih berlaku atau tidak
+router.post('/guest-token/:scope', guestScope.rateLimit, guestScope.createToken);    // params: /guest-token/app, /guest-token/project -> tab GuestTokens_Params
 
 // video (akses lewat guest token)
 router.get('/guest-view', video.getGuestView);
