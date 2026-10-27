@@ -1,87 +1,126 @@
 [
-    {
-      "id": "1",
-      "slug": "dodok-store",
-      "title": "Dodok Store",
-      "img_url": "https://api-mfikria.vercel.app/public/assets/project/DodokStore.webp",
-      "descriptions": "Store Project with Html Css Javascript",
-      "url_github": "https://github.com/dodokjr/dodok-store",
-      "url_demo": "https://dodokvapestore.netlify.app/",
-      "code": {
-        "name_html": "html",
-        "skillHtml": 20,
-        "name_css": "css",
-        "skillCss": 20,
-        "name_js": "Javascript",
-        "skillJs": 10
-      }
+  {
+    "id": "1",
+    "slug": "dodok-store",
+    "title": "Dodok Store",
+    "kategori": "Web Application",
+    "deskripsi": "Website toko online sederhana untuk toko vape yang dibangun dengan HTML, CSS, dan JavaScript murni tanpa framework.",
+    "teknologi": [
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/dodok-store",
+      "demo": "https://dodokvapestore.netlify.app/"
     },
-    {
-      "id": "2",
-      "slug": "token-and-password-random",
-      "title": "Token And Password Random",
-      "img_url": "https://api-mfikria.vercel.app/public/assets/project/gabut.webp",
-      "descriptions": "Project with Html Css Javascript",
-      "url_github": "https://github.com/dodokjr/gabut-1",
-      "url_demo": "https://gabut-1.vercel.app/",
-      "code": {
-        "name_html": "html",
-        "skillHtml": 20,
-        "name_css": "css",
-        "skillCss": 20,
-        "name_js": "Javascript",
-        "skillJs": 10
-      }
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/DodokStore.webp",
+      "https://api-mfikria.vercel.app/public/assets/project/DodokStore.webp"
+    ]
+  },
+  {
+    "id": "2",
+    "slug": "anime-list",
+    "title": "Anime List",
+    "kategori": "Fullstack Web App",
+    "deskripsi": "Aplikasi daftar anime dengan frontend React dan backend Express yang mengambil data dari Jikan API.",
+    "teknologi": [
+      "React",
+      "Express.js",
+      "Jikan API",
+      "JavaScript"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/animeList",
+      "demo": "https://mfanimelist.vercel.app/"
     },
-    {
-      "id": "3",
-      "slug": "anime-list",
-      "title": "Anime List",
-      "img_url": "https://api-mfikria.vercel.app/public/assets/project/mfanimelist.webp",
-      "descriptions": "Project with frontend Reactjs and backend Expressjs api with jikan anime",
-      "url_github": "https://github.com/dodokjr/animeList",
-      "url_demo": "https://mfanimelist.vercel.app/",
-      "code": {
-        "name_html": "html",
-        "skillHtml": 20,
-        "name_css": "css",
-        "skillCss": 20,
-        "name_js": "Javascript",
-        "skillJs": 10
-      }
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/mfanimelist.webp",
+      "https://api-mfikria.vercel.app/public/assets/project/mfanimelistwebp"
+    ]
+  },
+  {
+    "id": "3",
+    "slug": "api-mfikria",
+    "title": "Official API By Me",
+    "kategori": "REST API / Backend",
+    "deskripsi": "API pribadi berbasis Express.js yang di-deploy di Vercel dan menyajikan aset gambar proyek untuk portofolio ini.",
+    "teknologi": [
+      "Node.js",
+      "Express.js",
+      "JavaScript"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/api-mfikria",
+      "demo": "https://api-mfikria.vercel.app/"
     },
-    {
-      "id": "4",
-      "slug": "api-mfikria",
-      "title": "official Api By me",
-      "img_url": "https://api-mfikria.vercel.app/public/assets/project/api.webp",
-      "descriptions": "Project with Backend Express js",
-      "url_github": "https://github.com/dodokjr/api-mfikria",
-      "url_demo": "https://api-mfikria.vercel.app/",
-      "code": {
-        "name_html": "html",
-        "skillHtml": 20,
-        "name_css": "css",
-        "skillCss": 20,
-        "name_js": "Javascript",
-        "skillJs": 10
-      }
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/api.webp",
+      "https://api-mfikria.vercel.app/public/assets/project/api_docs.webp",
+      "https://api-mfikria.vercel.app/public/assets/project/api_tool.webp"
+    ]
+  },
+  {
+    "id": "4",
+    "slug": "S3Com",
+    "title": "Company Profile S3",
+    "kategori": "Fullstack Web App",
+    "deskripsi": "Website company profile S3 dengan frontend Vite + React TypeScript dan backend Express.js.",
+    "teknologi": [
+      "Vite",
+      "React",
+      "TypeScript",
+      "Express.js"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/S3-Frontend",
+      "demo": "https://s3com.vercel.app/"
     },
-    {
-      "id": "5",
-      "slug": "S3Com",
-      "title": "Company Profile S3",
-      "img_url": "https://api-mfikria.vercel.app/public/assets/project/S3com.png",
-      "descriptions": "Project Company Profile FrontEnd and Backend With Vite ReactTS For FrontEnd and Backend ExpressJs",
-      "url_github": "https://github.com/dodokjr/S3-Frontend",
-      "url_demo": "https://s3com.vercel.app/",
-      "code": {
-        "name_html": "html",
-        "skillHtml": 40,
-        "name_css": "css",
-        "skillCss": 40,
-        "name_js": "Javascript",
-        "skillJs": 45
-      }
-    }
-  ]
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/S3com.png",
+      "https://api-mfikria.vercel.app/public/assets/project/S3com-2.png"
+    ]
+  },
+  {
+    "id": "5",
+    "slug": "App_Cuaca_dan_waktu_dunia",
+    "title": "App Cuaca dan Waktu Dunia",
+    "kategori": "Mobile App",
+    "deskripsi": "Aplikasi mobile untuk melihat cuaca dan waktu di berbagai kota di dunia dengan React Native dan Express.js.",
+    "teknologi": [
+      "React Native",
+      "TypeScript",
+      "Express.js"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/Apk-learning",
+      "demo": null
+    },
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/App_page_2.png",
+      "https://api-mfikria.vercel.app/public/assets/project/App_page.png"
+    ]
+  },
+  {
+    "id": "6",
+    "slug": "Portofolio",
+    "title": "Mfikria Web App",
+    "kategori": "Portfolio Web App",
+    "deskripsi": "Aplikasi website portofolio pribadi untuk menampilkan daftar proyek dan keahlian.",
+    "teknologi": [
+      "Vite",
+      "React",
+      "TypeScript",
+      "Express.js"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/S3-Frontend",
+      "demo": "https://mfikria.vercel.app/"
+    },
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/App_page_2.png",
+      "https://api-mfikria.vercel.app/public/assets/project/App_page.png"
+    ]
+  }
+]
