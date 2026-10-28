@@ -1,7 +1,3 @@
-// routes/mfikria/routes/authRoutes.js
-// Di-mount di app.js: app.use('/mfikria/v1', authRoutes)
-// Route GitHub TIDAK ada di sini: sudah dilayani Githubroutes di app.use('/v2/github', ...)
-
 const express = require('express');
 const auth = require('../controllers/authController');
 const video = require('../controllers/Videocontroller');
@@ -22,7 +18,7 @@ router.get('/assets/session-photo/:photoId', auth.getPhotoAsset);  // validasi s
 // guest token (berlaku 24 jam). Route guest-token TIDAK boleh di belakang pengecekan guest token.
 router.post('/guest-token', video.issueGuestToken);                                  // tab GuestTokens (asli)
 router.get('/guest-token/status', video.guestTokenStatus);                           // frontend cek token dari sessionStorage masih berlaku atau tidak
-router.post('/guest-token/:scope', guestScope.rateLimit, guestScope.createToken);    // params: /guest-token/app, /guest-token/project -> tab GuestTokens_Params
+router.post('/guest-token/p/:scope', guestScope.rateLimit, guestScope.trackVisit);      // catat halaman yang dibuka guest (token & userId sama) -> tab GuestTokens_Params
 
 // video (akses lewat guest token)
 router.get('/guest-view', video.getGuestView);
