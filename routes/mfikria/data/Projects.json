@@ -5,6 +5,7 @@
     "title": "Dodok Store",
     "kategori": "Web Application",
     "deskripsi": "Website toko online sederhana untuk toko vape yang dibangun dengan HTML, CSS, dan JavaScript murni tanpa framework.",
+    "markdown_path": "testing",
     "teknologi": [
       "HTML",
       "CSS",
@@ -25,6 +26,7 @@
     "title": "Anime List",
     "kategori": "Fullstack Web App",
     "deskripsi": "Aplikasi daftar anime dengan frontend React dan backend Express yang mengambil data dari Jikan API.",
+    "markdown_path": "testing",
     "teknologi": [
       "React",
       "Express.js",
@@ -46,6 +48,7 @@
     "title": "Official API By Me",
     "kategori": "REST API / Backend",
     "deskripsi": "API pribadi berbasis Express.js yang di-deploy di Vercel dan menyajikan aset gambar proyek untuk portofolio ini.",
+    "markdown_path": "testing",
     "teknologi": [
       "Node.js",
       "Express.js",
@@ -67,6 +70,7 @@
     "title": "Company Profile S3",
     "kategori": "Fullstack Web App",
     "deskripsi": "Website company profile S3 dengan frontend Vite + React TypeScript dan backend Express.js.",
+    "markdown_path": "testing",
     "teknologi": [
       "Vite",
       "React",
@@ -88,6 +92,7 @@
     "title": "App Cuaca dan Waktu Dunia",
     "kategori": "Mobile App",
     "deskripsi": "Aplikasi mobile untuk melihat cuaca dan waktu di berbagai kota di dunia dengan React Native dan Express.js.",
+    "markdown_path": "testing",
     "teknologi": [
       "React Native",
       "TypeScript",
@@ -108,6 +113,7 @@
     "title": "Mfikria Web App",
     "kategori": "Portfolio Web App",
     "deskripsi": "Aplikasi website portofolio pribadi untuk menampilkan daftar proyek dan keahlian.",
+    "markdown_path": "testing",
     "teknologi": [
       "Vite",
       "React",
@@ -121,6 +127,80 @@
     "gambar": [
       "https://api-mfikria.vercel.app/public/assets/project/mf_pc.png",
       "https://api-mfikria.vercel.app/public/assets/project/mf_mobile.png"
+    ]
+  },
+  {
+    "id": "7",
+    "slug": "AI GateAway",
+    "title": "AI Gateway (Golang) — Claude + GPT + Gemini + lainnya, teks saja",
+    "kategori": "Artificial Intelligence",
+    "deskripsi": "Satu API untuk banyak AI. Kalau token/kuota satu key atau provider habis (429/402), gateway otomatis pindah ke key/provider berikutnya. Bisa (dilatih) lewat basis pengetahuan. Hanya teks: gambar/video/audio ditolak (HTTP 400). Inti gateway tanpa dependensi eksternal (hanya standard library Go); hanya fungsi Netlify yang memaka",
+    "markdown_path": "testing",
+    "teknologi": [
+      "Golang ",
+      "Html"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/AI-Gateway",
+      "demo": null
+    },
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/Developer.jpg"
+    ]
+  },
+  {
+    "id": "8",
+    "slug": "BirdChat",
+    "title": "BirdChat — React + Tailwind starter",
+    "kategori": "Web App",
+    "deskripsi": "Bird Apps Adalah aplikasi buat sosial dan hiburan di tengah tengah konfik dunia yang tidak beraturan",
+    "teknologi": [
+      "React",
+      "JavaScript",
+      "Express.js"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/BirdApps",
+      "demo": null
+    },
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/Developer.jpg"
+    ]
+  },
+  {
+    "id": "9",
+    "slug": "mfikria Status Dashboard",
+    "title": "mfikria Status Dashboard",
+    "kategori": "Web App",
+    "deskripsi": "Dashboard admin (Next.js 15 + TypeScript + Tailwind CSS 4) untuk memantau status server mfikriaApp dan project Vercel/Netlify. Registrasi lewat GitHub, akun dan password (hash bcrypt) disimpan di Google Spreadsheet.",
+    "teknologi": [
+      "React/Next 15",
+      "TypeScript"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/Mfikria-Status",
+      "demo": null
+    },
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/Developer.jpg"
+    ]
+  },
+  {
+    "id": "10",
+    "slug": "Galaxy Kasir",
+    "title": "Galaxy Kasir (Next.js + TypeScript + Tailwind + Google Sheets)",
+    "kategori": "Web App",
+    "deskripsi": "Berdasarkan dokumentasi yang Anda berikan, App-Kasir (Kasir Toko) adalah aplikasi Point of Sale (POS) / Kasir Berbasis Web (Fullstack) yang dibangun menggunakan ekosistem JavaScript modern dengan Google Sheets sebagai basis data (database).Aplikasi ini dirancang khusus untuk memenuhi kebutuhan operasional toko kecil hingga menengah dengan dukungan multi-role, multi-cabang, serta penyesuaian untuk berbagai jenis usaha (F&B, Sembako, Retail).",
+    "teknologi": [
+      "React/Next 16",
+      "TypeScript"
+    ],
+    "tautan": {
+      "github": "https://github.com/dodokjr/App-Kasir",
+      "demo": null
+    },
+    "gambar": [
+      "https://api-mfikria.vercel.app/public/assets/project/Developer.jpg"
     ]
   }
 ]

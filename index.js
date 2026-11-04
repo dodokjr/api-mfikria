@@ -81,7 +81,7 @@ const COOKIE_OPTIONS = {
 // Origin = scheme + host (+ port) only. NO trailing slash, NO path.
 const allowedOrigins = [
      'https://mfikria.vercel.app',
-     'https://5173-firebase-api-mfikria-1781747502400.cluster-ikxjzjhlifcwuroomfkjrx437g.cloudworkstations.dev',
+     'https://5173-firebase-api-mfikria-1781747502400.cluster-ikxjzjhlifcwuroomfkjrx437g.cloudworkstations.dev/',
      process.env.FRONTEND_ORIGIN,
 ].filter(Boolean);
 

@@ -189,6 +189,7 @@ router.get("/home", (req, res) =>
             ...profile,
             project: projects,
             blog: blogPosts.map(toHomeBlog),
+            daily_dev: "daily_dev",
             media_sosial: mediaSosial,
         },
     });
